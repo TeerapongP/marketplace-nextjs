@@ -1,0 +1,105 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+
+model User {
+  ID           Int    @id @default(autoincrement())
+  Username     String @unique
+  PasswordHash String
+  FirstName    String
+  LastName     String
+  RoleID       Int
+  Email        String @unique
+  PhoneNumber  String
+  Address      String
+  ProfileImage String
+}
+
+model Order {
+  ID               Int      @id @default(autoincrement())
+  CustomerId       Int
+  StoreId          Int
+  OrderDate        DateTime
+  Status           Boolean
+  TotalAmount      BigInt
+  PaymentMethod    String
+  ShippingAddress  String
+  TrackingNumber   String
+}
+
+model Store {
+  ID               Int      @id @default(autoincrement())
+  StoreName        String
+  Status           Boolean
+  OwnerID          String
+  StoreImage       String
+  DetailStore      String
+}
+
+model StallReservation{
+  ID          Int    @id @default(autoincrement())
+  StallID   Int    
+  UserID   Int
+  ReservationDate DateTime
+  Status Boolean
+}
+
+model SaleStall{
+  ID          Int    @id @default(autoincrement())
+  Location    String
+  Status Boolean
+  PricePerDay BigInt
+}
+
+model Role {
+  ID          Int    @id @default(autoincrement())
+  RoleName    String
+  Description String
+}
+
+model RoleMenu {
+  ID          Int    @id @default(autoincrement())
+  MenuID    String
+  CanAccess Boolean
+}
+
+model Menu {
+  ID          Int    @id @default(autoincrement())
+  MenuName    String
+  ParentMenu  String
+  URL         String
+}
+
+model Cart {
+  ID    Int         @id @default(autoincrement())
+  UserID    Int
+  CreatedDate DateTime
+  UpdatedDate DateTime
+}
+
+model CartItem {
+  ID Int     @id @default(autoincrement())
+  CartID Int
+  ProductID Int
+  Quantity Int
+  UserID    Int
+}
+
+model Product {
+  ID  Int @id @default(autoincrement())
+  ProductName String
+  Price BigInt
+  Description String
+  StoreID Int
+  ProductImage String
+}
+
+
+
