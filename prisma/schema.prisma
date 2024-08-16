@@ -15,17 +15,17 @@ model User {
   PasswordHash String
   FirstName    String
   LastName     String
-  RoleID       Int
   Email        String @unique
   PhoneNumber  String
   Address      String
   ProfileImage String
+  Role       Role?
 }
 
 model Order {
   ID               Int      @id @default(autoincrement())
   CustomerId       Int
-  StoreId          Int
+  StoreId          Int      @unique
   OrderDate        DateTime
   Status           Boolean
   TotalAmount      BigInt
@@ -38,7 +38,7 @@ model Store {
   ID               Int      @id @default(autoincrement())
   StoreName        String
   Status           Boolean
-  OwnerID          String
+  OwnerID          String  @unique
   StoreImage       String
   DetailStore      String
 }
@@ -46,7 +46,7 @@ model Store {
 model StallReservation{
   ID          Int    @id @default(autoincrement())
   StallID   Int    
-  UserID   Int
+  UserID   Int   @unique
   ReservationDate DateTime
   Status Boolean
 }
@@ -62,11 +62,13 @@ model Role {
   ID          Int    @id @default(autoincrement())
   RoleName    String
   Description String
+  UserID      Int @unique
+  User      User? @relation(fields: [UserID],references: [ID])
 }
 
 model RoleMenu {
   ID          Int    @id @default(autoincrement())
-  MenuID    String
+  MenuID    String   @unique
   CanAccess Boolean
 }
 
@@ -79,17 +81,17 @@ model Menu {
 
 model Cart {
   ID    Int         @id @default(autoincrement())
-  UserID    Int
+  UserID    Int      @unique
   CreatedDate DateTime
   UpdatedDate DateTime
 }
 
 model CartItem {
   ID Int     @id @default(autoincrement())
-  CartID Int
-  ProductID Int
+  CartID Int   @unique
+  ProductID Int  @unique
   Quantity Int
-  UserID    Int
+  UserID    Int   @unique
 }
 
 model Product {
@@ -97,7 +99,7 @@ model Product {
   ProductName String
   Price BigInt
   Description String
-  StoreID Int
+  StoreID Int        @unique
   ProductImage String
 }
 
