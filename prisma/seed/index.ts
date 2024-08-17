@@ -7,6 +7,8 @@ import { seedOrders } from "./order-seed";
 import { seedSaleStalls } from "./sale-stall-seed";
 import { seedStallReservations } from "./stall-reservation-seed";
 import { seedMenus } from "./menu-seed";
+import {seedRoles} from "./role-seed";
+import {seedCartItems }from "./cart-item-seed";
 
 // Initialize Prisma Client
 const prisma = new PrismaClient();
@@ -23,6 +25,8 @@ async function main() {
   await seedSaleStalls(prisma);
   await seedStallReservations(prisma);
   await seedMenus(prisma);
+  await seedRoles(prisma);
+  await seedCartItems(prisma);
 
   console.log("Seeding completed successfully!");
 }
