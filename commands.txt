@@ -1,0 +1,5 @@
+npx prisma migrate dev --name (ชื่อ Migrate)
+
+npx prisma migrate deploy
+
+npx prisma studio
