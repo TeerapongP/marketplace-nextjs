@@ -10,98 +10,156 @@ generator client {
 // prisma/schema.prisma
 
 model User {
-  ID           Int    @id @default(autoincrement())
-  Username     String @unique
+  ID           Int      @id @default(autoincrement())
+  Username     String   @unique
   PasswordHash String
   FirstName    String
   LastName     String
-  Email        String @unique
+  Email        String   @unique
   PhoneNumber  String
   Address      String
   ProfileImage String
-  Role       Role?
+
+  roles        Role[]      @relation("UserRoles")   // One-to-many relationship with Role
+  carts        Cart[]      @relation("UserCarts")   // One-to-many relationship with Cart
+  cartItems    CartItem[]  @relation("UserCartItems") // One-to-many relationship with CartItem
+  stores       Store[]     @relation("UserStores")  // One-to-many relationship with Store
+  orders       Order[]     @relation("UserOrders")  // One-to-many relationship with Order
 }
+
 
 model Order {
   ID               Int      @id @default(autoincrement())
   CustomerId       Int
-  StoreId          Int      @unique
+  StoreId          Int
   OrderDate        DateTime
   Status           Boolean
   TotalAmount      BigInt
   PaymentMethod    String
   ShippingAddress  String
   TrackingNumber   String
+
+  customer         User     @relation("UserOrders", fields: [CustomerId], references: [ID], onUpdate: NoAction, onDelete: NoAction)
+  store            Store    @relation("StoreOrders", fields: [StoreId], references: [ID])
+  
+  @@index([CustomerId])
+  @@index([StoreId])
 }
 
 model Store {
-  ID               Int      @id @default(autoincrement())
+  ID               Int              @id @default(autoincrement())
   StoreName        String
   Status           Boolean
-  OwnerID          String  @unique
+  OwnerID          Int              // Foreign key to User model
   StoreImage       String
   DetailStore      String
+
+  owner            User             @relation("UserStores", fields: [OwnerID], references: [ID])
+  orders           Order[]          @relation("StoreOrders") // One-to-many relationship with Order
+  stallReservation StallReservation? @relation("StoreStallReservation") // One-to-one relationship with StallReservation
 }
 
-model StallReservation{
-  ID          Int    @id @default(autoincrement())
-  StallID   Int    
-  UserID   Int   @unique
-  ReservationDate DateTime
-  Status Boolean
+model StallReservation {
+  ID               Int      @id @default(autoincrement())
+  StoreID          Int      @unique // Foreign key to Store model
+  UserID           Int      @unique
+  ReservationDate  DateTime
+  Status           Boolean
+  SaleStallID      Int      @unique // Ensure this is unique for one-to-one relationship
+
+  store            Store    @relation("StoreStallReservation", fields: [StoreID], references: [ID])
+  saleStall        SaleStall @relation("StallReservationSaleStall", fields: [SaleStallID], references: [ID])
+  
+  @@index([StoreID])
+  @@index([SaleStallID])
 }
 
-model SaleStall{
-  ID          Int    @id @default(autoincrement())
+model SaleStall {
+  ID          Int           @id @default(autoincrement())
   Location    String
-  Status Boolean
+  Status      Boolean
   PricePerDay BigInt
+
+  stallReservation StallReservation? @relation("StallReservationSaleStall") // One-to-one relationship with StallReservation
+  
+  @@index([ID])
 }
 
 model Role {
-  ID          Int    @id @default(autoincrement())
+  ID          Int        @id @default(autoincrement())
   RoleName    String
   Description String
-  UserID      Int @unique
-  User      User? @relation(fields: [UserID],references: [ID])
+  UserID      Int        @unique
+
+  user        User       @relation("UserRoles", fields: [UserID], references: [ID])
+  roleMenus   RoleMenu[] @relation("RoleRoleMenus") // One-to-many relationship with RoleMenu
+
+  @@index([UserID])
 }
 
 model RoleMenu {
   ID          Int    @id @default(autoincrement())
-  MenuID    String   @unique
-  CanAccess Boolean
+  MenuID      Int
+  CanAccess   Boolean
+  RoleID      Int
+
+  role        Role   @relation("RoleRoleMenus", fields: [RoleID], references: [ID])
+  menu        Menu   @relation("MenuRoleMenus", fields: [MenuID], references: [ID])
+
+  @@index([RoleID])
+  @@index([MenuID])
 }
 
 model Menu {
-  ID          Int    @id @default(autoincrement())
+  ID          Int        @id @default(autoincrement())
   MenuName    String
   ParentMenu  String
   URL         String
+
+  roleMenus   RoleMenu[] @relation("MenuRoleMenus") // One-to-many relationship with RoleMenu
 }
 
+
 model Cart {
-  ID    Int         @id @default(autoincrement())
-  UserID    Int      @unique
+  ID          Int        @id @default(autoincrement())
+  UserID      Int
   CreatedDate DateTime
   UpdatedDate DateTime
+
+  user        User       @relation("UserCarts", fields: [UserID], references: [ID])
+  cartItems   CartItem[] @relation("CartCartItems") // One-to-many relationship with CartItem
+
+  @@index([UserID])
 }
 
 model CartItem {
-  ID Int     @id @default(autoincrement())
-  CartID Int   @unique
-  ProductID Int  @unique
-  Quantity Int
-  UserID    Int   @unique
+  ID        Int    @id @default(autoincrement())
+  CartID    Int
+  ProductID Int
+  Quantity  Int
+  UserID    Int
+
+  cart      Cart     @relation("CartCartItems", fields: [CartID], references: [ID], onUpdate: NoAction, onDelete: NoAction)
+  product   Product  @relation("ProductCartItems", fields: [ProductID], references: [ID], onUpdate: Cascade, onDelete: Cascade)
+  user      User     @relation("UserCartItems", fields: [UserID], references: [ID], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([CartID])
+  @@index([ProductID])
+  @@index([UserID])
 }
 
+
 model Product {
-  ID  Int @id @default(autoincrement())
-  ProductName String
-  Price BigInt
-  Description String
-  StoreID Int        @unique
+  ID           Int        @id @default(autoincrement())
+  ProductName  String
+  Price        BigInt
+  Description  String
+  StoreID      Int        @unique
   ProductImage String
+
+  cartItems    CartItem[] @relation("ProductCartItems") // One-to-many relationship with CartItem
 }
+
 
 
 
