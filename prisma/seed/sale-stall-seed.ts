@@ -1,44 +1,48 @@
-import { PrismaClient } from '@prisma/client';
 
-// Initialize Prisma Client
+import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
 
-export async function seedSaleStalls(prisma: PrismaClient) {
-  // Define the sale stalls to be seeded
-  const saleStalls = [
-    {
-      Location: 'A1',
-      Status: true,
-      PricePerDay: 1000,
-    },
-    {
-      Location: 'B2',
-      Status: false,
-      PricePerDay: 1500,
-    },
-    {
-      Location: 'C3',
-      Status: true,
-      PricePerDay: 2000,
-    },
-  ];
+const seedSaleStalls = async (prisma: PrismaClient) => {
+  console.log("Seeding seedRoleMenus data...");
 
-  // Insert the sale stalls into the database
-  for (const stall of saleStalls) {
-    await prisma.saleStall.create({
-      data: stall, // Directly pass the data object
+  try {
+    await prisma.saleStall.createMany({
+      data: [
+        {
+          Location: 'A1',
+          Status: true,
+          PricePerDay: 1000,
+        },
+        {
+          Location: 'B2',
+          Status: false,
+          PricePerDay: 1500,
+        },
+        {
+          Location: 'C3',
+          Status: true,
+          PricePerDay: 2000,
+        },
+      ],
     });
-  }
 
-  console.log('SaleStalls seeded successfully');
-}
-
-// Run the seed function
-seedSaleStalls(prisma)
-  .catch((e) => {
-    console.error('Error during seeding:', e);
+    console.log("data seeded successfully!");
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      console.error("Unique constraint violation occurred during seeding.");
+    } else if (error.code === "P2003") {
+      console.error(
+        "Foreign key constraint violation occurred during seeding."
+      );
+    } else {
+      console.error("Error during seeding:", error);
+    }
     process.exit(1);
-  })
-  .finally(async () => {
+  } finally {
     await prisma.$disconnect();
-  });
+  }
+};
+
+export default seedSaleStalls;
+

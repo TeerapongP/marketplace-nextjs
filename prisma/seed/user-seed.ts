@@ -1,46 +1,53 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const checkUsers = async (prisma: PrismaClient) => {
+  const users = await prisma.user.findMany();
+  console.log("Existing users:", users);
+};
 
 const seedUsers = async (prisma: PrismaClient) => {
-  console.log('Seeding user data...');
+  console.log("Seeding user data...");
 
   try {
     await prisma.user.createMany({
       data: [
         {
-          Username: 'john_doe',
-          PasswordHash: 'hashed_password_123',
-          FirstName: 'John',
-          LastName: 'Doe',
-          Email: 'john.doe@example.com',
-          PhoneNumber: '555-1234',
-          Address: '123 Main St, Anytown, USA',
-          ProfileImage: 'http://example.com/profile/john_doe.jpg',
+          Username: 'user1',
+          PasswordHash: 'hashedpassword1',
+          FirstName: 'First1',
+          LastName: 'Last1',
+          Email: 'user1@example.com',
+          PhoneNumber: '1234567890',
+          Address: 'Address 1',
+          ProfileImage: 'profile1.jpg'
         },
         {
-          Username: 'jane_smith',
-          PasswordHash: 'hashed_password_456',
-          FirstName: 'Jane',
-          LastName: 'Smith',
-          Email: 'jane.smith@example.com',
-          PhoneNumber: '555-5678',
-          Address: '456 Elm St, Anytown, USA',
-          ProfileImage: 'http://example.com/profile/jane_smith.jpg',
+          Username: 'user2',
+          PasswordHash: 'hashedpassword2',
+          FirstName: 'First2',
+          LastName: 'Last2',
+          Email: 'user2@example.com',
+          PhoneNumber: '1234567891',
+          Address: 'Address 2',
+          ProfileImage: 'profile2.jpg'
         },
-      ],
+        {
+          Username: 'user3',
+          PasswordHash: 'hashedpassword3',
+          FirstName: 'First3',
+          LastName: 'Last3',
+          Email: 'user3@example.com',
+          PhoneNumber: '1234567892',
+          Address: 'Address 3',
+          ProfileImage: 'profile3.jpg'
+        }
+      ]
     });
 
-    console.log('User data seeded successfully!');
-  } catch (error:any) {
-    if (error.code === 'P2002') {
-      console.error('Unique constraint violation occurred during seeding.');
-    } else {
-      console.error('Error during seeding:', error);
-    }
+    console.log("User data seeded successfully!");
+  } catch (error) {
+    console.error("Error during seeding user data:", error);
     process.exit(1);
-  } finally {
-    await prisma.$disconnect();
   }
 };
 
