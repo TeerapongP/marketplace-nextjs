@@ -4,7 +4,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "noEmit": true,
+    "noEmit": true,  // This prevents TypeScript from outputting .js files; ts-node will handle this
     "esModuleInterop": true,
     "module": "CommonJS",
     "moduleResolution": "Node",
@@ -16,6 +16,13 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "prisma/seed/**/*.ts"  // Include your seed files
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

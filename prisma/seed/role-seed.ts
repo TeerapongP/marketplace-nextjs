@@ -1,38 +1,42 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const seedRoles = async (prisma: PrismaClient) => {
+  console.log("Seeding role data...");
 
-export const seedRoles = async (prisma: PrismaClient) => {
-  // Example user ID (replace with actual ID)
-  const roles = [
-    {
-      RoleName: 'User',
-      Description: 'Regular user with basic access rights',
-      userId: 1,
-    },
-    {
-      RoleName: 'Merchant',
-      Description: 'Seller or shop owner with permissions to manage their products and orders',
-      userId: 2,
-    },
-    {
-      RoleName: 'Market Owner',
-      Description: 'Market owner with permissions to manage multiple merchants and overall market settings',
-      userId: 3,
-    }
-  ];
-
-  for (const role of roles) {
-    await prisma.role.create({
-      data: {
-        RoleName: role.RoleName,
-        Description: role.Description,
-        user: { connect: { ID: role.userId } },
-      }
+  try {
+    await prisma.role.createMany({
+      data: [
+        {
+          RoleName: 'User',
+          Description: 'Regular user with basic access rights',
+          UserID: 1,
+        },
+        {
+          RoleName: 'Merchant',
+          Description: 'Seller or shop owner with permissions to manage their products and orders',
+          UserID: 2,
+        },
+        {
+          RoleName: 'Market Owner',
+          Description: 'Market owner with permissions to manage multiple merchants and overall market settings',
+          UserID: 3,
+        }
+      ],
     });
+
+    console.log("Roles seeded successfully!");
+  } catch (error:any) {
+    if (error.code === "P2002") {
+      console.error("Unique constraint violation occurred during seeding.");
+    } else if (error.code === "P2003") {
+      console.error("Foreign key constraint violation occurred during seeding.");
+    } else {
+      console.error("Error during seeding:", error);
+    }
+    process.exit(1);
+  } finally {
+    await prisma.$disconnect();
   }
+};
 
-  console.log('Roles seeded successfully');
-}
-
-module.exports = seedRoles;
+export default seedRoles;
