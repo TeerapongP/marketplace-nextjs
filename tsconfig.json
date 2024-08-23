@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "noEmit": true,  // This prevents TypeScript from outputting .js files; ts-node will handle this
+    "noEmit": true,
     "esModuleInterop": true,
     "module": "CommonJS",
     "moduleResolution": "Node",
@@ -14,13 +18,19 @@
     "incremental": true,
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "prisma/seed/**/*.ts"  // Include your seed files
+    "prisma/**/*.ts", // Ensure Prisma types are included
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

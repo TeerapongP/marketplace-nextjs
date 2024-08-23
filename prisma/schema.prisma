@@ -11,15 +11,15 @@ generator client {
 
 model User {
   userId      Int      @id @default(autoincrement())
-  userName    String
+  userName    String   @unique // Ensure userName is unique
   password    String
   firstName   String
   lastName    String
-  email       String
-  phoneNumber String
+  email       String   @unique
+  phoneNumber String   @unique
   address     String
   userImage   String?
-  
+
   roleId      Int
   role        Role     @relation(fields: [roleId], references: [roleId])
 
@@ -30,6 +30,7 @@ model User {
 
   @@map("User")  // Maps the model name "User" to the table name "User" in the database
 }
+
 
 model Role {
   roleId      Int      @id @default(autoincrement())
