@@ -1,12 +1,15 @@
 // components/Alert.tsx
-import React from 'react';
-
-type AlertProps = {
-    message: string;
-    type: 'success' | 'error' | 'warning' | 'info';
-};
+import React, { useEffect, useState } from 'react';
+import { AlertProps } from './interface/AlertProps';
 
 const Alert: React.FC<AlertProps> = ({ message, type }) => {
+    const [isVisible, setIsVisible] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsVisible(false), 5000);
+        return () => clearTimeout(timer);
+    }, []);
+
     let bgColor, textColor, borderColor;
 
     switch (type) {
@@ -37,31 +40,39 @@ const Alert: React.FC<AlertProps> = ({ message, type }) => {
     }
 
     return (
-        <div className={`tw-flex tw-items-center tw-px-4 tw-py-3 tw-border-l-4 ${bgColor} ${textColor} ${borderColor} tw-rounded`}>
-            <svg
-                className="tw-h-5 tw-w-5 tw-mr-3"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        isVisible && (
+            <div
+                className={`tw-fixed tw-bottom-4 tw-right-4 tw-w-80 tw-p-4 tw-border-l-4 ${bgColor} ${textColor} ${borderColor} tw-rounded-lg tw-shadow-lg tw-transition-opacity tw-duration-500 ${
+                    isVisible ? 'tw-animate-fadeIn' : 'tw-animate-fadeOut'
+                }`}
             >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d={
-                        type === 'success'
-                            ? 'M5 13l4 4L19 7'
-                            : type === 'error'
-                                ? 'M6 18L18 6M6 6l12 12'
-                                : type === 'warning'
-                                    ? 'M12 8v4m0 4h.01'
-                                    : 'M12 16h.01M12 8v4'
-                    }
-                />
-            </svg>
-            <span className="tw-font-medium">{message}</span>
-        </div>
+                <div className="tw-flex tw-items-center">
+                    <svg
+                        className="tw-h-6 tw-w-6 tw-mr-2"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d={
+                                type === 'success'
+                                    ? 'M5 13l4 4L19 7'
+                                    : type === 'error'
+                                        ? 'M6 18L18 6M6 6l12 12'
+                                        : type === 'warning'
+                                            ? 'M12 8v4m0 4h.01'
+                                            : 'M12 16h.01M12 8v4'
+                            }
+                        />
+                    </svg>
+                    <span className="tw-font-medium">{message}</span>
+                </div>
+            </div>
+        )
     );
 };
 

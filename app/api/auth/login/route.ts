@@ -12,15 +12,15 @@ if (!JWT_SECRET) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { username, password } = body;
+    const { username, password, roleId } = body;
 
-    if (!username || !password) {
-      return NextResponse.json({ message: 'Username and password are required' }, { status: 400 });
+    if (!username || !password || !roleId) {
+      return NextResponse.json({ message: 'Username, password, and role are required' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { userName: username },
-      select: { // Specify the fields you want to return
+      where: { userName: username,roleId },
+      select: {
         userId: true,
         userName: true,
         firstName: true,
@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
         phoneNumber: true,
         address: true,
         userImage: true,
-        password: true // Include password to verify it
+        password: true, // Include password to verify it
+        roleId: true // Include roleId
       }
     });
 
@@ -44,15 +45,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
+    // Check if provided role matches user's role
+    if (roleId !== user.roleId) {
+      return NextResponse.json({ message: 'Invalid role' }, { status: 403 });
+    }
+
     // Generate JWT
     const token = jwt.sign(
-      { userId: user.userId, username: user.userName },
+      { userId: user.userId, username: user.userName, roleId: user.roleId },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
-    return NextResponse.json({ message: 'Login successful', token, userId:user.userId,userName:username }, { status: 200 });
+
+    return NextResponse.json({ message: 'Login successful', token, userId: user.userId, userName: username }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
+ 

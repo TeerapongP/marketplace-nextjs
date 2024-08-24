@@ -13,11 +13,11 @@ model User {
   userId      Int      @id @default(autoincrement())
   userName    String   @unique // Ensure userName is unique
   password    String
-  firstName   String
-  lastName    String
-  email       String   @unique
-  phoneNumber String   @unique
-  address     String
+  firstName   String?
+  lastName    String?
+  email       String?   @unique
+  phoneNumber String?   @unique
+  address     String?
   userImage   String?
 
   roleId      Int

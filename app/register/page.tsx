@@ -2,17 +2,24 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
 import Alert from '../../components/Alert';
 import Dropdown from '../../components/Dropdown';
 import Button from '../../components/Button';
-import LoginIcon from '../../public/iconsLoginPage.svg';
+import SignupIcon from '../../public/iconsSignUp.svg';
 import TextInput from '@/components/Input';
-import Link from 'next/link';
 
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName] = useState('');
+  const [lastName] = useState('');
+  const [email] = useState('');
+  const [phoneNumber] = useState('');
+  const [address] = useState('');
+  const [userImage] = useState('');
   const [roleId, setRoleId] = useState(0);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
@@ -21,25 +28,23 @@ const LoginPage = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password,roleId }),
-        
+        body: JSON.stringify({ username, password, roleId,firstName,lastName,email,phoneNumber,address,userImage }),
+
       });
-      console.log( username, password,roleId)
-      console.log(res)
+      console.log("res : ",res)
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem('token', data.token);
         setUsername(''); // Clear username
         setPassword(''); // Clear password
         setRoleId(0)
-      
-        router.push('/'); // Redirect to a protected route
-        setAlertMessage('Login successful');
+        router.push('/login'); // Redirect to a protected route
+        setAlertMessage('Signup successful');
         setAlertType('success');
       } else {
         const errorMessage = 'Something went wrong. Please try again.';
@@ -56,11 +61,11 @@ const LoginPage = () => {
   };
 
   return (
-<div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-h-screen tw-bg-custom-yellow tw-p-4 tw-gap-4">
-  <div className="tw-relative tw-w-full tw-max-w-[60vw] tw-h-64 sm:tw-h-80 md:tw-h-96 lg:tw-h-[500px] tw-flex tw-items-center tw-justify-center">
-        <div className="tw-flex-1 tw-bg-custom-green tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-10 tw-text-center tw-z-10 tw-grid tw-grid-rows-auto tw-gap-4">
+    <div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-h-screen tw-bg-custom-green tw-p-4 tw-gap-4">
+      <div className="tw-relative tw-w-full tw-max-w-[60vw] tw-h-64 sm:tw-h-80 md:tw-h-96 lg:tw-h-[500px] tw-flex tw-items-center tw-justify-center">
+        <div className="tw-flex-1 tw-bg-custom-yellow tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-8 tw-text-center tw-z-10">
           <div className='tw-w-full'>
-            <h1 className="tw-text-lg sm:tw-text-2xl md:tw-text-3xl tw-font-bold tw-mb-4 sm:tw-mb-6 lg:tw-mb-8">Login</h1>
+            <h1 className="tw-text-lg sm:tw-text-2xl md:tw-text-3xl tw-font-bold tw-mb-4 sm:tw-mb-6 lg:tw-mb-8">Register</h1>
           </div>
           <div className="tw-max-w-full tw-w-full">
             <form onSubmit={handleSubmit} className="tw-space-y-4">
@@ -95,23 +100,22 @@ const LoginPage = () => {
                   placeholder="Enter your password"
                   className="tw-w-full"
                 />
-                <div className='tw-text-center tw-mt-2'>
-                  <Link href="/">
-                    Forgot your password? 
-                  </Link>
-                  <Link href="/signup">
-                       / Register
+                  <div className='tw-text-center tw-mt-2'>
+                  <Link href="/login">
+                      Already a member / Login
                   </Link>
                   </div>
               </div>
-              <Button type="submit" text="Login" width="tw-w-80" textColor='tw-text-black' color="tw-bg-white" />
+           
+              <Button type="submit" text="Register" width="tw-w-80" textColor='tw-text-black' color="tw-bg-white" />
+              
             </form>
           </div>
 
         </div>
-        <div className="tw-flex-1 tw-bg-custom-gray tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-10 tw-text-center tw-z-0">
+        <div className="tw-flex-1 tw-bg-custom-gray tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-10 tw-text-center tw-z-0 tw-m-h-[100vh]">
           <div className='tw-flex tw-justify-center tw-items-center'>
-            <LoginIcon />
+            <SignupIcon />
           </div>
         </div>
       </div>
@@ -122,4 +126,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
