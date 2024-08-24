@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 import { prisma } from '../../../../lib/prisma';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret'; // Use your actual secret
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,8 +13,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Username and role are required' }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { userName: username, roleId },
+    // Find user by username and roleId
+    const user = await prisma.user.findFirst({
+      where: { userName: username, roleId: roleId },
       select: {
         userId: true,
         userName: true,
@@ -29,7 +33,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'User found', userId: user.userId, userName: username }, { status: 200 });
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.userId, username: user.userName, roleId: user.roleId },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    // Return user data along with the token
+    return NextResponse.json({
+      message: 'User found',
+      user: {
+        userId: user.userId,
+        userName: user.userName,
+        roleId: user.roleId
+      },
+      token
+    }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
