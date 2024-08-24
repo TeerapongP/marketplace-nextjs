@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { prisma } from '@/lib/prisma'; // Adjust the path as needed
+import { prisma } from '@/lib/prisma';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,29 +10,6 @@ export async function POST(req: NextRequest) {
 
     if (!username || !password || !roleId) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
-    }
-
-    // Check if the user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        userName: username,
-      },
-    });
-
-    if (existingUser) {
-      return NextResponse.json({ message: 'Username already exists' }, { status: 400 });
-    }
-
-    // Optionally, you can also check for unique email and phoneNumber
-    const existingEmail = email ? await prisma.user.findUnique({ where: { email } }) : null;
-    const existingPhoneNumber = phoneNumber ? await prisma.user.findUnique({ where: { phoneNumber } }) : null;
-
-    if (existingEmail) {
-      return NextResponse.json({ message: 'Email already exists' }, { status: 400 });
-    }
-
-    if (existingPhoneNumber) {
-      return NextResponse.json({ message: 'Phone number already exists' }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -52,6 +30,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: 'User created successfully', user }, { status: 201 });
   } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+      const targetField = error.meta?.target;
+
+      return NextResponse.json({
+        message: `Unique constraint failed on the field: ${targetField}`,
+      }, { status: 400 });
+    }
+    
     console.error(error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
