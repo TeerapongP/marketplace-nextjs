@@ -36,15 +36,12 @@ const RegisterPage = () => {
         body: JSON.stringify({ username, password, roleId,firstName,lastName,email,phoneNumber,address,userImage }),
 
       });
-      console.log("res : ",res)
       if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem('token', data.token);
         setUsername(''); // Clear username
         setPassword(''); // Clear password
         setRoleId(0)
         router.push('/login'); // Redirect to a protected route
-        setAlertMessage('Signup successful');
+        setAlertMessage('Register successful');
         setAlertType('success');
       } else {
         const errorMessage = 'Something went wrong. Please try again.';
@@ -65,7 +62,7 @@ const RegisterPage = () => {
       <div className="tw-relative tw-w-full tw-max-w-[60vw] tw-h-64 sm:tw-h-80 md:tw-h-96 lg:tw-h-[500px] tw-flex tw-items-center tw-justify-center">
         <div className="tw-flex-1 tw-bg-custom-yellow tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-8 tw-text-center tw-z-10">
           <div className='tw-w-full'>
-            <h1 className="tw-text-lg sm:tw-text-2xl md:tw-text-3xl tw-font-bold tw-mb-4 sm:tw-mb-6 lg:tw-mb-8">Register</h1>
+            <h1 className="tw-text-lg sm:tw-text-2xl md:tw-text-3xl tw-font-bold tw-mb-4 sm:tw-mb-6 lg:tw-mb-3">Register</h1>
           </div>
           <div className="tw-max-w-full tw-w-full">
             <form onSubmit={handleSubmit} className="tw-space-y-4">
@@ -113,7 +110,7 @@ const RegisterPage = () => {
           </div>
 
         </div>
-        <div className="tw-flex-1 tw-bg-custom-gray tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-10 tw-text-center tw-z-0 tw-m-h-[100vh]">
+        <div className="tw-flex-1 tw-bg-custom-gray tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-7 tw-text-center tw-z-0 tw-m-h-[100vh]">
           <div className='tw-flex tw-justify-center tw-items-center'>
             <SignupIcon />
           </div>

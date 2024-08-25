@@ -99,7 +99,7 @@ const LoginPage = () => {
                   <Link href="/">
                     Forgot your password? 
                   </Link>
-                  <Link href="/signup">
+                  <Link href="/register">
                        / Register
                   </Link>
                   </div>

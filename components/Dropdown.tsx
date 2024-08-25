@@ -27,7 +27,6 @@ const Dropdown: React.FC<DropdownProps> = ({ url, onSelect, placeholder = "" }) 
                 setLoading(false);
             }
         };
-
         fetchOptions();
     }, [url]);
 
