@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../../../../lib/prisma';
 
-const JWT_SECRET = process.env.JWT_SECRET || ''; // Use your actual secret
+// Ensure JWT_SECRET is always a string
+const JWT_SECRET = process.env.JWT_SECRET as string;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not defined');
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,7 +41,7 @@ export async function POST(req: NextRequest) {
     // Generate JWT token
     const token = jwt.sign(
       { userId: user.userId, username: user.userName, roleId: user.roleId },
-      JWT_SECRET,
+      JWT_SECRET, // JWT_SECRET is guaranteed to be a string here
       { expiresIn: '1h' }
     );
 
