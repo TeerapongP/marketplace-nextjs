@@ -32,6 +32,8 @@ const LoginPage = () => {
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem('token', data.token);
+        localStorage.setItem('userName', data.user.userName);
+        localStorage.setItem('roleId', data.user.roleId);
         setUsername(''); // Clear username
         setPassword(''); // Clear password
         setRoleId(0)
