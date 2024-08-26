@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../../../../lib/prisma';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret'; // Use your actual secret
+const JWT_SECRET = process.env.JWT_SECRET || ''; // Use your actual secret
 
 export async function POST(req: NextRequest) {
   try {
