@@ -31,7 +31,6 @@ model User {
   @@map("User")  // Maps the model name "User" to the table name "User" in the database
 }
 
-
 model Role {
   roleId      Int      @id @default(autoincrement())
   roleName    String
@@ -41,7 +40,7 @@ model Role {
   menus       Menu[]
   reserveSpaces ReserveSpace[]
 
-  @@map("Role")  // Maps the model name "Role" to the table name "Role" in the database
+  @@map("Role")
 }
 
 model Menu {
@@ -52,8 +51,9 @@ model Menu {
   roleId      Int
   role        Role     @relation(fields: [roleId], references: [roleId])
 
-  @@map("Menu")  // Maps the model name "Menu" to the table name "Menu" in the database
+  @@map("Menu")
 }
+
 
 model Payment {
   paymentId    Int      @id @default(autoincrement())
