@@ -1,21 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import { prisma } from '../../../../lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import { prisma } from "../../../../lib/prisma";
 
 // Ensure JWT_SECRET is always a string
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is not defined');
+  throw new Error("JWT_SECRET environment variable is not defined");
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { username, roleId } = body;
+    const body: { username: string; roleId: number; password: string } = await req.json();
+    const { username, roleId, password } = body;
 
-    if (!username || !roleId) {
-      return NextResponse.json({ message: 'Username and role are required' }, { status: 400 });
+    if (!username || roleId === undefined || !password) {
+      return NextResponse.json(
+        { message: "Username, roleId, and password are required" },
+        { status: 400 }
+      );
     }
 
     // Find user by username and roleId
@@ -30,33 +34,47 @@ export async function POST(req: NextRequest) {
         phoneNumber: true,
         address: true,
         userImage: true,
-        roleId: true // Include roleId
-      }
+        password: true, // Include password hash
+        roleId: true, // Include roleId
+      },
     });
 
     if (!user) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    // Compare the provided password with the hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return NextResponse.json({ message: "Invalid password" }, { status: 401 });
     }
 
     // Generate JWT token
     const token = jwt.sign(
       { userId: user.userId, username: user.userName, roleId: user.roleId },
       JWT_SECRET, // JWT_SECRET is guaranteed to be a string here
-      { expiresIn: '1h' }
+      { expiresIn: "1h" }
     );
 
     // Return user data along with the token
-    return NextResponse.json({
-      message: 'User found',
-      user: {
-        userId: user.userId,
-        userName: user.userName,
-        roleId: user.roleId
+    return NextResponse.json(
+      {
+        message: "User found",
+        user: {
+          userId: user.userId,
+          userName: user.userName,
+          roleId: user.roleId,
+        },
+        token,
       },
-      token
-    }, { status: 200 });
+      { status: 200 }
+    );
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    console.error("Internal Server Error:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

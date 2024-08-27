@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'; // Import useRouter
 
 import { NavbarProps } from './interface/NavbarProps'; // Adjust the path as necessary
 import { MenuItem } from './interface/MenuItem';
-import TextInput from './Input';
 import Button from './Button';
+import SearchInput from './SearchInput';
 
 const Navbar: React.FC<NavbarProps> = ({ url, userRoleId ,userName}) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -26,7 +26,6 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId ,userName}) => {
                 console.error('Error fetching menu items:', error);
             }
         };
-
         fetchOptions();
     }, [url]); // Dependency on url to refetch if url changes
     const shouldShowSpecificItems = userRoleId === 0;
@@ -59,9 +58,11 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId ,userName}) => {
         setIsLoggedIn(false);
         router.push('/login');
     };
-
     
-   
+    const handleSearch = (value: string) => {
+        console.log("value : ",value)
+    };
+
     return (
         <nav className="tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50">
             <div className="tw-container tw-mx-auto tw-flex tw-justify-between tw-items-center">
@@ -101,15 +102,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId ,userName}) => {
                     </ul>
                 </div>
                 <div className="tw-flex tw-w-1/4 tw-justify-end">
-                    <TextInput
-                        type="text"
-                        id="username"
-                        value={''}
-                        onChange={(e) => ""}
-                        required
-                        placeholder=""
-                        className="tw-w-full"
-                    />
+                <SearchInput onSearch={handleSearch} />
                 </div>
                 <div className="tw-flex tw-w-1/4 tw-justify-end tw-space-x-4">
                 {!userName && (
