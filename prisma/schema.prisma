@@ -36,23 +36,23 @@ model Role {
   roleName    String
 
   // Relationships
-  users       User[]
-  menus       Menu[]
-  reserveSpaces ReserveSpace[]
+  users          User[]
+  reserveSpaces  ReserveSpace[]
+  menus          Menu[] @relation("MenuRoles")
 
-  @@map("Role")
+  @@map("Role") // Maps the model name "Role" to the table name "Role" in the database
 }
 
 model Menu {
-  menuId      Int      @id @default(autoincrement())
-  menuName    String
-  menuUrl     String
+  menuId   Int     @id @default(autoincrement())
+  menuName String
+  menuUrl  String
 
-  roleId      Int
-  role        Role     @relation(fields: [roleId], references: [roleId])
+  roles    Role[]  @relation("MenuRoles")
 
-  @@map("Menu")
+  @@map("Menu") // Maps the model name "Menu" to the table name "Menu" in the database
 }
+
 
 
 model Payment {
