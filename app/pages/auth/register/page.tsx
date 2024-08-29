@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-import Alert from '../../components/Alert';
-import Dropdown from '../../components/Dropdown';
-import Button from '../../components/Button';
-import SignupIcon from '../../public/iconsSignUp.svg';
+import Alert from '../../../../components/Alert';
+import Dropdown from '../../../../components/Dropdown';
+import Button from '../../../../components/Button';
+import SignupIcon from '../../../../public/iconsSignUp.svg';
 import TextInput from '@/components/Input';
 
 
@@ -40,7 +40,7 @@ const RegisterPage = () => {
         setUsername(''); // Clear username
         setPassword(''); // Clear password
         setRoleId(0)
-        router.push('/login'); // Redirect to a protected route
+        router.push('auth/login'); // Redirect to a protected route
         setAlertMessage('Register successful');
         setAlertType('success');
       } else {
@@ -98,7 +98,7 @@ const RegisterPage = () => {
                   className="tw-w-full"
                 />
                   <div className='tw-text-center tw-mt-2'>
-                  <Link href="/login">
+                  <Link href="/pages/auth/login">
                       Already a member / Login
                   </Link>
                   </div>

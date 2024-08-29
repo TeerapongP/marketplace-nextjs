@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Alert from '../../components/Alert';
-import Dropdown from '../../components/Dropdown';
-import Button from '../../components/Button';
-import LoginIcon from '../../public/iconsLoginPage.svg';
+import Alert from '../../../../components/Alert';
+import Dropdown from '../../../../components/Dropdown';
+import Button from '../../../../components/Button';
+import LoginIcon from '../../../../public/iconsLoginPage.svg';
 import TextInput from '@/components/Input';
 import Link from 'next/link';
 
@@ -99,7 +99,7 @@ const LoginPage = () => {
                   <Link href="/">
                     Forgot your password? 
                   </Link>
-                  <Link href="/register">
+                  <Link href="/pages/auth/register">
                        / Register
                   </Link>
                   </div>

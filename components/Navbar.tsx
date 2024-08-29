@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation'; // Import useRouter
 import { NavbarProps } from './interface/NavbarProps'; // Adjust the path as necessary
 import { MenuItem } from './interface/MenuItem';
 import Button from './Button';
-import SearchInput from './SearchInput';
 
-const Navbar: React.FC<NavbarProps> = ({ url, userRoleId ,userName}) => {
+
+const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, userName }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
 
@@ -32,47 +32,35 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId ,userName}) => {
     const filteredMenuItems = menuItems.filter(item =>
         item.roles.some(role => role.roleId === Number(userRoleId))
     );
-
-    // Check user authentication status, e.g., via a token or session check
     useEffect(() => {
-        // Logic to check if the user is logged in
         const checkLoginStatus = () => {
-            // Replace with actual login status check
-            // For example, checking a token in localStorage or context
             const token = localStorage.getItem('authToken');
-            setIsLoggedIn(!!token); // Set login status based on token presence
+            setIsLoggedIn(!!token); 
         };
-
         checkLoginStatus();
     }, []);
 
     const handleLoginClick = () => {
-        router.push('/login'); // Navigate to /login
+        router.push('/pages/auth/login'); // Navigate to /login
     };
     const handleSignoutClick = () => {
-        // Handle signout logic here
         localStorage.removeItem('token');
         localStorage.removeItem('userName');
         localStorage.removeItem('roleId');
 
         setIsLoggedIn(false);
-        router.push('/login');
+        router.push('/pages/auth/login');
     };
+   
     
-    const handleSearch = (value: string) => {
-        console.log("value : ",value)
-    };
-
     return (
         <nav className="tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50">
-            <div className="tw-container tw-mx-auto tw-flex tw-justify-between tw-items-center">
-                <div className="tw-w-1/6 tw-text-white tw-text-xl tw-font-bold">
-                    <Link href="/" className="tw-text-black tw-text-2xl">
+            <div className='tw-grid tw-grid-cols-2 tw-w-full'>
+                <div className='tw-w-full tw-flex  tw-space-x-4'>
+                    <Link href="/" className="tw-font-bold tw-text-black tw-text-2xl md:tw-text-xl sm:tw-text-sm custom-sm:tw-text-base">
                         Market delivery
                     </Link>
-                </div>
-                <div className="tw-flex tw-grow tw-items-center">
-                    <ul className="tw-flex tw-space-x-4 tw-text-white tw-text-xl">
+                    <ul className="tw-flex tw-space-x-4 tw-text-white lg:tw-text-xl md:tw-text-base sm:tw-text-base custom-sm:text-base custom-sm:tw-text-center tw-tw-ml-5">
                         {shouldShowSpecificItems ? (
                             <>
                                 {menuItems.length > 0 && (
@@ -100,15 +88,12 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId ,userName}) => {
                             ))
                         )}
                     </ul>
-                </div>
-                <div className="tw-flex tw-w-1/4 tw-justify-end">
-                <SearchInput onSearch={handleSearch} />
-                </div>
-                <div className="tw-flex tw-w-1/4 tw-justify-end tw-space-x-4">
-                {!userName && (
-                    <Button type="submit" text="Login" width="tw-w-20" textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />)}
+                    </div>
+                <div className='tw-grid tw-justify-items-end custom-sm:tw-mx-24'>
+                    {!userName && (
+                        <Button type="submit" text="Login" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />)}
                     {userName && (
-                    <Button type="button" text="Logout" width="tw-w-20" textColor='tw-text-black' color="tw-bg-white"  onClick={handleSignoutClick } /> )}
+                        <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />)}
                 </div>
             </div>
         </nav>
