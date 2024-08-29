@@ -1,10 +1,12 @@
+// app/layout.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation'; // Import usePathname hook
+import { usePathname } from 'next/navigation';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import Custom404 from './404';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,7 +18,7 @@ export default function RootLayout({
   const [currentUserRoleId, setCurrentUserRoleId] = useState<number | string>('');
   const [userName, setUserName] = useState<string>('');
 
-  const pathname = usePathname(); // Get the current pathname
+  const pathname = usePathname();
 
   useEffect(() => {
     const roleId = localStorage.getItem('roleId');
@@ -27,15 +29,23 @@ export default function RootLayout({
 
   const apiUrl = '/api/menu';
 
-  const hideNavbar = '/login'  === pathname  || '/register' === pathname;
+  // Determine if the navbar should be hidden based on pathname and depth
+  const hideNavbar =
+    pathname === 'auth/login' ||
+    pathname === 'auth/register' ||
+    pathname.split('/').length > 10;
+
+  // Handle rendering of the 404 page
+  const isValidPath = ['/', '/pages/auth/login', '/pages/auth/register','/pages/order','/pages/shop'].includes(pathname);
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        {!hideNavbar && (
+        {!hideNavbar && isValidPath && (
           <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userName={userName} />
         )}
-        <div className={`${hideNavbar ? 'tw-mt-0' : 'tw-mt-16'}`}>
-          {children}
+        <div className={`tw-mt-${hideNavbar ? '0' : '16'}`}>
+          {isValidPath ? children : <Custom404 />}
         </div>
       </body>
     </html>
