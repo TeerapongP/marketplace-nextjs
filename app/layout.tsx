@@ -16,23 +16,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [currentUserRoleId, setCurrentUserRoleId] = useState<number | string>('');
-  const [userName, setUserName] = useState<string>('');
+  const [userId, setUserId] = useState<string>('');
 
   const pathname = usePathname();
 
   useEffect(() => {
     const roleId = localStorage.getItem('roleId');
-    const storedUserName = localStorage.getItem('userName');
+    const storedUserId = localStorage.getItem('userId');
+   
     setCurrentUserRoleId(roleId ? Number(roleId) : '');
-    setUserName(storedUserName || '');
+    setUserId(storedUserId || '');
   }, []);
 
   const apiUrl = '/api/menu';
 
   // Determine if the navbar should be hidden based on pathname and depth
   const hideNavbar =
-    pathname === 'auth/login' ||
-    pathname === 'auth/register' ||
+    pathname === '/pages/auth/login' ||
+    pathname === '/pages/auth/register' ||
     pathname.split('/').length > 10;
 
   // Handle rendering of the 404 page
@@ -42,7 +43,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {!hideNavbar && isValidPath && (
-          <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userName={userName} />
+          <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} />
         )}
         <div className={`tw-mt-${hideNavbar ? '0' : '16'}`}>
           {isValidPath ? children : <Custom404 />}
