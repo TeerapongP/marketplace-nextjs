@@ -6,15 +6,21 @@ import { useRouter } from 'next/navigation'; // Import useRouter
 import { NavbarProps } from './interface/NavbarProps'; // Adjust the path as necessary
 import { MenuItem } from './interface/MenuItem';
 import Button from './Button';
+import UserAvatarIcon from './UserAvatarIcon';
 
 
-const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, userName }) => {
+const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
 
     const router = useRouter(); // Initialize useRouter
+    const [userId, setUserId] = useState<number | null>(null); // Use number or null for userId
 
     useEffect(() => {
+        const storedUserId = localStorage.getItem('userId');
+        // Convert to number if not null, otherwise set to null
+        const userIdNumber = storedUserId ? parseInt(storedUserId, 10) : null;
+        setUserId(userIdNumber);
         const fetchOptions = async () => {
             try {
                 const res = await fetch(url); // Use the url prop for fetching data
@@ -35,28 +41,27 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, userName }) => {
     useEffect(() => {
         const checkLoginStatus = () => {
             const token = localStorage.getItem('authToken');
-            setIsLoggedIn(!!token); 
+            setIsLoggedIn(!!token);
         };
         checkLoginStatus();
     }, []);
-
+    
     const handleLoginClick = () => {
         router.push('/pages/auth/login'); // Navigate to /login
     };
     const handleSignoutClick = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('userName');
+        localStorage.removeItem('userId');
         localStorage.removeItem('roleId');
-
         setIsLoggedIn(false);
         router.push('/pages/auth/login');
     };
-   
-    
+
+
     return (
         <nav className="tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50">
-            <div className='tw-grid tw-grid-cols-2 tw-w-full'>
-                <div className='tw-w-full tw-flex  tw-space-x-4'>
+            <div className='tw-grid tw-grid-cols-2 tw-w-full '>
+                <div className='tw-w-full tw-flex tw-space-x-4 '>
                     <Link href="/" className="tw-font-bold tw-text-black tw-text-2xl md:tw-text-xl sm:tw-text-sm custom-sm:tw-text-base">
                         Market delivery
                     </Link>
@@ -88,12 +93,24 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, userName }) => {
                             ))
                         )}
                     </ul>
-                    </div>
-                <div className='tw-grid tw-justify-items-end custom-sm:tw-mx-24'>
-                    {!userName && (
-                        <Button type="submit" text="Login" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />)}
-                    {userName && (
-                        <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />)}
+                </div>
+                <div className='tw-grid tw-justify-items-end custom-sm:tw-mx-6'>
+                    {!userId && (
+                        <>
+                            <div className='tw-flex'>
+                                <UserAvatarIcon className='tw-mr-4' />
+                                <Button type="submit" text="Login" width="tw-w-20 custom-sm:tw-w-16" height='tw-h-10' textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />
+                            </div>
+                        </>)
+                    }
+                    {userId && (
+                        <>
+                            <div className='tw-flex'>
+                                <UserAvatarIcon className='tw-mr-4' />
+                                <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </nav>
