@@ -3,4 +3,5 @@ export default interface CardProps {
   title: string;
   content: string;
   imageUrl: string;
+  status?: boolean
 }

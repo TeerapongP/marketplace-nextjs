@@ -7,7 +7,6 @@ import { NavbarProps } from './interface/NavbarProps'; // Adjust the path as nec
 import { MenuItem } from './interface/MenuItem';
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
-import Loading from './Loading';
 
 const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);

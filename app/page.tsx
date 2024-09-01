@@ -90,6 +90,7 @@ export default function Home() {
             title={item.shopName}
             content={item.shopDescription}
             imageUrl={item.shopImages}
+            status={item.status}
           />
         ))}
       </div>
