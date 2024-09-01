@@ -1,5 +1,5 @@
 interface UserAvatarIconProps {
     className?: string;
-    imageUrl?: string;
     userId?:string;
+    onClick?: () => void; // Add onClick prop
 }

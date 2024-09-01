@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image'; // Make sure you import Image from Next.js
 
-interface UserAvatarIconProps {
-    className?: string;
-}
 
-const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className }) => {
+const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className,onClick }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
     const [token, setToken] = useState<string | null>(null);
-
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
+    
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
         const storedToken = localStorage.getItem('token');
         const userIdNumber = storedUserId ? parseInt(storedUserId, 10) : null;
+
         setUserId(userIdNumber);
         setToken(storedToken);
 
@@ -42,13 +42,16 @@ const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className }) => {
     }, [userId, token]); // Add token as a dependency
 
     return (
-        <div className={`tw-relative tw-w-10 tw-h-10 tw-overflow-hidden tw-bg-gray-100 tw-rounded-full tw-dark:bg-gray-600 ${className}`}>
+        <div
+            className={`tw-relative tw-w-10 tw-h-10 tw-overflow-hidden tw-bg-gray-100 tw-rounded-full tw-dark:bg-gray-600 ${className}`}
+            onClick={onClick}
+        >
             {imageUrl ? (
                 <Image
                     src={imageUrl}
                     alt="User Avatar"
-                    fill // Use fill for responsive images
-                    style={{ objectFit: 'cover' }} // Ensure the image covers the container
+                    fill // Ensure the image covers the container
+                    style={{ objectFit: 'cover' }} // Ensures the image covers the container
                     sizes="(max-width: 640px) 100vw, 50vw" // Adjust based on your design needs
                     className="tw-absolute tw-w-full tw-h-full"
                 />

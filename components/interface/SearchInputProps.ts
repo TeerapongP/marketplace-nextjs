@@ -1,3 +1,5 @@
+// interface/SearchInputProps.ts
 export default interface SearchInputProps {
-    onSearch: (value: string) => void; // Define the callback function type
+    onSearch: (value: string) => void;
+    onClick: (value: string) => void; // Ensure onClick accepts a string argument
 }
