@@ -6,4 +6,5 @@ export default interface ButtonProps {
   textColor?: string;
   color?: string;
   onClick?: () => void; // Add onClick prop
+  disabled?: boolean; // Add this line
 }

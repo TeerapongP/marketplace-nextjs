@@ -4,4 +4,5 @@ export default interface Shop {
   shopName: string;
   shopDescription: string;
   shopImages: string;
+  status:boolean;
 }
