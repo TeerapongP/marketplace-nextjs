@@ -6,10 +6,6 @@
 //   "/",
 //   "/auth/login",
 //   "/auth/register",
-//   "/category",
-//   "/shops",
-//   "/orders",
-//   "/deliverys", // Ensure this path is included
 // ];
 
 // // Define API paths that should be allowed without authentication
@@ -87,10 +83,6 @@
 // export const config = {
 //   matcher: [
 //     "/",
-//     "/category",
-//     "/shops",
-//     "/orders",
-//     "/deliverys",
 //     "/api/:path*",
 //     "/(.*)",
 //   ],
