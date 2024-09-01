@@ -1,29 +1,25 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 
 import { NavbarProps } from './interface/NavbarProps'; // Adjust the path as necessary
 import { MenuItem } from './interface/MenuItem';
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
-
+import Loading from './Loading';
 
 const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const router = useRouter(); // Initialize useRouter
-    const [userId, setUserId] = useState<number | null>(null); // Use number or null for userId
+    const router = useRouter();
 
     useEffect(() => {
-        const storedUserId = localStorage.getItem('userId');
-        // Convert to number if not null, otherwise set to null
-        const userIdNumber = storedUserId ? parseInt(storedUserId, 10) : null;
-        setUserId(userIdNumber);
+
         const fetchOptions = async () => {
             try {
-                const res = await fetch(url); // Use the url prop for fetching data
+                const res = await fetch(url);
                 if (res.ok) {
                     const data: MenuItem[] = await res.json();
                     setMenuItems(data);
@@ -31,58 +27,56 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
             } catch (error) {
                 console.error('Error fetching menu items:', error);
             }
+            
         };
         fetchOptions();
-    }, [url]); // Dependency on url to refetch if url changes
-    const shouldShowSpecificItems = userRoleId === 0;
-    const filteredMenuItems = menuItems.filter(item =>
-        item.roles.some(role => role.roleId === Number(userRoleId))
-    );
+    }, [url]);
+
     useEffect(() => {
         const checkLoginStatus = () => {
-            const token = localStorage.getItem('authToken');
+            const token = localStorage.getItem('token');
             setIsLoggedIn(!!token);
         };
         checkLoginStatus();
     }, []);
     
     const handleLoginClick = () => {
-        router.push('/pages/auth/login'); // Navigate to /login
+        router.push('/pages/auth/login');
     };
+
     const handleSignoutClick = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('roleId');
+
         setIsLoggedIn(false);
+
         router.push('/pages/auth/login');
     };
-
+    
+    const shouldShowSpecificItems = userRoleId === 0;
+    const filteredMenuItems = menuItems.filter(item =>
+        item.roles.some(role => role.roleId === Number(userRoleId))
+    );
+    
+   
 
     return (
         <nav className="tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50">
-            <div className='tw-grid tw-grid-cols-2 tw-w-full '>
-                <div className='tw-w-full tw-flex tw-space-x-4 '>
+            <div className='tw-grid tw-grid-cols-2 tw-w-full'>
+                <div className='tw-w-full tw-flex tw-space-x-4'>
                     <Link href="/" className="tw-font-bold tw-text-black tw-text-2xl md:tw-text-xl sm:tw-text-sm custom-sm:tw-text-base">
                         Market delivery
                     </Link>
                     <ul className="tw-flex tw-space-x-4 tw-text-white lg:tw-text-xl md:tw-text-base sm:tw-text-base custom-sm:text-base custom-sm:tw-text-center tw-tw-ml-5">
                         {shouldShowSpecificItems ? (
-                            <>
-                                {menuItems.length > 0 && (
-                                    <li key={menuItems[0].menuName}>
-                                        <Link href={menuItems[0].menuUrl} className="tw-hover:tw-text-gray-400">
-                                            {menuItems[0].menuName}
-                                        </Link>
-                                    </li>
-                                )}
-                                {menuItems.length > 1 && (
-                                    <li key={menuItems[1].menuName}>
-                                        <Link href={menuItems[1].menuUrl} className="tw-hover:tw-text-gray-400">
-                                            {menuItems[1].menuName}
-                                        </Link>
-                                    </li>
-                                )}
-                            </>
+                            menuItems.slice(0, 2).map(item => (
+                                <li key={item.menuName}>
+                                    <Link href={item.menuUrl} className="tw-hover:tw-text-gray-400">
+                                        {item.menuName}
+                                    </Link>
+                                </li>
+                            ))
                         ) : (
                             filteredMenuItems.map(item => (
                                 <li key={item.menuName}>
@@ -95,21 +89,16 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
                     </ul>
                 </div>
                 <div className='tw-grid tw-justify-items-end custom-sm:tw-mx-6'>
-                    {!userId && (
-                        <>
-                            <div className='tw-flex'>
-                                <UserAvatarIcon className='tw-mr-4' />
-                                <Button type="submit" text="Login" width="tw-w-20 custom-sm:tw-w-16" height='tw-h-10' textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />
-                            </div>
-                        </>)
-                    }
-                    {userId && (
-                        <>
-                            <div className='tw-flex'>
-                                <UserAvatarIcon className='tw-mr-4' />
-                                <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />
-                            </div>
-                        </>
+                    {!isLoggedIn ? (
+                        <div className='tw-flex'>
+                            <UserAvatarIcon className='tw-mr-4' />
+                            <Button type="submit" text="Login" width="tw-w-20 custom-sm:tw-w-16" height='tw-h-10' textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />
+                        </div>
+                    ) : (
+                        <div className='tw-flex'>
+                            <UserAvatarIcon className='tw-mr-4' />
+                            <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />
+                        </div>
                     )}
                 </div>
             </div>

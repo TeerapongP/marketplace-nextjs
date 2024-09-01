@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
+import SearchInputProps from './interface/SearchInputProps';
 
-interface SearchInputProps {
-    onSearch: (value: string) => void; // Define the callback function type
-}
-
-const SearchInput: React.FC<SearchInputProps> = ({ onSearch }) => {
+const SearchInput: React.FC<SearchInputProps> = ({ onSearch, onClick }) => {
     const [searchValue, setSearchValue] = useState('');
 
     // Handles input field changes
@@ -14,24 +11,35 @@ const SearchInput: React.FC<SearchInputProps> = ({ onSearch }) => {
 
     // Handles search button click
     const handleSearchClick = () => {
-        if (searchValue) {
+        if (searchValue.trim()) { // Check if searchValue is not just whitespace
             onSearch(searchValue); // Emit current searchValue
-            setSearchValue('');   // Clear the input field
+            onClick(searchValue); // Execute onClick prop with searchValue
+        } else {
+            onSearch('');
+            onClick('');
+        }
+        setSearchValue(''); // Clear the input field
+    };
+
+    // Handles key down event on the input field
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearchClick(); // Trigger search on Enter key
         }
     };
 
     return (
         <>
-            <form className="tw-w-64" >
+            <form className="tw-w-64" onSubmit={(e) => e.preventDefault()}> {/* Prevent form submission */}
                 <div className="tw-relative">
                     <input
                         type="search"
                         id="default-search"
                         value={searchValue}
                         onChange={handleChange} // Update searchValue on input change
+                        onKeyDown={handleKeyDown} // Handle key down events
                         className="tw-block tw-w-full tw-p-4 tw-pr-10 tw-text-sm tw-text-gray-900 tw-border tw-border-gray-300 tw-rounded-lg tw-focus:border-none tw-focus:ring-0"
                         placeholder="Search"
-                        required
                     />
                     <div
                         className="tw-absolute tw-inset-y-0 tw-end-0 tw-flex tw-items-center tw-pe-3 tw-pointer-events-auto tw-cursor-pointer"

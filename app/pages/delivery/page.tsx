@@ -1,9 +1,12 @@
-'use client';
+import { NextPage } from 'next';
 
-const Delivery = () => {
-  return (
-    <h1>Delivery</h1>
-  );
+const Deliverys: NextPage = () => {
+    return (
+        <div className='tw-mt-96'>
+            <h1>Deliverys Page</h1>
+            <p>Content for the deliverys page.</p>
+        </div>
+    );
 };
 
-export default Delivery;
+export default Deliverys;

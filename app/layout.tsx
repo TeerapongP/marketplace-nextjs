@@ -1,4 +1,3 @@
-// app/layout.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,15 +16,22 @@ export default function RootLayout({
 }>) {
   const [currentUserRoleId, setCurrentUserRoleId] = useState<number | string>('');
   const [userId, setUserId] = useState<string>('');
+  const [token, setToken] = useState<string | null>(null); // Add state for token
 
   const pathname = usePathname();
 
   useEffect(() => {
     const roleId = localStorage.getItem('roleId');
     const storedUserId = localStorage.getItem('userId');
-   
-    setCurrentUserRoleId(roleId ? Number(roleId) : '');
-    setUserId(storedUserId || '');
+    const storedToken = localStorage.getItem('token'); // Retrieve token from local storage
+
+    if (storedToken) {
+      setToken(storedToken);
+      setCurrentUserRoleId(roleId ? Number(roleId) : '');
+      setUserId(storedUserId || '');
+    } else {
+      setToken(null); // Ensure token is cleared if not present
+    }
   }, []);
 
   const apiUrl = '/api/menu';
@@ -37,18 +43,31 @@ export default function RootLayout({
     pathname.split('/').length > 10;
 
   // Handle rendering of the 404 page
-  const isValidPath = ['/', '/pages/auth/login', '/pages/auth/register','/pages/order','/pages/shop'].includes(pathname);
+  const isValidPath = [
+    '/',
+    '/pages/auth/login',
+    '/pages/auth/register',
+    '/pages/category',
+    '/pages/shop',
+  ].includes(pathname);
+
+  // Check if the current path requires a token to be valid
+  const requiresToken = [
+    '/pages/order',
+    '/pages/delivery'
+  ].includes(pathname);
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        {!hideNavbar && isValidPath && (
+        {(isValidPath || (requiresToken && token)) && !hideNavbar && (
           <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} />
         )}
         <div className={`tw-mt-${hideNavbar ? '0' : '16'}`}>
-          {isValidPath ? children : <Custom404 />}
+          {(isValidPath || (requiresToken && token)) ? children : <Custom404 />}
         </div>
       </body>
+
     </html>
   );
 }

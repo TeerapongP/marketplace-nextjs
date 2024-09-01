@@ -27,9 +27,12 @@ model User {
   payments    Payment[]
   orders      Order[]
   carts       Cart[]
+  shops       Shop[]   // Add this line to indicate a user can have multiple shops
 
   @@map("User")  // Maps the model name "User" to the table name "User" in the database
 }
+
+
 
 model Role {
   roleId      Int      @id @default(autoincrement())
@@ -52,8 +55,6 @@ model Menu {
 
   @@map("Menu") // Maps the model name "Menu" to the table name "Menu" in the database
 }
-
-
 
 model Payment {
   paymentId    Int      @id @default(autoincrement())
@@ -124,6 +125,7 @@ model Product {
 
   @@map("Product")  // Maps the model name "Product" to the table name "Product" in the database
   OrderItem OrderItem[]
+  Shop Shop[]
 }
 
 model Category {
@@ -160,14 +162,33 @@ model Space {
   @@map("Space")  // Maps the model name "Space" to the table name "Space" in the database
 }
 
+model Shop {
+  shopId          Int             @id @default(autoincrement())
+  shopName        String
+  shopDescription String
+  shopImages      String
+  status          Boolean
+
+  ownerId         Int             // Foreign key for the user who owns the shop
+  owner           User            @relation(fields: [ownerId], references: [userId])  // Relationship to User
+  products        Product[]       // A shop can have multiple products
+  reserveSpace    ReserveSpace?   // Optional one-to-one relationship with ReserveSpace
+
+  @@map("Shop")  // Maps the model name "Shop" to the table name "Shop" in the database
+}
+
 model ReserveSpace {
   reserveSpaceId Int      @id @default(autoincrement())
   reserveDate    DateTime @default(now())
   status         String
   roleId         Int
-  role           Role     @relation(fields: [roleId], references: [roleId])
   spaceId        Int
-  space          Space    @relation(fields: [spaceId], references: [spaceId])
+  shopId         Int    @unique   // Foreign key for the shop associated with the reservation @unique
 
-  @@map("ReserveSpace")  // Maps the model name "ReserveSpace" to the table name "ReserveSpace" in the database
+  role           Role     @relation(fields: [roleId], references: [roleId], onUpdate: NoAction, onDelete: NoAction)
+  space          Space    @relation(fields: [spaceId], references: [spaceId], onUpdate: NoAction, onDelete: NoAction)
+  shop           Shop     @relation(fields: [shopId], references: [shopId], onUpdate: NoAction, onDelete: Cascade) 
+
+  @@map("ReserveSpace")  
 }
+
