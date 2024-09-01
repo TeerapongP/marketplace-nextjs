@@ -40,7 +40,7 @@ const RegisterPage = () => {
         setUsername(''); // Clear username
         setPassword(''); // Clear password
         setRoleId(0)
-        router.push('auth/login'); // Redirect to a protected route
+        router.push('/pages/auth/login'); // Redirect to a protected route
         setAlertMessage('Register successful');
         setAlertType('success');
       } else {
@@ -54,6 +54,7 @@ const RegisterPage = () => {
     }
   };
   const handleSelect = (roleId: number) => {
+    console.log("ROLE ID ",roleId)
     setRoleId(roleId)
   };
 

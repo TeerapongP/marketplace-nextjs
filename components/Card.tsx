@@ -36,12 +36,12 @@ const Card: React.FC<CardProps> = ({ title, content, imageUrl, status }) => {
             height="tw-h-10"
             textColor="tw-text-black"
             color="tw-bg-white"
-            disabled={status === false}
+            disabled={false === status}
             className="tw-mr-4" // Added margin-right
           />
           <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
             <ToggleSwitch
-              label="Open"
+              label={true === status ? 'open' : 'close'}
               checked={status}
             />
           </div>
