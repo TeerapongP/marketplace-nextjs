@@ -4,13 +4,40 @@ import SearchInput from '../components/SearchInput';
 import Card from '../components/Card';
 import Loading from '../components/Loading';
 import Shop from './interface/shop';
+import Alert from '../components/Alert';
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [roleId, setRoleId] = useState<number | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
 
-  // Fetch all shops
+  useEffect(() => {
+    const storedRoleId = localStorage.getItem('roleId');
+    setRoleId(storedRoleId ? Number(storedRoleId) : null);
+
+    const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
+    fetchShopAll();
+  }, []);
+
+  useEffect(() => {
+    if (alertMessage) {
+      const timer = setTimeout(() => {
+        setAlertMessage(null);
+        setAlertType(null);
+      }, 3000); // Hide alert after 3 seconds
+
+      return () => clearTimeout(timer); // Cleanup timeout on unmount
+    }
+  }, [alertMessage]);
+
   const fetchShopAll = async () => {
     try {
       const res = await fetch('/api/shop/shop-list');
@@ -27,20 +54,12 @@ export default function Home() {
     }
   };
 
-  // Initial fetch
-  useEffect(() => {
-    fetchShopAll();
-  }, []); // Empty dependency array means this will run once after the initial render
-
-  // Handle search
   const handleSearch = async (value: string) => {
     setData([]);
     setLoading(true);
-    console.log("Search value:", value);
 
     try {
       if (value.trim() === '') {
-        // Fetch all shops if search value is empty
         await fetchShopAll();
       } else {
         const encodedValue = encodeURIComponent(value);
@@ -61,12 +80,43 @@ export default function Home() {
     }
   };
 
+  const handleToggleChange = async (shopId: number, checked: boolean) => {
+    console.log("shopId : ", shopId);
+    console.log("checked : ", checked);
 
+    if (roleId === 2) {
+      return;
+    }
 
-  // Handle click
+    try {
+      const response = await fetch('/api/shop/status-shop', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          shopId: shopId,
+          status: checked,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update status');
+      }
+      await fetchShopAll();
+      setAlertMessage('Update successful');
+      setAlertType('success');
+    } catch (error) {
+      setAlertMessage('Update failed');
+      setAlertType('error');
+      console.error('Error updating status:', error);
+    }
+  };
+
   const handleClick = (value: string) => {
     if (value.trim() === '') {
-      fetchShopAll(); // Fetch all shops if search value is empty
+      fetchShopAll();
     }
   };
 
@@ -83,18 +133,22 @@ export default function Home() {
       <div className='tw-grid sm:tw-mt-24 md:tw-mt-24 lg:tw-mt-24 custom-sm:tw-mt-24 custom-sm:tw-justify-items-center tw-justify-items-end tw-mr-20 custom-sm:tw-mr-0'>
         <SearchInput onSearch={handleSearch} onClick={handleClick} />
       </div>
-      <div className='tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5'>
+      <div className='tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center'>
         {data.length > 0 && data.map((item) => (
           <Card
-            key={item.shopName} // Ensure this is unique for each Card
+            key={item.shopId}
             title={item.shopName}
             content={item.shopDescription}
             imageUrl={item.shopImages}
+            shopId={Number(item.shopId)}
             status={item.status}
+            onToggleChange={handleToggleChange}
           />
         ))}
       </div>
-
+      {alertMessage && alertType && (
+        <Alert type={alertType} message={alertMessage} />
+      )}
     </div>
   );
 }
