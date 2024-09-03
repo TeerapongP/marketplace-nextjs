@@ -1,7 +1,9 @@
-// components/interface/CardProps.ts
 export default interface CardProps {
   title: string;
   content: string;
-  imageUrl: string;
-  status?: boolean
+  imageUrl?: string;
+  status?: boolean;
+  shopId: number;
+  roleId?: number;
+  onToggleChange?: (shopId: number, checked: boolean) => void;
 }

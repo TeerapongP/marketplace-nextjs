@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CardProps from './interface/CardProps';
 import Image from 'next/image';
 import ToggleSwitch from './Toggle';
 import Button from './Button';
 
-const Card: React.FC<CardProps> = ({ title, content, imageUrl, status }) => {
+const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, shopId, onToggleChange }) => {
+  const [isToggled, setIsToggled] = useState<boolean>(status);
+
+  // Sync the toggle state with the initial status prop
+  useEffect(() => {
+    setIsToggled(status);
+  }, [status]);
+
+  const handleToggleChange = (checked: boolean) => {
+    setIsToggled(checked);
+    if (onToggleChange && shopId !== undefined) {
+      onToggleChange(shopId, checked); // Pass shopId and checked value
+    }
+  };
+
   return (
     <div className="tw-bg-gray-100 tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm">
       <div className="tw-grid tw-grid-rows-[auto_1fr_auto] tw-gap-4 tw-h-full">
@@ -37,12 +51,13 @@ const Card: React.FC<CardProps> = ({ title, content, imageUrl, status }) => {
             textColor="tw-text-black"
             color="tw-bg-white"
             disabled={false === status}
-            className="tw-mr-4" // Added margin-right
+            className="tw-mr-4"
           />
           <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
             <ToggleSwitch
-              label={true === status ? 'open' : 'close'}
-              checked={status}
+              label={isToggled ? 'open' : 'close'}
+              checked={isToggled}
+              onChange={handleToggleChange}
             />
           </div>
         </div>

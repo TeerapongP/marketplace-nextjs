@@ -6,6 +6,7 @@ export async function GET(req: NextRequest) {
     // Fetch the list of shops with the desired fields
     const shops = await prisma.shop.findMany({
       select: {
+        shopId:true,
         shopName: true,
         shopDescription: true,
         shopImages: true,
