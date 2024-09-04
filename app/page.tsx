@@ -5,6 +5,7 @@ import Card from '../components/Card';
 import Loading from '../components/Loading';
 import Shop from './interface/shop';
 import Alert from '../components/Alert';
+import router from 'next/router';
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
@@ -16,8 +17,6 @@ export default function Home() {
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
 
   useEffect(() => {
-    const storedRoleId = localStorage.getItem('roleId');
-    setRoleId(storedRoleId ? Number(storedRoleId) : null);
 
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
@@ -25,9 +24,11 @@ export default function Home() {
 
   useEffect(() => {
     fetchShopAll();
-  }, []);
 
-  useEffect(() => {
+    const storedRoleId = localStorage.getItem('roleId');
+    setRoleId(storedRoleId ? Number(storedRoleId) : null);
+
+
     if (alertMessage) {
       const timer = setTimeout(() => {
         setAlertMessage(null);
@@ -81,10 +82,7 @@ export default function Home() {
   };
 
   const handleToggleChange = async (shopId: number, checked: boolean) => {
-    console.log("shopId : ", shopId);
-    console.log("checked : ", checked);
-
-    if (roleId === 2) {
+    if (2 === roleId || null === roleId) {
       return;
     }
 
@@ -107,7 +105,10 @@ export default function Home() {
       await fetchShopAll();
       setAlertMessage('Update successful');
       setAlertType('success');
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === 'Token expired') {
+        router.push('/pages/auth/login'); // Redirect to a protected route
+      }
       setAlertMessage('Update failed');
       setAlertType('error');
       console.error('Error updating status:', error);
@@ -142,6 +143,7 @@ export default function Home() {
             imageUrl={item.shopImages}
             shopId={Number(item.shopId)}
             status={item.status}
+            disabled={null == roleId ? true : false}
             onToggleChange={handleToggleChange}
           />
         ))}

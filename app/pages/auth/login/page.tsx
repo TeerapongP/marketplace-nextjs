@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '../../../../components/Alert';
 import Dropdown from '../../../../components/Dropdown';
@@ -8,6 +8,7 @@ import Button from '../../../../components/Button';
 import LoginIcon from '../../../../public/iconsLoginPage.svg';
 import TextInput from '@/components/Input';
 import Link from 'next/link';
+import bcrypt from 'bcryptjs';
 
 
 const LoginPage = () => {
@@ -21,13 +22,15 @@ const LoginPage = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
+      const hashedPassword = await bcrypt.hash(password, 10);
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password,roleId }),
         
+        body: JSON.stringify({ username, password:hashedPassword, roleId }),
+
       });
       if (res.ok) {
         const data = await res.json();
@@ -38,7 +41,7 @@ const LoginPage = () => {
         setUsername(''); // Clear username
         setPassword(''); // Clear password
         setRoleId(0)
-      
+
         router.push('/'); // Redirect to a protected route
         setAlertMessage('Login successful');
         setAlertType('success');
@@ -56,9 +59,20 @@ const LoginPage = () => {
     setRoleId(roleId)
   };
 
+  useEffect(() => {
+    if (alertMessage) {
+      const timer = setTimeout(() => {
+        setAlertMessage(null);
+        setAlertType(null);
+      }, 3000); // Hide alert after 3 seconds
+
+      return () => clearTimeout(timer); // Cleanup timeout on unmount
+    }
+  }, [alertMessage]);
+  
   return (
-<div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-h-screen tw-bg-custom-yellow tw-p-4 tw-gap-4">
-  <div className="tw-relative tw-w-full tw-max-w-[60vw] tw-h-64 sm:tw-h-80 md:tw-h-96 lg:tw-h-[500px] tw-flex tw-items-center tw-justify-center">
+    <div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-h-screen tw-bg-custom-yellow tw-p-4 tw-gap-4">
+      <div className="tw-relative tw-w-full tw-max-w-[60vw] tw-h-64 sm:tw-h-80 md:tw-h-96 lg:tw-h-[500px] tw-flex tw-items-center tw-justify-center">
         <div className="tw-flex-1 tw-bg-custom-green tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-6 tw-text-center tw-z-10 tw-grid tw-grid-rows-auto tw-gap-4">
           <div className='tw-w-full'>
             <h1 className="tw-text-lg sm:tw-text-2xl md:tw-text-3xl tw-font-bold tw-mb-4 sm:tw-mb-6 lg:tw-mb-8">Login</h1>
@@ -97,13 +111,13 @@ const LoginPage = () => {
                   className="tw-w-full"
                 />
                 <div className='tw-text-center tw-mt-2'>
-                  <Link href="/">
-                    Forgot your password? 
+                  <Link href="/pages/auth/forgotpassword">
+                    Forgot your password?
                   </Link>
                   <Link href="/pages/auth/register">
-                       / Register
+                    / Register
                   </Link>
-                  </div>
+                </div>
               </div>
               <Button type="submit" text="Login" width="tw-w-80" textColor='tw-text-black' color="tw-bg-white" />
             </form>

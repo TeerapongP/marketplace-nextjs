@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -25,6 +25,18 @@ const RegisterPage = () => {
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter();
 
+  useEffect(() => {
+    if (alertMessage) {
+      const timer = setTimeout(() => {
+        setAlertMessage(null);
+        setAlertType(null);
+      }, 3000); // Hide alert after 3 seconds
+
+      return () => clearTimeout(timer); // Cleanup timeout on unmount
+    }
+  }, [alertMessage]);
+
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -33,7 +45,7 @@ const RegisterPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password, roleId,firstName,lastName,email,phoneNumber,address,userImage }),
+        body: JSON.stringify({ username, password, roleId, firstName, lastName, email, phoneNumber, address, userImage }),
 
       });
       if (res.ok) {
@@ -54,7 +66,7 @@ const RegisterPage = () => {
     }
   };
   const handleSelect = (roleId: number) => {
-    console.log("ROLE ID ",roleId)
+    console.log("ROLE ID ", roleId)
     setRoleId(roleId)
   };
 
@@ -98,15 +110,15 @@ const RegisterPage = () => {
                   placeholder="Enter your password"
                   className="tw-w-full"
                 />
-                  <div className='tw-text-center tw-mt-2'>
+                <div className='tw-text-center tw-mt-2'>
                   <Link href="/pages/auth/login">
-                      Already a member / Login
+                    Already a member / Login
                   </Link>
-                  </div>
+                </div>
               </div>
-           
+
               <Button type="submit" text="Register" width="tw-w-80" textColor='tw-text-black' color="tw-bg-white" />
-              
+
             </form>
           </div>
 

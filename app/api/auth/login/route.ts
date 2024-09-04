@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 import { prisma } from "../../../../lib/prisma";
 
 // Ensure JWT_SECRET is always a string
@@ -12,12 +11,12 @@ if (!JWT_SECRET) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body: { username: string; roleId: number; password: string } = await req.json();
-    const { username, roleId, password } = body;
+    const body: { username: string; roleId: number } = await req.json();
+    const { username, roleId } = body;
 
-    if (!username || roleId === undefined || !password) {
+    if (!username || roleId === undefined) {
       return NextResponse.json(
-        { message: "Username, roleId, and password are required" },
+        { message: "Username and roleId are required" },
         { status: 400 }
       );
     }
@@ -34,20 +33,12 @@ export async function POST(req: NextRequest) {
         phoneNumber: true,
         address: true,
         userImage: true,
-        password: true, // Include password hash
-        roleId: true, // Include roleId
+        roleId: true,   // Include roleId
       },
     });
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
-    // Compare the provided password with the hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return NextResponse.json({ message: "Invalid password" }, { status: 401 });
     }
 
     // Generate JWT token

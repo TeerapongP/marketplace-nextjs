@@ -7,15 +7,16 @@ import { NavbarProps } from './interface/NavbarProps'; // Adjust the path as nec
 import { MenuItem } from './interface/MenuItem';
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
+import Loading from './Loading';
 
 const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // Use null to represent loading state
+    const [loading, setLoading] = useState(true); // Loading state for fetching data
 
     const router = useRouter();
 
     useEffect(() => {
-
         const fetchOptions = async () => {
             try {
                 const res = await fetch(url);
@@ -25,9 +26,11 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
                 }
             } catch (error) {
                 console.error('Error fetching menu items:', error);
+            } finally {
+                setLoading(false); // Set loading to false after fetching
             }
-            
         };
+
         fetchOptions();
     }, [url]);
 
@@ -38,7 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
         };
         checkLoginStatus();
     }, []);
-    
+
     const handleLoginClick = () => {
         router.push('/pages/auth/login');
     };
@@ -49,16 +52,17 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
         localStorage.removeItem('roleId');
 
         setIsLoggedIn(false);
-
         router.push('/pages/auth/login');
     };
-    
+
+    if (loading) {
+        return <Loading />; // Display loading state
+    }
+
     const shouldShowSpecificItems = userRoleId === 0;
     const filteredMenuItems = menuItems.filter(item =>
         item.roles.some(role => role.roleId === Number(userRoleId))
     );
-    
-   
 
     return (
         <nav className="tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50">
@@ -88,7 +92,9 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
                     </ul>
                 </div>
                 <div className='tw-grid tw-justify-items-end custom-sm:tw-mx-6'>
-                    {!isLoggedIn ? (
+                    {isLoggedIn === null ? ( // Show loading state for login status
+                        <div>Loading...</div>
+                    ) : !isLoggedIn ? (
                         <div className='tw-flex'>
                             <UserAvatarIcon className='tw-mr-4' />
                             <Button type="submit" text="Login" width="tw-w-20 custom-sm:tw-w-16" height='tw-h-10' textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />
