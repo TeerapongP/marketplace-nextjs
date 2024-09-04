@@ -5,5 +5,6 @@ export default interface CardProps {
   status?: boolean;
   shopId: number;
   roleId?: number;
+  disabled:boolean;
   onToggleChange?: (shopId: number, checked: boolean) => void;
 }

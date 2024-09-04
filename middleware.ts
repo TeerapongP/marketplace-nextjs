@@ -6,7 +6,8 @@ const allowedPaths = [
   "/",
   "/pages/auth/login",
   "/pages/auth/register",
-  "/pages/auth/login"
+  "/pages/auth/login",
+  '/pages/auth/forgotpassword'
 ];
 
 // Define API paths that should be allowed without authentication
@@ -16,6 +17,7 @@ const allowedApiPaths = [
   "/api/auth/login",
   "/api/auth/register",
   "/api/shop/shop-list",
+  "/api/auth/forgotPassword"
 ];
 
 // Exclude internal Next.js paths and static assets

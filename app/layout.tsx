@@ -40,6 +40,7 @@ export default function RootLayout({
   const hideNavbar =
     pathname === '/pages/auth/login' ||
     pathname === '/pages/auth/register' ||
+    pathname === '/pages/auth/forgotpassword'
     pathname.split('/').length > 10;
 
   // Handle rendering of the 404 page
@@ -49,6 +50,7 @@ export default function RootLayout({
     '/pages/auth/register',
     '/pages/category',
     '/pages/shop',
+    '/pages/auth/forgotpassword'
   ].includes(pathname);
 
   // Check if the current path requires a token to be valid

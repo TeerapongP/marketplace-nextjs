@@ -20,11 +20,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
     
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
     await prisma.user.update({
       where: { userName },
-      data: { password: hashedPassword },
+      data: { password: newPassword },
     });
 
     return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 });

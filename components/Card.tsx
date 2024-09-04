@@ -4,7 +4,7 @@ import Image from 'next/image';
 import ToggleSwitch from './Toggle';
 import Button from './Button';
 
-const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, shopId, onToggleChange }) => {
+const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, shopId, disabled, onToggleChange }) => {
   const [isToggled, setIsToggled] = useState<boolean>(status);
 
   // Sync the toggle state with the initial status prop
@@ -43,23 +43,27 @@ const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, s
 
         {/* Footer Section */}
         <div className="tw-p-4 tw-flex tw-items-center tw-justify-between tw-row-span-1">
-          <Button
-            type="submit"
-            text="View"
-            width="tw-w-48 custom-sm:tw-w-16"
-            height="tw-h-10"
-            textColor="tw-text-black"
-            color="tw-bg-white"
-            disabled={false === status}
-            className="tw-mr-4"
-          />
+          <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
+            <Button
+              type="submit"
+              text="View"
+              width="tw-w-48 custom-sm:tw-w-16"
+              height="tw-h-10"
+              textColor="tw-text-black"
+              color="tw-bg-white"
+              disabled={false === status}
+              className="tw-mr-4"
+            />
+          </div>
           <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
             <ToggleSwitch
               label={isToggled ? 'open' : 'close'}
               checked={isToggled}
               onChange={handleToggleChange}
+              disabled={disabled}
             />
           </div>
+
         </div>
       </div>
     </div>
