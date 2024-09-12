@@ -17,18 +17,12 @@ export default function Home() {
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
 
   useEffect(() => {
-
-    const storedToken = localStorage.getItem('token');
-    setToken(storedToken);
-  }, []);
-
-  useEffect(() => {
     fetchShopAll();
 
     const storedRoleId = localStorage.getItem('roleId');
+    const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
     setRoleId(storedRoleId ? Number(storedRoleId) : null);
-
-
     if (alertMessage) {
       const timer = setTimeout(() => {
         setAlertMessage(null);
@@ -64,8 +58,10 @@ export default function Home() {
         await fetchShopAll();
       } else {
         const encodedValue = encodeURIComponent(value);
-        const res = await fetch(`/api/shop/shop-find-by-name?shopName=${encodedValue}`);
+        const res = await fetch(`/api/shop/shop-find-by-name?shopName=${encodedValue}`, {
+          method: 'GET',
 
+        });
         if (!res.ok) {
           throw new Error(`Network response was not ok: ${res.statusText}`);
         }
@@ -75,7 +71,6 @@ export default function Home() {
       }
     } catch (error) {
       setError(`Error fetching search results`);
-      console.error('Error fetching search results:', error);
     } finally {
       setLoading(false);
     }
@@ -120,7 +115,6 @@ export default function Home() {
       fetchShopAll();
     }
   };
-
   if (loading) {
     return <Loading />;
   }
