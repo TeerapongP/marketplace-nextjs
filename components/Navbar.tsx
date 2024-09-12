@@ -46,6 +46,10 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
         router.push('/pages/auth/login');
     };
 
+    const handleProfile = () => {
+        router.push('/pages/profile');
+    };
+
     const handleSignoutClick = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
@@ -101,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
                         </div>
                     ) : (
                         <div className='tw-flex'>
-                            <UserAvatarIcon className='tw-mr-4' />
+                            <UserAvatarIcon className='tw-mr-4 tw-cursor-pointer' onClick={handleProfile} />
                             <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />
                         </div>
                     )}
