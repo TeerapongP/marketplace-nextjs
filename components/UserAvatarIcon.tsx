@@ -48,7 +48,7 @@ const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className,onClick }) =>
         >
             {imageUrl ? (
                 <Image
-                    src={imageUrl}
+                    src={`/${imageUrl}`} // Correct relative path with leading slash
                     alt="User Avatar"
                     fill // Ensure the image covers the container
                     style={{ objectFit: 'cover' }} // Ensures the image covers the container

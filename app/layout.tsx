@@ -56,7 +56,8 @@ export default function RootLayout({
   // Check if the current path requires a token to be valid
   const requiresToken = [
     '/pages/order',
-    '/pages/delivery'
+    '/pages/delivery',
+    '/pages/profile',
   ].includes(pathname);
 
   return (

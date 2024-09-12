@@ -6,7 +6,7 @@ const allowedPaths = [
   "/",
   "/pages/auth/login",
   "/pages/auth/register",
-  "/pages/auth/login",
+  '/pages/profile',
   '/pages/auth/forgotpassword'
 ];
 
