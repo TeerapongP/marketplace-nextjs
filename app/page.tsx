@@ -60,10 +60,7 @@ export default function Home() {
         const encodedValue = encodeURIComponent(value);
         const res = await fetch(`/api/shop/shop-find-by-name?shopName=${encodedValue}`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
-          },
+
         });
         if (!res.ok) {
           throw new Error(`Network response was not ok: ${res.statusText}`);

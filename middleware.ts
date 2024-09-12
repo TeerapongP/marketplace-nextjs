@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextRequest, NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
 // Define public paths
 const allowedPaths = [
   "/",
   "/pages/auth/login",
   "/pages/auth/register",
-  '/pages/profile',
-  '/pages/auth/forgotpassword'
+  "/pages/profile",
+  "/pages/auth/forgotpassword",
 ];
 
 // Define API paths that should be allowed without authentication
@@ -17,7 +17,8 @@ const allowedApiPaths = [
   "/api/auth/login",
   "/api/auth/register",
   "/api/shop/shop-list",
-  "/api/auth/forgotPassword"
+  "/api/auth/forgotPassword",
+  "/api/shop/shop-find-by-name",
 ];
 
 // Exclude internal Next.js paths and static assets
@@ -85,10 +86,5 @@ export async function middleware(req: NextRequest) {
 
 // Define the routes where the middleware should be applied
 export const config = {
-  matcher: [
-    "/",
-    "/api/:path*",
-    "/(.*)",
-  ],
+  matcher: ["/", "/api/:path*", "/(.*)"],
 };
-
