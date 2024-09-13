@@ -3,122 +3,79 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-    // Create Roles
-    const adminRole = await prisma.role.create({
-        data: {
-            roleName: "Admin",
-        },
-    });
+  // Create bakery products
+  await prisma.product.createMany({
+    data: [
+      {
+        productName: "ครัวซองต์",
+        description:
+          "ครัวซองต์เป็นขนมปังอบกรอบจากฝรั่งเศสที่มีลักษณะเป็นชั้นๆ รสชาติหวานและเนย มีเนื้อสัมผัสที่กรอบนอกนุ่มใน สามารถรับประทานได้ทั้งแบบเปล่าๆ หรือใส่แยมและเนยเพิ่มเติม",
+        price: 75,
+        stock: 30,
+        images: "https://www.bakery.com/images/croissant.jpg",
+        categoryId: 2, // Replace with actual categoryId for bakery
+        shopId: 5,
+      },
+      {
+        productName: "เค้กช็อคโกแลต",
+        description:
+          "เค้กช็อคโกแลตเป็นเค้กที่มีรสชาติเข้มข้นจากช็อคโกแลตที่ใช้ในการอบ อาจจะมีการตกแต่งด้วยครีมหรือช็อคโกแลตเพิ่มเติมเพื่อเพิ่มรสชาติและความสวยงาม",
+        price: 250,
+        stock: 15,
+        images: "https://www.bakery.com/images/chocolate-cake.jpg",
+        categoryId: 2, // Replace with actual categoryId for bakery
+        shopId: 5,
+      },
+      {
+        productName: "แพนเค้ก",
+        description:
+          "แพนเค้กเป็นขนมอบที่ทำจากแป้งและนม บางครั้งจะมีการใส่ผลไม้สดหรือช็อคโกแลตชิพลงไปด้วย รสชาติอ่อนหวานและเนื้อสัมผัสนุ่ม",
+        price: 85,
+        stock: 20,
+        images: "https://www.bakery.com/images/pancake.jpg",
+        categoryId: 2, // Replace with actual categoryId for bakery
+        shopId: 5,
+      },
+      {
+        productName: "มัฟฟินบลูเบอรี",
+        description:
+          "มัฟฟินบลูเบอรีเป็นขนมปังอบที่มีส่วนผสมของบลูเบอรีสดหรือแช่แข็ง ซึ่งทำให้มีรสชาติเปรี้ยวหวานและสีสันที่สวยงาม เหมาะสำหรับการรับประทานในมื้อเช้าหรือเป็นขนมว่าง",
+        price: 90,
+        stock: 25,
+        images: "https://www.bakery.com/images/blueberry-muffin.jpg",
+        categoryId: 2, // Replace with actual categoryId for bakery
+        shopId: 5,
+      },
+      {
+        productName: "บรรดาเค้กผลไม้",
+        description:
+          "บรรดาเค้กผลไม้มีหลายประเภทที่ใช้ผลไม้สดเป็นส่วนประกอบหลัก เช่น เค้กสตรอเบอรี, เค้กมะม่วง หรือเค้กแอปเปิ้ล รสชาติจะหวานอมเปรี้ยวและมีกลิ่นหอมของผลไม้",
+        price: 200,
+        stock: 18,
+        images: "https://www.bakery.com/images/fruit-cake.jpg",
+        categoryId: 2, // Replace with actual categoryId for bakery
+        shopId: 5,
+      },
+      {
+        productName: "ขนมปังชอคโกแลต",
+        description:
+          "ขนมปังชอคโกแลตเป็นขนมปังที่มีชอคโกแลตอัดแน่นอยู่ภายใน มีรสชาติหวานและเนย ช่วยเพิ่มความนุ่มและอร่อยให้กับขนมปัง",
+        price: 60,
+        stock: 40,
+        images: "https://www.bakery.com/images/chocolate-bread.jpg",
+        categoryId: 2, // Replace with actual categoryId for bakery
+        shopId: 5,
+      },
+    ],
+  });
 
-    const userRole = await prisma.role.create({
-        data: {
-            roleName: "User",
-        },
-    });
-
-    // Create Categories
-    const electronicsCategory = await prisma.category.create({
-        data: {
-            name: "Electronics",
-        },
-    });
-
-    const clothingCategory = await prisma.category.create({
-        data: {
-            name: "Clothing",
-        },
-    });
-
-    // Create Products
-    const phoneProduct = await prisma.product.create({
-        data: {
-            description: "Smartphone",
-            price: 699.99,
-            stock: 50,
-            category: {
-                connect: { categoryId: electronicsCategory.categoryId },
-            },
-        },
-    });
-
-    const shirtProduct = await prisma.product.create({
-        data: {
-            description: "T-shirt",
-            price: 19.99,
-            stock: 100,
-            category: {
-                connect: { categoryId: clothingCategory.categoryId },
-            },
-        },
-    });
-
-    // Create Users
-    const adminUser = await prisma.user.create({
-        data: {
-            userName: "admin",
-            password: "admin123",
-            firstName: "Admin",
-            lastName: "User",
-            email: "admin@example.com",
-            phoneNumber: "1234567890",
-            address: "123 Admin St",
-            role: {
-                connect: { roleId: adminRole.roleId },
-            },
-        },
-    });
-
-    const normalUser = await prisma.user.create({
-        data: {
-            userName: "user",
-            password: "user123",
-            firstName: "Normal",
-            lastName: "User",
-            email: "user@example.com",
-            phoneNumber: "0987654321",
-            address: "456 User Ave",
-            role: {
-                connect: { roleId: userRole.roleId },
-            },
-        },
-    });
-
-    // Create Orders with OrderItems
-    const order = await prisma.order.create({
-        data: {
-            orderDate: new Date(),
-            totalPrice: 719.98,
-            user: {
-                connect: { userId: normalUser.userId },
-            },
-            orderItems: {
-                create: [
-                    {
-                        orderDate: new Date(),
-                        totalPrice: 699.99,
-                        product: {
-                            connect: { productId: phoneProduct.productId },
-                        },
-                    },
-                    {
-                        orderDate: new Date(),
-                        totalPrice: 19.99,
-                        product: {
-                            connect: { productId: shirtProduct.productId },
-                        },
-                    },
-                ],
-            },
-        },
-    });
-
-    console.log("Seed data inserted");
+  console.log("Bakery seed data inserted");
 }
 
 main()
-    .catch((e) => {
-        throw e;
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+  .catch((e) => {
+    throw e;
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

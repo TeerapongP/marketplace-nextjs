@@ -5,7 +5,7 @@ import Card from '../components/Card';
 import Loading from '../components/Loading';
 import Shop from './interface/shop';
 import Alert from '../components/Alert';
-import router from 'next/router';
+import { useRouter } from 'next/navigation'; // Import for client-side navigation
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
@@ -15,6 +15,7 @@ export default function Home() {
   const [token, setToken] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
+  const router = useRouter(); // Get the router instance
 
   useEffect(() => {
     fetchShopAll();
@@ -110,6 +111,11 @@ export default function Home() {
     }
   };
 
+  // Function to handle button click
+  const handleButtonClick = (shopId: number) => {
+    router.push(`/pages/products/${shopId}`); // Perform client-side navigation
+  };
+
   const handleClick = (value: string) => {
     if (value.trim() === '') {
       fetchShopAll();
@@ -139,6 +145,7 @@ export default function Home() {
             status={item.status}
             disabled={null == roleId ? true : false}
             onToggleChange={handleToggleChange}
+            onButtonClick={handleButtonClick}
           />
         ))}
       </div>
