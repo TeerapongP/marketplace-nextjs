@@ -10,77 +10,75 @@ generator client {
 // prisma/schema.prisma
 
 model User {
-  userId      Int      @id @default(autoincrement())
-  userName    String   @unique // Ensure userName is unique
+  userId      Int     @id @default(autoincrement())
+  userName    String  @unique // Ensure userName is unique
   password    String
   firstName   String?
   lastName    String?
-  email       String?   
-  phoneNumber String?   
+  email       String?
+  phoneNumber String?
   address     String?
   userImage   String?
 
-  roleId      Int
-  role        Role     @relation(fields: [roleId], references: [roleId])
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [roleId])
 
   // Relationships
-  payments    Payment[]
-  orders      Order[]
-  carts       Cart[]
-  shops       Shop[]   // Add this line to indicate a user can have multiple shops
+  payments Payment[]
+  orders   Order[]
+  carts    Cart[]
+  shops    Shop[] // Add this line to indicate a user can have multiple shops
 
-  @@map("User")  // Maps the model name "User" to the table name "User" in the database
+  @@map("User") // Maps the model name "User" to the table name "User" in the database
 }
 
-
-
 model Role {
-  roleId      Int      @id @default(autoincrement())
-  roleName    String
+  roleId   Int    @id @default(autoincrement())
+  roleName String
 
   // Relationships
-  users          User[]
-  reserveSpaces  ReserveSpace[]
-  menus          Menu[] @relation("MenuRoles")
+  users         User[]
+  reserveSpaces ReserveSpace[]
+  menus         Menu[]         @relation("MenuRoles")
 
   @@map("Role") // Maps the model name "Role" to the table name "Role" in the database
 }
 
 model Menu {
-  menuId   Int     @id @default(autoincrement())
+  menuId   Int    @id @default(autoincrement())
   menuName String
   menuUrl  String
 
-  roles    Role[]  @relation("MenuRoles")
+  roles Role[] @relation("MenuRoles")
 
   @@map("Menu") // Maps the model name "Menu" to the table name "Menu" in the database
 }
 
 model Payment {
-  paymentId    Int      @id @default(autoincrement())
-  paymentDate  DateTime @default(now())
+  paymentId     Int      @id @default(autoincrement())
+  paymentDate   DateTime @default(now())
   paymentMethod String
-  amount       Float
+  amount        Float
 
-  userId       Int
-  user         User     @relation(fields: [userId], references: [userId])
+  userId Int
+  user   User @relation(fields: [userId], references: [userId])
 
-  @@map("Payment")  // Maps the model name "Payment" to the table name "Payment" in the database
+  @@map("Payment") // Maps the model name "Payment" to the table name "Payment" in the database
 }
 
 model Order {
-  orderId     Int      @id @default(autoincrement())
-  orderDate   DateTime @default(now())
-  totalPrice  Float
+  orderId    Int      @id @default(autoincrement())
+  orderDate  DateTime @default(now())
+  totalPrice Float
 
-  userId      Int
-  user        User     @relation(fields: [userId], references: [userId])
-  
+  userId Int
+  user   User @relation(fields: [userId], references: [userId])
+
   // Relationships
-  orderItems  OrderItem[]
-  shipments   Shipment[]
+  orderItems OrderItem[]
+  shipments  Shipment[]
 
-  @@map("Order")  // Maps the model name "Order" to the table name "Order" in the database
+  @@map("Order") // Maps the model name "Order" to the table name "Order" in the database
 }
 
 model OrderItem {
@@ -88,13 +86,13 @@ model OrderItem {
   orderDate   DateTime @default(now())
   totalPrice  Float
 
-  orderId     Int
-  order       Order    @relation(fields: [orderId], references: [orderId])
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [orderId], onUpdate: NoAction, onDelete: NoAction)
 
-  productId   Int
-  product     Product  @relation(fields: [productId], references: [productId])
+  productId Int
+  product   Product @relation(fields: [productId], references: [productId], onUpdate: NoAction, onDelete: NoAction)
 
-  @@map("OrderItem")  // Maps the model name "OrderItem" to the table name "OrderItem" in the database
+  @@map("OrderItem") // Maps the model name "OrderItem" to the table name "OrderItem" in the database
 }
 
 model Shipment {
@@ -106,75 +104,78 @@ model Shipment {
   country      String
   zipCode      String
 
-  orderId      Int
-  order        Order    @relation(fields: [orderId], references: [orderId])
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [orderId])
 
-  @@map("Shipment")  // Maps the model name "Shipment" to the table name "Shipment" in the database
+  @@map("Shipment") // Maps the model name "Shipment" to the table name "Shipment" in the database
 }
 
 model Product {
-  productId   Int      @id @default(autoincrement())
+  productId   Int    @id @default(autoincrement())
+  productName String // New field
   description String
   price       Float
   stock       Int
+  images      String
 
   // Relationships
-  categoryId  Int
-  category    Category @relation(fields: [categoryId], references: [categoryId])
-  carts       Cart[]
+  categoryId Int
+  category   Category    @relation(fields: [categoryId], references: [categoryId])
+  shopId     Int
+  shop       Shop        @relation(fields: [shopId], references: [shopId])
+  carts      Cart[]
+  OrderItem  OrderItem[]
 
-  @@map("Product")  // Maps the model name "Product" to the table name "Product" in the database
-  OrderItem OrderItem[]
-  Shop Shop[]
+  @@map("Product")
 }
 
 model Category {
-  categoryId Int      @id @default(autoincrement())
+  categoryId Int    @id @default(autoincrement())
   name       String
 
   // Relationships
-  products   Product[]
+  products Product[]
 
-  @@map("Category")  // Maps the model name "Category" to the table name "Category" in the database
+  @@map("Category") // Maps the model name "Category" to the table name "Category" in the database
 }
 
 model Cart {
-  cartId    Int      @id @default(autoincrement())
-  quantity  Int
+  cartId   Int @id @default(autoincrement())
+  quantity Int
 
-  userId    Int
-  user      User     @relation(fields: [userId], references: [userId])
+  userId Int
+  user   User @relation(fields: [userId], references: [userId], onUpdate: NoAction, onDelete: NoAction)
 
   productId Int
-  product   Product  @relation(fields: [productId], references: [productId])
+  product   Product @relation(fields: [productId], references: [productId], onUpdate: NoAction, onDelete: NoAction)
 
-  @@map("Cart")  // Maps the model name "Cart" to the table name "Cart" in the database
-}
-
-model Space {
-  spaceId     Int      @id @default(autoincrement())
-  spaceLocation String
-  pricePerDay Float
-
-  // Relationships
-  reserveSpaces ReserveSpace[]
-
-  @@map("Space")  // Maps the model name "Space" to the table name "Space" in the database
+  @@map("Cart")
 }
 
 model Shop {
-  shopId          Int             @id @default(autoincrement())
+  shopId          Int     @id @default(autoincrement())
   shopName        String
   shopDescription String
   shopImages      String
   status          Boolean
 
-  ownerId         Int             // Foreign key for the user who owns the shop
-  owner           User            @relation(fields: [ownerId], references: [userId])  // Relationship to User
-  products        Product[]       // A shop can have multiple products
-  reserveSpace    ReserveSpace?   // Optional one-to-one relationship with ReserveSpace
+  ownerId      Int // Foreign key for the user who owns the shop
+  owner        User          @relation(fields: [ownerId], references: [userId])
+  products     Product[] // A shop can have multiple products
+  reserveSpace ReserveSpace? // Optional one-to-one relationship with ReserveSpace
 
-  @@map("Shop")  // Maps the model name "Shop" to the table name "Shop" in the database
+  @@map("Shop")
+}
+
+model Space {
+  spaceId       Int    @id @default(autoincrement())
+  spaceLocation String
+  pricePerDay   Float
+
+  // Relationships
+  reserveSpaces ReserveSpace[]
+
+  @@map("Space") // Maps the model name "Space" to the table name "Space" in the database
 }
 
 model ReserveSpace {
@@ -183,12 +184,11 @@ model ReserveSpace {
   status         String
   roleId         Int
   spaceId        Int
-  shopId         Int    @unique   // Foreign key for the shop associated with the reservation @unique
+  shopId         Int      @unique // Foreign key for the shop associated with the reservation @unique
 
-  role           Role     @relation(fields: [roleId], references: [roleId], onUpdate: NoAction, onDelete: NoAction)
-  space          Space    @relation(fields: [spaceId], references: [spaceId], onUpdate: NoAction, onDelete: NoAction)
-  shop           Shop     @relation(fields: [shopId], references: [shopId], onUpdate: NoAction, onDelete: Cascade) 
+  role  Role  @relation(fields: [roleId], references: [roleId], onUpdate: NoAction, onDelete: NoAction)
+  space Space @relation(fields: [spaceId], references: [spaceId], onUpdate: NoAction, onDelete: NoAction)
+  shop  Shop  @relation(fields: [shopId], references: [shopId], onUpdate: NoAction, onDelete: Cascade)
 
-  @@map("ReserveSpace")  
+  @@map("ReserveSpace")
 }
-

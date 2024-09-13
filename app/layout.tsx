@@ -16,61 +16,58 @@ export default function RootLayout({
 }>) {
   const [currentUserRoleId, setCurrentUserRoleId] = useState<number | string>('');
   const [userId, setUserId] = useState<string>('');
-  const [token, setToken] = useState<string | null>(null); // Add state for token
+  const [token, setToken] = useState<string | null>(null);
 
   const pathname = usePathname();
 
   useEffect(() => {
     const roleId = localStorage.getItem('roleId');
     const storedUserId = localStorage.getItem('userId');
-    const storedToken = localStorage.getItem('token'); // Retrieve token from local storage
+    const storedToken = localStorage.getItem('token');
 
     if (storedToken) {
       setToken(storedToken);
       setCurrentUserRoleId(roleId ? Number(roleId) : '');
       setUserId(storedUserId || '');
     } else {
-      setToken(null); // Ensure token is cleared if not present
+      setToken(null);
     }
   }, []);
 
   const apiUrl = '/api/menu';
 
   // Determine if the navbar should be hidden based on pathname and depth
-  const hideNavbar =
-    pathname === '/pages/auth/login' ||
-    pathname === '/pages/auth/register' ||
-    pathname === '/pages/auth/forgotpassword'
-    pathname.split('/').length > 10;
+  const hideNavbar = pathname.startsWith('/pages/auth/') || pathname.split('/').length > 10;
 
-  // Handle rendering of the 404 page
+  // Determine if the path is valid or needs token validation
   const isValidPath = [
     '/',
     '/pages/auth/login',
     '/pages/auth/register',
     '/pages/category',
     '/pages/shop',
-    '/pages/auth/forgotpassword'
-  ].includes(pathname);
+    '/pages/auth/forgotpassword',
+  ].includes(pathname) || pathname.startsWith('/pages/products/');
 
-  // Check if the current path requires a token to be valid
   const requiresToken = [
     '/pages/order',
     '/pages/delivery',
     '/pages/profile',
   ].includes(pathname);
 
+  // Check if the current path requires token validation and token is present
+  const shouldRenderContent = isValidPath || (requiresToken && token);
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        {(isValidPath || (requiresToken && token)) && !hideNavbar && (
+        {shouldRenderContent && !hideNavbar && (
           <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} />
         )}
         <div className={`tw-mt-${hideNavbar ? '0' : '16'}`}>
-          {(isValidPath || (requiresToken && token)) ? children : <Custom404 />}
+          {shouldRenderContent ? children : <Custom404 />}
         </div>
       </body>
-
     </html>
   );
 }

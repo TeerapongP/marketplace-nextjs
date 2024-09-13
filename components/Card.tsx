@@ -4,11 +4,12 @@ import Image from 'next/image';
 import ToggleSwitch from './Toggle';
 import Button from './Button';
 
-const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, shopId, disabled, onToggleChange }) => {
+const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, shopId, disabled, onToggleChange, onButtonClick }) => {
   const [isToggled, setIsToggled] = useState<boolean>(status);
 
   // Sync the toggle state with the initial status prop
   useEffect(() => {
+    console.log("status : ", status)
     setIsToggled(status);
   }, [status]);
 
@@ -16,6 +17,12 @@ const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, s
     setIsToggled(checked);
     if (onToggleChange && shopId !== undefined) {
       onToggleChange(shopId, checked); // Pass shopId and checked value
+    }
+  };
+
+  const handleButtonClick = () => {
+    if (onButtonClick && shopId !== undefined) {
+      onButtonClick(shopId); // Pass shopId when button is clicked
     }
   };
 
@@ -27,7 +34,7 @@ const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, s
           <div className="tw-relative tw-w-full tw-h-48 tw-row-span-1">
             <Image
               src={imageUrl}
-              alt={title}
+              alt={title || ""}
               layout="fill"
               objectFit="cover"
               className="tw-object-cover"
@@ -43,27 +50,31 @@ const Card: React.FC<CardProps> = ({ title, content, imageUrl, status = false, s
 
         {/* Footer Section */}
         <div className="tw-p-4 tw-flex tw-items-center tw-justify-between tw-row-span-1">
-          <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
-            <Button
-              type="submit"
-              text="View"
-              width="tw-w-48 custom-sm:tw-w-16"
-              height="tw-h-10"
-              textColor="tw-text-black"
-              color="tw-bg-white"
-              disabled={false === status}
-              className="tw-mr-4"
-            />
-          </div>
-          <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
-            <ToggleSwitch
-              label={isToggled ? 'open' : 'close'}
-              checked={isToggled}
-              onChange={handleToggleChange}
-              disabled={disabled}
-            />
-          </div>
-
+          {status ? (
+            <>
+              <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
+                <Button
+                  type="submit"
+                  text="View"
+                  width="tw-w-48 custom-sm:tw-w-16"
+                  height="tw-h-10"
+                  textColor="tw-text-black"
+                  color="tw-bg-white"
+                  disabled={false} // Assuming you want the button to be enabled when status is true
+                  className="tw-mr-4"
+                  onClick={handleButtonClick} // Add onClick handler
+                />
+              </div>
+              <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
+                <ToggleSwitch
+                  label={isToggled ? 'open' : 'close'}
+                  checked={isToggled}
+                  onChange={handleToggleChange}
+                  disabled={disabled}
+                />
+              </div>
+            </>
+          ) : null} {/* Render nothing if status is false */}
         </div>
       </div>
     </div>

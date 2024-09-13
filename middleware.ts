@@ -8,7 +8,7 @@ const allowedPaths = [
   "/pages/auth/register",
   "/pages/profile",
   "/pages/auth/forgotpassword",
-];
+].concat(["/pages/products/"]);
 
 // Define API paths that should be allowed without authentication
 const allowedApiPaths = [
@@ -19,6 +19,7 @@ const allowedApiPaths = [
   "/api/shop/shop-list",
   "/api/auth/forgotPassword",
   "/api/shop/shop-find-by-name",
+  "/api/products",
 ];
 
 // Exclude internal Next.js paths and static assets
@@ -40,7 +41,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // Allow specified public paths
-  if (allowedPaths.includes(pathname)) {
+  if (allowedPaths.some((path) => pathname.startsWith(path))) {
     return NextResponse.next();
   }
 
@@ -75,7 +76,7 @@ export async function middleware(req: NextRequest) {
 
       return NextResponse.next();
     } catch (error) {
-      console.error("Token verification error:", error); // Debugging output
+      console.error("Token verification error:", error);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
   }

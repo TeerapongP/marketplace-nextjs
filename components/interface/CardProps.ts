@@ -1,10 +1,11 @@
 export default interface CardProps {
-  title: string;
-  content: string;
+  title?: string;
+  content?: string;
   imageUrl?: string;
   status?: boolean;
-  shopId: number;
+  shopId?: number;
   roleId?: number;
-  disabled:boolean;
+  disabled?: boolean;
   onToggleChange?: (shopId: number, checked: boolean) => void;
+  onButtonClick?: (shopId: number) => void; // Add this line
 }
