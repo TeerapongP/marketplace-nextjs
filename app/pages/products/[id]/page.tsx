@@ -38,26 +38,35 @@ const ProductPage = () => {
   }, [pathname]);
 
   return (
-    <div className="tw-flex tw-justify-center tw-mt-20">
+    <div className="tw-w-full tw-mt-24">
       {loading ? (
         <div className="tw-flex tw-justify-center tw-items-center tw-w-full tw-h-full">
           <Loading />
         </div>
       ) : (
         <>
-          <div className='tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center'>
-            {data.length > 0 && data.map((item) => (
-              <Card
-                key={item.productId}
-                title={item.productName}
-                content={item.description}
-                imageUrl={item.images}
-              />
-            ))}
-          </div>
           {alertMessage && alertType && (
-            <Alert type={alertType} message={alertMessage} />
+            <div className="tw-w-full tw-flex tw-justify-center tw-mb-4">
+              <Alert type={alertType} message={alertMessage} />
+            </div>
           )}
+          <div className="tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center">
+            {data.length > 0 ? (
+              data.map((item) => (
+                <Card
+                  key={item.productId}
+                  title={item.productName}
+                  content={item.description}
+                  imageUrl={item.images}
+                  bgColor="tw-bg-custom-yellow"
+                  price={item.price}
+                  bgButtonColor="tw-bg-custom-green"
+                />
+              ))
+            ) : (
+              <p>No products found</p> // You can add a fallback message
+            )}
+          </div>
         </>
       )}
     </div>
