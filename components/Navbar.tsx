@@ -13,6 +13,8 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // Use null to represent loading state
     const [loading, setLoading] = useState(true); // Loading state for fetching data
+    const [cartItems, setCartItems] = useState<number>(0); // State for cart items
+    const [dropdownOpen, setDropdownOpen] = useState<boolean>(false); // State for dropdown menu
 
     const router = useRouter();
 
@@ -42,6 +44,18 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
         checkLoginStatus();
     }, []);
 
+    useEffect(() => {
+        if (isLoggedIn) {
+            const fetchCartItems = () => {
+                // Fetch cart items from local storage or an API
+                const cart = localStorage.getItem('cartItems');
+                setCartItems(cart ? JSON.parse(cart).length : 0);
+            };
+
+            fetchCartItems();
+        }
+    }, [isLoggedIn]);
+
     const handleLoginClick = () => {
         router.push('/pages/auth/login');
     };
@@ -54,9 +68,12 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('roleId');
-
         setIsLoggedIn(false);
         router.push('/pages/auth/login');
+    };
+
+    const handleCartClick = () => {
+        setDropdownOpen(prevState => !prevState); // Toggle dropdown visibility
     };
 
     if (loading) {
@@ -95,8 +112,8 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
                         )}
                     </ul>
                 </div>
-                <div className='tw-grid tw-justify-items-end custom-sm:tw-mx-6'>
-                    {isLoggedIn === null ? ( // Show loading state for login status
+                <div className='tw-flex tw-space-x-4 tw-items-center tw-justify-end'>
+                    {isLoggedIn === null ? (
                         <div>Loading...</div>
                     ) : !isLoggedIn ? (
                         <div className='tw-flex'>
@@ -104,10 +121,29 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
                             <Button type="submit" text="Login" width="tw-w-20 custom-sm:tw-w-16" height='tw-h-10' textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />
                         </div>
                     ) : (
-                        <div className='tw-flex'>
-                            <UserAvatarIcon className='tw-mr-4 tw-cursor-pointer' onClick={handleProfile} />
-                            <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />
-                        </div>
+                        <>
+                            <div className='tw-flex'>
+                                <UserAvatarIcon className='tw-mr-4 tw-cursor-pointer' onClick={handleProfile} />
+                                <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />
+                            </div>
+                            <div className='tw-relative'>
+                                <div className='tw-flex tw-items-center tw-cursor-pointer' onClick={handleCartClick}>
+                                    <i className="fas fa-shopping-cart tw-w-5 tw-h-5 tw-text-white tw-mr-2"></i>
+                                    <span className="tw-bg-white tw-text-black tw-rounded-full tw-px-2 tw-py-1 tw-text-sm">{cartItems}</span>
+                                </div>
+                                {dropdownOpen && (
+                                    <div className='tw-absolute tw-right-0 tw-top-full tw-mt-2 tw-bg-white tw-text-black tw-shadow-lg tw-rounded-md tw-w-64 tw-p-4'>
+                                        <h4 className='tw-font-bold tw-text-lg'>Cart Items</h4>
+                                        {/* Placeholder for cart item details */}
+                                        <ul>
+                                            {/* Render cart items here */}
+                                            <li>No items in the cart</li>
+                                        </ul>
+                                        <Link href="/pages/order" className='tw-block tw-mt-2 tw-text-blue-600 tw-hover:tw-text-blue-800'>View Cart</Link>
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     )}
                 </div>
             </div>

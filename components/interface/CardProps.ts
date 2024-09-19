@@ -1,3 +1,4 @@
+import Product from "../../app/interface/products";
 export default interface CardProps {
   title?: string;
   content?: string;
@@ -10,5 +11,5 @@ export default interface CardProps {
   price?: number;
   bgButtonColor?: string;
   onToggleChange?: (shopId: number, checked: boolean) => void;
-  onButtonClick?: (shopId: number) => void; // Add this line
+  onButtonClick?: (product: Product) => void; // Updated to accept a Product parameter
 }

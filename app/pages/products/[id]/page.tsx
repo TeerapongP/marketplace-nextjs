@@ -6,6 +6,7 @@ import Card from '../../../../components/Card'; // Adjust the import path as nee
 import Alert from '../../../../components/Alert'; // Adjust the import path as needed
 import Product from '../../../interface/products'; // Adjust the import path as needed
 import Loading from '../../../../components/Loading';
+import { useCart } from '../../../context/CartContext'; // Ensure this path is correct
 
 const ProductPage = () => {
   const pathname = usePathname();
@@ -14,7 +15,8 @@ const ProductPage = () => {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [roleId, setRoleId] = useState<number | null>(null); // Add roleId if needed
+
+  const { dispatch } = useCart();
 
   useEffect(() => {
     const id = pathname.split('/').pop(); // Extract the dynamic parameter
@@ -36,6 +38,16 @@ const ProductPage = () => {
         });
     }
   }, [pathname]);
+
+  const handleAddToCart = (product: Product) => {
+    console.log("product ", product);
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: { ...product, quantity: 1 },
+    });
+    setAlertMessage('Product added to cart');
+    setAlertType('success');
+  };
 
   return (
     <div className="tw-w-full tw-mt-24">
@@ -61,6 +73,7 @@ const ProductPage = () => {
                   bgColor="tw-bg-custom-yellow"
                   price={item.price}
                   bgButtonColor="tw-bg-custom-green"
+                  onButtonClick={handleAddToCart}
                 />
               ))
             ) : (

@@ -3,7 +3,8 @@ import CardProps from './interface/CardProps';
 import Image from 'next/image';
 import ToggleSwitch from './Toggle';
 import Button from './Button';
-import IconsCart from '../public/iconsCart.svg'
+import Product from '../app/interface/products';
+
 const Card: React.FC<CardProps> = ({
   title,
   content,
@@ -19,25 +20,34 @@ const Card: React.FC<CardProps> = ({
 }) => {
   const [isToggled, setIsToggled] = useState<boolean>(status);
   const [token, setToken] = useState<string | null>(null);
-  // Sync the toggle state with the initial status prop
+
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
-    setToken(storedToken)
+    setToken(storedToken);
     setIsToggled(status);
   }, [status]);
 
   const handleToggleChange = (checked: boolean) => {
     setIsToggled(checked);
     if (onToggleChange && shopId !== undefined) {
-      onToggleChange(shopId, checked); // Pass shopId and checked value
+      onToggleChange(shopId, checked);
     }
   };
 
   const handleButtonClick = () => {
-    if (onButtonClick && shopId !== undefined) {
-      onButtonClick(shopId); // Pass shopId when button is clicked
+    if (onButtonClick) {
+      const product: Product = {
+        productId: shopId ?? 0,
+        productName: title ?? "",
+        description: content ?? "",
+        price: price ?? 0,
+        stock: 0,
+        images: imageUrl ?? "",
+      };
+      onButtonClick(product);
     }
   };
+
 
   return (
     <div className={`${bgColor ? bgColor : 'tw-bg-gray-100'} tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm`}>
@@ -87,30 +97,31 @@ const Card: React.FC<CardProps> = ({
                 />
               </div>
             </>
-          ) : <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4 tw-justify-between tw-w-full">
-            <Button
-              type="submit"
-              text={price ? `฿${price.toString()}` : ""}
-              width="tw-w-24 custom-sm:tw-w-16"
-              height="tw-h-10"
-              textColor="tw-text-white"
-              color={disabled ? bgButtonColor : 'tw-bg-green-600'}
-              disabled={null === token}
-              className="tw-mr-4"
-              onClick={handleButtonClick}
-            />
-            <Button
-              type="submit"
-              textColor="tw-text-white"
-              color={disabled ? bgButtonColor : 'tw-bg-blue-500'}
-              className=" tw-text-white tw-font-bold tw-px-4 tw-py-2 tw-rounded tw-shadow-lg hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 
-            focus:tw-ring-blue-300 tw-flex tw-items-center tw-space-x-2"
-            >
-              <i className="fas fa-shopping-cart tw-w-5 tw-h-5"></i>
-              <span>Cart</span>
-            </Button>
-          </div>
-          }
+          ) : (
+            <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4 tw-justify-between tw-w-full">
+              <Button
+                type="submit"
+                text={price ? `฿${price.toString()}` : ""}
+                width="tw-w-24 custom-sm:tw-w-16"
+                height="tw-h-10"
+                textColor="tw-text-white"
+                color={disabled ? bgButtonColor : 'tw-bg-green-600'}
+                disabled={null === token}
+                className="tw-mr-4"
+
+              />
+              <Button
+                type="submit"
+                textColor="tw-text-white"
+                color={disabled ? bgButtonColor : 'tw-bg-blue-500'}
+                className=" tw-text-white tw-font-bold tw-px-4 tw-py-2 tw-rounded tw-shadow-lg hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 
+              focus:tw-ring-blue-300 tw-flex tw-items-center tw-space-x-2"
+                onClick={handleButtonClick}>
+                <i className="fas fa-shopping-cart tw-w-5 tw-h-5"></i>
+                <span>Cart</span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

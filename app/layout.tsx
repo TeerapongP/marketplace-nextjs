@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Custom404 from './404';
+import { CartProvider } from './context/CartContext'; // Adjust the path as needed
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -61,12 +62,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {shouldRenderContent && !hideNavbar && (
-          <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} />
-        )}
-        <div className={`tw-mt-${hideNavbar ? '0' : '16'}`}>
-          {shouldRenderContent ? children : <Custom404 />}
-        </div>
+        <CartProvider>
+          {shouldRenderContent && !hideNavbar && (
+            <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} />
+          )}
+          <div className={`tw-mt-${hideNavbar ? '0' : '16'}`}>
+            {shouldRenderContent ? children : <Custom404 />}
+          </div>
+        </CartProvider>
       </body>
     </html>
   );
