@@ -1,11 +1,12 @@
-export default interface ButtonProps {
-  type?: 'button' | 'submit' | 'reset';
-  text: string;
+interface ButtonProps {
+  type?: "button" | "submit" | "reset";
+  text?: string;
   width?: string;
   height?: string;
   textColor?: string;
   color?: string;
-  className?:string;
-  onClick?: () => void; // Add onClick prop
-  disabled?: boolean; // Add this line
+  onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
 }
