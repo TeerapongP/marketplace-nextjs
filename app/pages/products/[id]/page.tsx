@@ -16,7 +16,7 @@ const ProductPage = () => {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const { state: { cartItems }, dispatch } = useCart();
+  const { state: { }, dispatch } = useCart();
 
   useEffect(() => {
     const id = pathname.split('/').pop(); // Extract the dynamic parameter

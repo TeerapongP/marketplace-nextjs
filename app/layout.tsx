@@ -58,7 +58,7 @@ export default function RootLayout({
           {shouldRenderContent && !hideNavbar && (
             <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} />
           )}
-          <div className={`tw-mt-${hideNavbar ? '0' : '16'}`}>
+          <div className={`tw-mt-${hideNavbar ? '0' : '16'} tw-my-10`}>
             {shouldRenderContent ? children : <Custom404 />}
           </div>
         </CartProvider>
