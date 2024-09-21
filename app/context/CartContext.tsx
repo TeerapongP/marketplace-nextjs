@@ -1,34 +1,45 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { CartState, CartAction, CartItem } from '../interface/carts'; // Adjust import path
+import React, { createContext, useContext, useReducer } from 'react';
+import { CartItem, CartState } from '../interface/carts';
+// Define action types
+type Action =
+    | { type: 'SET_CART_ITEMS'; payload: CartItem[] }
+    | { type: 'ADD_TO_CART'; payload: CartItem }
+    | { type: 'REMOVE_FROM_CART'; payload: number };
 
-const CartContext = createContext<{ state: CartState; dispatch: React.Dispatch<CartAction> } | undefined>(undefined);
+// Create initial state
+export const initialState: CartState = {
+    cartItems: [],
+};
 
-const cartReducer = (state: CartState, action: CartAction): CartState => {
+// Create a reducer function
+const cartReducer = (state: CartState, action: Action): CartState => {
     switch (action.type) {
+        case 'SET_CART_ITEMS':
+            return { ...state, cartItems: action.payload };
         case 'ADD_TO_CART':
-            const existingItemIndex = state.items.findIndex(item => item.productId === action.payload.productId);
-            if (existingItemIndex > -1) {
-                const updatedItems = [...state.items];
-                updatedItems[existingItemIndex] = {
-                    ...updatedItems[existingItemIndex],
-                    quantity: updatedItems[existingItemIndex].quantity + action.payload.quantity,
-                };
-                return { ...state, items: updatedItems };
-            } else {
-                return { ...state, items: [...state.items, action.payload] };
-            }
+            return {
+                ...state,
+                cartItems: [...state.cartItems, action.payload],
+            };
         case 'REMOVE_FROM_CART':
             return {
                 ...state,
-                items: state.items.filter(item => item.productId !== Number(action.payload.productId)),
+                cartItems: state.cartItems.filter(item => item.productId !== action.payload),
             };
         default:
             return state;
     }
 };
 
-export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [state, dispatch] = useReducer(cartReducer, { items: [] });
+// Create context
+export const CartContext = createContext<{
+    state: CartState;
+    dispatch: React.Dispatch<Action>;
+} | undefined>(undefined);
+
+// Create a provider component
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [state, dispatch] = useReducer(cartReducer, initialState);
     return (
         <CartContext.Provider value={{ state, dispatch }}>
             {children}
@@ -36,9 +47,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 };
 
+// Create a custom hook for easy access to the context
 export const useCart = () => {
     const context = useContext(CartContext);
-    if (context === undefined) {
+    if (!context) {
         throw new Error('useCart must be used within a CartProvider');
     }
     return context;

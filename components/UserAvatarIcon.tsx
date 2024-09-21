@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image'; // Make sure you import Image from Next.js
 
 
-const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className,onClick }) => {
+const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className, onClick }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
     const [token, setToken] = useState<string | null>(null);
-    const [alertMessage, setAlertMessage] = useState<string | null>(null);
-    const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
-    
+
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
         const storedToken = localStorage.getItem('token');
@@ -39,7 +37,7 @@ const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className,onClick }) =>
         };
 
         fetchImage();
-    }, [userId, token]); // Add token as a dependency
+    }, [userId, token]);
 
     return (
         <div
@@ -48,7 +46,7 @@ const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className,onClick }) =>
         >
             {imageUrl ? (
                 <Image
-                    src={`/${imageUrl}`} // Correct relative path with leading slash
+                    src={`${imageUrl}`} // Correct relative path with leading slash
                     alt="User Avatar"
                     fill // Ensure the image covers the container
                     style={{ objectFit: 'cover' }} // Ensures the image covers the container

@@ -29,6 +29,7 @@ const nextConfig = {
       { protocol: "https", hostname: "static.wixstatic.com" },
       { protocol: "https", hostname: "mkunigroup.com" },
       { protocol: "https", hostname: "www.easycookingmenu.com" },
+      { protocol: "https", hostname: "baansomtum.com" },
     ],
   },
   webpack(config) {

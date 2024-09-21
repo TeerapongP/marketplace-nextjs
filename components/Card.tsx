@@ -16,7 +16,8 @@ const Card: React.FC<CardProps> = ({
   price,
   bgButtonColor,
   onToggleChange,
-  onButtonClick
+  onButtonClick,
+  onButtonViewClick, // Include onButtonViewClick in props
 }) => {
   const [isToggled, setIsToggled] = useState<boolean>(status);
   const [token, setToken] = useState<string | null>(null);
@@ -48,6 +49,11 @@ const Card: React.FC<CardProps> = ({
     }
   };
 
+  const handleButtonViewClick = () => {
+    if (onButtonViewClick && shopId !== undefined) {
+      onButtonViewClick(shopId); // Pass shopId when button is clicked
+    }
+  };
 
   return (
     <div className={`${bgColor ? bgColor : 'tw-bg-gray-100'} tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm`}>
@@ -85,7 +91,7 @@ const Card: React.FC<CardProps> = ({
                   color="tw-bg-white"
                   disabled={false}
                   className="tw-mr-4"
-                  onClick={handleButtonClick}
+                  onClick={handleButtonViewClick} // Add View button click handler
                 />
               </div>
               <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
@@ -108,7 +114,6 @@ const Card: React.FC<CardProps> = ({
                 color={disabled ? bgButtonColor : 'tw-bg-green-600'}
                 disabled={null === token}
                 className="tw-mr-4"
-
               />
               <Button
                 type="submit"
