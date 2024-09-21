@@ -44,12 +44,17 @@ export async function GET(req: NextRequest) {
     const cartItems = await prisma.cart.findMany({
       where: { userId: Number(userIdParam) },
       include: {
-        product: true, // Include related product data
+        product: {
+          include: {
+            shop: true, // Include related shop data
+          },
+        },
       },
     });
 
     // Format the response to include only the desired fields
     const formattedCartItems = cartItems.map((item) => ({
+      shopName: item.product.shop?.shopName, // Access the shop name
       quantity: item.quantity,
       productName: item.product.productName,
       price: item.product.price,

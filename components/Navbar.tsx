@@ -8,13 +8,13 @@ import UserAvatarIcon from './UserAvatarIcon';
 import Loading from './Loading';
 import { useCart } from '../app/context/CartContext'; // Import the custom hook
 
-const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
+const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(true);
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const router = useRouter();
-    const { state: { cartItems }, dispatch } = useCart();
+    const { state: { cartItems } } = useCart();
 
 
     useEffect(() => {
@@ -64,7 +64,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
     }
 
     return (
-        <nav className="tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50">
+        <nav className={`tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50 ${className}`}>
             <div className='tw-grid tw-grid-cols-2 tw-w-full'>
                 <div className='tw-w-full tw-flex tw-space-x-4'>
                     <Link href="/" className="tw-font-bold tw-text-black tw-text-2xl md:tw-text-xl sm:tw-text-sm custom-sm:tw-text-base">

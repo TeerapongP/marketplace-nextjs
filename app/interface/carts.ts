@@ -7,6 +7,7 @@ export interface CartItem {
   quantity: number;
   stock: number;
   images: string;
+  shopName: string;
 }
 
 export interface CartState {
