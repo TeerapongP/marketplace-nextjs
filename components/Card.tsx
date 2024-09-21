@@ -44,6 +44,7 @@ const Card: React.FC<CardProps> = ({
         price: price ?? 0,
         stock: 0,
         images: imageUrl ?? "",
+        quantity: 0
       };
       onButtonClick(product);
     }
