@@ -5,4 +5,5 @@ export default interface ProductData {
   price: number;
   stock: number;
   images: string;
+  quantity: number;
 }

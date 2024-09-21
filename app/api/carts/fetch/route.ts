@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 
 export async function GET(req: NextRequest) {
   const JWT_SECRET = process.env.JWT_SECRET || "";
+
   try {
     // Extract the Authorization header
     const authHeader = req.headers.get("Authorization");
@@ -24,23 +25,24 @@ export async function GET(req: NextRequest) {
     }
 
     // Verify the token and extract user ID
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    if (!decoded) {
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+    } catch (error) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
-    // Extract user ID from the request URL
+    // Extract user ID from the request URL, if provided
     const { searchParams } = new URL(req.url);
-    const userIdParam = searchParams.get("id");
-    const userId = userIdParam ? Number(userIdParam) : decoded.userId;
-
-    if (isNaN(userId)) {
+    const userIdParam = searchParams.get("userId");
+    // Handle missing or invalid user ID
+    if (!userIdParam) {
       return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
     }
 
     // Fetch cart items for the user
     const cartItems = await prisma.cart.findMany({
-      where: { userId: userId },
+      where: { userId: Number(userIdParam) },
       include: {
         product: true, // Include related product data
       },
@@ -57,7 +59,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(formattedCartItems);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching cart items:", error);
     return NextResponse.json(
       { error: "Error fetching cart items" },
       { status: 500 }

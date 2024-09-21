@@ -24,12 +24,20 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify the token
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    if (!decoded) {
-      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+      if (!decoded) {
+        return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+      }
+    } catch (error) {
+      return NextResponse.json(
+        { message: "JWT malformed or invalid" },
+        { status: 401 }
+      );
     }
 
     const { userId, productId, quantity } = await req.json();
+
     // Add an item to the cart
     const cartItem = await prisma.cart.create({
       data: {
@@ -41,9 +49,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(cartItem, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Error adding to cart" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }

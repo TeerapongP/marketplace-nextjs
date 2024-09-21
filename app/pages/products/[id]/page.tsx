@@ -7,6 +7,7 @@ import Alert from '../../../../components/Alert'; // Adjust the import path as n
 import Product from '../../../interface/products'; // Adjust the import path as needed
 import Loading from '../../../../components/Loading';
 import { useCart } from '../../../context/CartContext'; // Ensure this path is correct
+import { CartItem } from '@/app/interface/carts';
 
 const ProductPage = () => {
   const pathname = usePathname();
@@ -15,8 +16,7 @@ const ProductPage = () => {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const { dispatch } = useCart();
+  const { state: { cartItems }, dispatch } = useCart();
 
   useEffect(() => {
     const id = pathname.split('/').pop(); // Extract the dynamic parameter
@@ -39,15 +39,65 @@ const ProductPage = () => {
     }
   }, [pathname]);
 
-  const handleAddToCart = (product: Product) => {
-    console.log("product ", product);
-    dispatch({
-      type: 'ADD_TO_CART',
-      payload: { ...product, quantity: 1 },
-    });
-    setAlertMessage('Product added to cart');
-    setAlertType('success');
+  const handleAddToCart = async (product: Product, quantity: number = 1) => {
+    const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+
+    if (!userId || !token) {
+      setAlertMessage('You need to be logged in to add items to the cart.');
+      setAlertType('error');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/carts/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: Number(userId),
+          productId: product.productId,
+          quantity,
+        }),
+      });
+
+      if (res.ok) {
+        // Create a new CartItem based on the product and quantity
+        const cartItem: CartItem = {
+          productId: product.productId,
+          productName: product.productName,
+          description: product.description, // Ensure the product object has this property
+          price: product.price,
+          quantity,
+          stock: product.stock, // Ensure the product object has this property
+          images: product.images, // Ensure the product object has this property
+        };
+
+        // Dispatch the action to add the item to the cart
+        dispatch({ type: 'ADD_TO_CART', payload: cartItem });
+        setAlertMessage('Product added to cart');
+        setAlertType('success');
+      } else {
+        const errorMessage = (await res.json())?.message || 'Something went wrong. Please try again.';
+        setAlertMessage(errorMessage);
+        setAlertType('error');
+      }
+    } catch (error) {
+      setAlertMessage('An unexpected error occurred. Please try again later.');
+      setAlertType('error');
+    } finally {
+      setLoading(false);
+    }
   };
+
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="tw-w-full tw-mt-24">
@@ -73,11 +123,11 @@ const ProductPage = () => {
                   bgColor="tw-bg-custom-yellow"
                   price={item.price}
                   bgButtonColor="tw-bg-custom-green"
-                  onButtonClick={handleAddToCart}
+                  onButtonClick={() => handleAddToCart(item)}
                 />
               ))
             ) : (
-              <p>No products found</p> // You can add a fallback message
+              <p>No products found</p> // Fallback message
             )}
           </div>
         </>

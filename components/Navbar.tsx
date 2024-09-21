@@ -1,89 +1,67 @@
-'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-import { NavbarProps } from './interface/NavbarProps'; // Adjust the path as necessary
+import { NavbarProps } from './interface/NavbarProps';
 import { MenuItem } from './interface/MenuItem';
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
 import Loading from './Loading';
+import { useCart } from '../app/context/CartContext'; // Import the custom hook
 
 const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // Use null to represent loading state
-    const [loading, setLoading] = useState(true); // Loading state for fetching data
-    const [cartItems, setCartItems] = useState<number>(0); // State for cart items
-    const [dropdownOpen, setDropdownOpen] = useState<boolean>(false); // State for dropdown menu
-
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const router = useRouter();
+    const { state: { cartItems }, dispatch } = useCart();
+
 
     useEffect(() => {
-        const fetchOptions = async () => {
+        const fetchMenuItems = async () => {
             try {
                 const res = await fetch(url);
                 if (res.ok) {
                     const data: MenuItem[] = await res.json();
                     setMenuItems(data);
+                } else {
+                    console.error('Failed to fetch menu items');
                 }
             } catch (error) {
                 console.error('Error fetching menu items:', error);
             } finally {
-                setLoading(false); // Set loading to false after fetching
+                setLoading(false);
             }
         };
 
-        fetchOptions();
+        fetchMenuItems();
     }, [url]);
 
     useEffect(() => {
-        const checkLoginStatus = () => {
-            const token = localStorage.getItem('token');
-            setIsLoggedIn(!!token);
-        };
-        checkLoginStatus();
+        const token = localStorage.getItem('token');
+        setIsLoggedIn(!!token);
     }, []);
 
-    useEffect(() => {
-        if (isLoggedIn) {
-            const fetchCartItems = () => {
-                // Fetch cart items from local storage or an API
-                const cart = localStorage.getItem('cartItems');
-                setCartItems(cart ? JSON.parse(cart).length : 0);
-            };
-
-            fetchCartItems();
-        }
-    }, [isLoggedIn]);
-
-    const handleLoginClick = () => {
-        router.push('/pages/auth/login');
-    };
-
-    const handleProfile = () => {
-        router.push('/pages/profile');
-    };
-
+    const handleLoginClick = () => router.push('/pages/auth/login');
+    const handleProfile = () => router.push('/pages/profile');
     const handleSignoutClick = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('roleId');
-        setIsLoggedIn(false);
         router.push('/pages/auth/login');
+        setIsLoggedIn(false);
     };
+    const handleCartClick = () => setDropdownOpen(prev => !prev);
 
-    const handleCartClick = () => {
-        setDropdownOpen(prevState => !prevState); // Toggle dropdown visibility
-    };
+    const filteredMenuItems = useMemo(() => {
+        return userRoleId === 0
+            ? menuItems.slice(0, 2)
+            : menuItems.filter(item => item.roles.some(role => role.roleId === Number(userRoleId)));
+    }, [menuItems, userRoleId]);
 
     if (loading) {
-        return <Loading />; // Display loading state
+        return <Loading />;
     }
-
-    const shouldShowSpecificItems = userRoleId === 0;
-    const filteredMenuItems = menuItems.filter(item =>
-        item.roles.some(role => role.roleId === Number(userRoleId))
-    );
 
     return (
         <nav className="tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50">
@@ -93,28 +71,18 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
                         Market delivery
                     </Link>
                     <ul className="tw-flex tw-space-x-4 tw-text-white lg:tw-text-xl md:tw-text-base sm:tw-text-base custom-sm:text-base custom-sm:tw-text-center tw-tw-ml-5">
-                        {shouldShowSpecificItems ? (
-                            menuItems.slice(0, 2).map(item => (
-                                <li key={item.menuName}>
-                                    <Link href={item.menuUrl} className="tw-hover:tw-text-gray-400">
-                                        {item.menuName}
-                                    </Link>
-                                </li>
-                            ))
-                        ) : (
-                            filteredMenuItems.map(item => (
-                                <li key={item.menuName}>
-                                    <Link href={item.menuUrl} className="tw-hover:tw-text-gray-400">
-                                        {item.menuName}
-                                    </Link>
-                                </li>
-                            ))
-                        )}
+                        {filteredMenuItems.map(item => (
+                            <li key={item.menuName}>
+                                <Link href={item.menuUrl} className="tw-hover:tw-text-gray-400">
+                                    {item.menuName}
+                                </Link>
+                            </li>
+                        ))}
                     </ul>
                 </div>
                 <div className='tw-flex tw-space-x-4 tw-items-center tw-justify-end'>
                     {isLoggedIn === null ? (
-                        <div>Loading...</div>
+                        <Loading />
                     ) : !isLoggedIn ? (
                         <div className='tw-flex'>
                             <UserAvatarIcon className='tw-mr-4' />
@@ -129,17 +97,31 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId }) => {
                             <div className='tw-relative'>
                                 <div className='tw-flex tw-items-center tw-cursor-pointer' onClick={handleCartClick}>
                                     <i className="fas fa-shopping-cart tw-w-5 tw-h-5 tw-text-white tw-mr-2"></i>
-                                    <span className="tw-bg-white tw-text-black tw-rounded-full tw-px-2 tw-py-1 tw-text-sm">{cartItems}</span>
+                                    <span className="tw-bg-white tw-text-black tw-rounded-full tw-px-2 tw-py-1 tw-text-sm">{cartItems.length}</span>
                                 </div>
                                 {dropdownOpen && (
-                                    <div className='tw-absolute tw-right-0 tw-top-full tw-mt-2 tw-bg-white tw-text-black tw-shadow-lg tw-rounded-md tw-w-64 tw-p-4'>
-                                        <h4 className='tw-font-bold tw-text-lg'>Cart Items</h4>
-                                        {/* Placeholder for cart item details */}
-                                        <ul>
-                                            {/* Render cart items here */}
-                                            <li>No items in the cart</li>
+                                    <div className='tw-absolute tw-right-0 tw-top-full tw-mt-2 tw-bg-white tw-text-black tw-shadow-lg tw-rounded-md tw-w-64 tw-p-4 tw-border tw-border-gray-200'>
+                                        <h4 className='tw-font-bold tw-text-lg tw-border-b tw-pb-2'>Cart Items</h4>
+                                        <ul className='tw-space-y-2'>
+                                            {cartItems.length === 0 ? (
+                                                <li className='tw-text-gray-500'>No items in the cart</li>
+                                            ) : (
+                                                cartItems.map(item => (
+                                                    <li key={item.productId} className='tw-flex tw-items-center tw-p-2 tw-border-b tw-border-gray-200 hover:bg-gray-100 transition-colors duration-300'>
+                                                        <img src={item.images} alt={item.productName} className='tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2' />
+                                                        <div className='tw-flex-1'>
+                                                            <span className='tw-font-semibold'>{item.productName}</span>
+                                                            <div className='tw-text-gray-600'>Quantity: {item.quantity}</div>
+                                                        </div>
+                                                    </li>
+                                                ))
+                                            )}
                                         </ul>
-                                        <Link href="/pages/order" className='tw-block tw-mt-2 tw-text-blue-600 tw-hover:tw-text-blue-800'>View Cart</Link>
+                                        {cartItems.length > 0 && (
+                                            <Link href="/pages/order" className='tw-block tw-bg-blue-600 tw-text-white tw-text-center tw-mt-4 tw-py-2 tw-rounded-md tw-transition tw-duration-300 tw-hover:bg-blue-700'>
+                                                View Cart
+                                            </Link>
+                                        )}
                                     </div>
                                 )}
                             </div>

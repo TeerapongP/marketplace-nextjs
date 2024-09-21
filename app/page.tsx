@@ -6,6 +6,7 @@ import Loading from '../components/Loading';
 import Shop from './interface/shop';
 import Alert from '../components/Alert';
 import { useRouter } from 'next/navigation'; // Import for client-side navigation
+import { useCart } from './context/CartContext';
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
@@ -16,10 +17,14 @@ export default function Home() {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter(); // Get the router instance
+  const { state: { cartItems }, dispatch } = useCart();
+
+  useEffect(() => {
+    fetchCartItems();
+  }, [dispatch]);
 
   useEffect(() => {
     fetchShopAll();
-
     const storedRoleId = localStorage.getItem('roleId');
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
@@ -47,6 +52,35 @@ export default function Home() {
       console.error('Error fetching shop list:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCartItems = async () => {
+    const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+
+    if (userId && token) {
+      try {
+        const res = await fetch(`/api/carts/fetch?userId=${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          dispatch({ type: 'SET_CART_ITEMS', payload: data });
+        } else {
+          const errorMessage = (await res.json())?.message || 'Error fetching cart items';
+          console.error(errorMessage);
+        }
+      } catch (error) {
+        console.error('Error fetching cart items:', error);
+      }
+    } else {
+      console.error('User ID or token is missing');
     }
   };
 
@@ -87,7 +121,7 @@ export default function Home() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`, // Include 'Bearer' in the header
         },
         body: JSON.stringify({
           shopId: shopId,
@@ -145,7 +179,7 @@ export default function Home() {
             status={item.status}
             disabled={null == roleId ? true : false}
             onToggleChange={handleToggleChange}
-            onButtonClick={handleButtonClick}
+            onButtonViewClick={handleButtonClick}
           />
         ))}
       </div>
