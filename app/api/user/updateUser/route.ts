@@ -69,3 +69,9 @@
 //     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
 //   }
 // }
+import { NextResponse } from "next/server";
+
+export async function POST(request: Request) {
+  // Your logic to handle the request
+  return NextResponse.json({ message: "User updated successfully" });
+}
