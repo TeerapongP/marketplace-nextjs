@@ -17,7 +17,7 @@ const Card: React.FC<CardProps> = ({
   bgButtonColor,
   onToggleChange,
   onButtonClick,
-  onButtonViewClick, // Include onButtonViewClick in props
+  onButtonViewClick,
 }) => {
   const [isToggled, setIsToggled] = useState<boolean>(status);
   const [token, setToken] = useState<string | null>(null);
@@ -39,12 +39,12 @@ const Card: React.FC<CardProps> = ({
     if (onButtonClick) {
       const product: Product = {
         productId: shopId ?? 0,
-        productName: title ?? "",
-        description: content ?? "",
+        productName: title ?? '',
+        description: content ?? '',
         price: price ?? 0,
         stock: 0,
-        images: imageUrl ?? "",
-        quantity: 0
+        images: imageUrl ?? '',
+        quantity: 0,
       };
       onButtonClick(product);
     }
@@ -64,7 +64,7 @@ const Card: React.FC<CardProps> = ({
           <div className="tw-relative tw-w-full tw-h-48 tw-row-span-1">
             <Image
               src={imageUrl}
-              alt={title || ""}
+              alt={title || ''}
               layout="fill"
               objectFit="cover"
               className="tw-object-cover"
@@ -79,56 +79,56 @@ const Card: React.FC<CardProps> = ({
         </div>
 
         {/* Footer Section */}
-        <div className="tw-p-4 tw-flex tw-items-center tw-justify-between tw-row-span-1">
-          {status ? (
-            <>
-              <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
-                <Button
-                  type="submit"
-                  text="View"
-                  width="tw-w-48 custom-sm:tw-w-16"
-                  height="tw-h-10"
-                  textColor="tw-text-black"
-                  color="tw-bg-white"
-                  disabled={false}
-                  className="tw-mr-4"
-                  onClick={handleButtonViewClick} // Add View button click handler
-                />
-              </div>
-              <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
-                <ToggleSwitch
-                  label={isToggled ? 'open' : 'close'}
-                  checked={isToggled}
-                  onChange={handleToggleChange}
-                  disabled={disabled}
-                />
-              </div>
-            </>
-          ) : (
-            <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4 tw-justify-between tw-w-full">
-              <Button
-                type="submit"
-                text={price ? `฿${price.toString()}` : ""}
-                width="tw-w-24 custom-sm:tw-w-16"
-                height="tw-h-10"
-                textColor="tw-text-white"
-                color={disabled ? bgButtonColor : 'tw-bg-green-600'}
-                disabled={null === token}
-                className="tw-mr-4"
-              />
-              <Button
-                type="submit"
-                textColor="tw-text-white"
-                color={disabled ? bgButtonColor : 'tw-bg-blue-500'}
-                className=" tw-text-white tw-font-bold tw-px-4 tw-py-2 tw-rounded tw-shadow-lg hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 
+        {price !== undefined ? (
+          <div className="tw-flex tw-items-center tw-ml-4 tw-my-4 tw-justify-between tw-w-full">
+            <Button
+              type="submit"
+              text={price ? `฿${price.toString()}` : ''}
+              width="tw-w-24 custom-sm:tw-w-16"
+              height="tw-h-10"
+              textColor="tw-text-white"
+              color={disabled ? bgButtonColor : 'tw-bg-green-600'}
+              disabled={token === null}
+              className="tw-mr-4"
+            />
+            <Button
+              type="submit"
+              textColor="tw-text-white"
+              color={disabled ? bgButtonColor : 'tw-bg-blue-500'}
+              className="tw-text-white tw-font-bold  tw-mr-8 tw-px-4 tw-py-2 tw-rounded tw-shadow-lg hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 
               focus:tw-ring-blue-300 tw-flex tw-items-center tw-space-x-2"
-                onClick={handleButtonClick}>
-                <i className="fas fa-shopping-cart tw-w-5 tw-h-5"></i>
-                <span>Cart</span>
-              </Button>
+              onClick={handleButtonClick}
+            >
+              <i className="fas fa-shopping-cart tw-w-5 tw-h-5"></i>
+              <span>Cart</span>
+            </Button>
+          </div>
+        ) : (
+          <div className="tw-p-4 tw-flex tw-items-center tw-justify-between tw-row-span-1">
+            <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
+              <Button
+                type="submit"
+                text="View"
+                width="tw-w-48 custom-sm:tw-w-16"
+                height="tw-h-10"
+                textColor="tw-text-black"
+                color="tw-bg-white"
+                disabled={false}
+                className="tw-mr-4"
+                onClick={handleButtonViewClick}
+              />
             </div>
-          )}
-        </div>
+
+            <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
+              <ToggleSwitch
+                label={isToggled ? 'open' : 'close'}
+                checked={isToggled}
+                onChange={handleToggleChange}
+                disabled={disabled}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
