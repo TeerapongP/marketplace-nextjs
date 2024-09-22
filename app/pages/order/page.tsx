@@ -70,7 +70,7 @@ const OrderPage = () => {
   }, {} as Record<string, typeof cartItems>);
 
   return (
-    <div className="tw-container tw-mx-auto tw-py-10">
+    <div className="tw-container tw-mx-auto tw-py-10 tw-mt-10">
       <h1 className="tw-text-3xl tw-font-bold tw-text-center tw-mb-8">
         <i className="fas fa-shopping-cart tw-mr-2"></i>
         Order Confirmation
