@@ -4,12 +4,26 @@ import { useEffect, useState } from 'react';
 import { useCart } from '../../context/CartContext'; // Adjust the path as necessary
 import Alert from '@/components/Alert'; // Adjust path as necessary
 import Loading from '@/components/Loading'; // Adjust path as necessary
+import Button from '@/components/Button';
+import { useRouter } from 'next/navigation'; // Import for client-side navigation
+import TextInput from '@/components/Input';
 
 const OrderPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | null>(null);
   const { state: { cartItems }, dispatch } = useCart();
+  const router = useRouter(); // Get the router instance
+
+  const [shipmentInfo, setShipmentInfo] = useState({
+    name: '',
+    lastName: '',
+    address: '',
+    city: '',
+    state: '',
+    country: '',
+    zipCode: '',
+  });
 
   useEffect(() => {
     fetchCartItems();
@@ -28,36 +42,63 @@ const OrderPage = () => {
             'Authorization': `Bearer ${token}`,
           },
         });
-
         if (res.ok) {
           const data = await res.json();
           dispatch({ type: 'SET_CART_ITEMS', payload: data });
         } else {
           const errorMessage = (await res.json())?.message || 'Error fetching cart items';
           console.error(errorMessage);
+          setAlertMessage(errorMessage);
+          setAlertType('error');
         }
       } catch (error) {
-        console.error('Error fetching cart items:', error);
+        setAlertMessage(`ERROR: ${error}`);
+        setAlertType('error');
       }
-    } else {
-      console.error('User ID or token is missing');
     }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
 
-    // Handle order submission logic here
+    const orderData = {
+      userId: userId,
+      orderItems: cartItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        totalPrice: item.price, // Make sure to get the correct price
+      })),
+      totalPrice: cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
+      shipment: {
+        ...shipmentInfo,
+      },
+    };
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderData),
+      });
 
-    // On success
-    setAlertMessage('Order placed successfully!');
-    setAlertType('success');
-    setLoading(false);
-
-    // On error
-    // setAlertMessage('Error placing order.');
-    // setAlertType('error');
+      if (!response.ok) {
+        throw new Error('Failed to place order');
+      }
+      setAlertMessage('Order placed successfully!');
+      setAlertType('success');
+      router.push('/');
+    } catch (error) {
+      console.error('Error placing order:', error);
+      setAlertMessage('Failed to place order.');
+      setAlertType('error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Group items by shopName
@@ -94,7 +135,7 @@ const OrderPage = () => {
             <div className="tw-text-gray-500">No items in the cart</div>
           ) : (
             Object.entries(groupedItems).map(([shopName, items], index) => {
-              const totalPrice = items.reduce((total, item) => total + item.price, 0);
+              const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
               const backgroundColor = index % 2 === 0 ? 'tw-bg-blue-100' : 'tw-bg-green-100'; // Alternate colors
               return (
                 <div key={shopName} className={`tw-mb-6 ${backgroundColor} tw-p-4 tw-rounded-lg`}>
@@ -121,41 +162,98 @@ const OrderPage = () => {
             <i className="fas fa-shipping-fast tw-mr-2"></i>
             Shipping Information
           </h2>
-          <div className="tw-mb-4">
-            <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Name</label>
-            <input type="text" required className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500" />
+          <div className="tw-grid tw-gap-4 tw-mb-4 md:tw-grid-cols-2">
+            <div>
+              <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Name</label>
+              <TextInput
+                type="text"
+                id="name"
+                value={shipmentInfo.name}
+                onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, name: e.target.value }))} // Inline update
+                required
+                placeholder="Enter your first name"
+                className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Last Name</label>
+              <TextInput
+                type="text"
+                id="lastName"
+                value={shipmentInfo.lastName}
+                onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, lastName: e.target.value }))} // Inline update
+                required
+                placeholder="Enter your last name"
+                className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+              />
+            </div>
           </div>
           <div className="tw-mb-4">
             <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Address</label>
-            <input type="text" required className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500" />
+            <TextInput
+              type="text"
+              id="address"
+              value={shipmentInfo.address}
+              onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, address: e.target.value }))} // Inline update
+              required
+              placeholder="Enter your address"
+              className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+            />
           </div>
           <div className="tw-mb-4">
             <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">City</label>
-            <input type="text" required className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500" />
+            <TextInput
+              type="text"
+              id="city"
+              value={shipmentInfo.city}
+              onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, city: e.target.value }))} // Inline update
+              required
+              placeholder="Enter your city"
+              className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+            />
+          </div>
+          <div className="tw-grid tw-gap-4 tw-mb-4 md:tw-grid-cols-2">
+            <div>
+              <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">State</label>
+              <TextInput
+                type="text"
+                id="state"
+                value={shipmentInfo.state}
+                onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, state: e.target.value }))} // Inline update
+                required
+                placeholder="Enter your state"
+                className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Zip Code</label>
+              <TextInput
+                type="text"
+                id="zipCode"
+                value={shipmentInfo.zipCode}
+                onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, zipCode: e.target.value }))} // Inline update
+                required
+                maxLength={5}
+                placeholder="Enter your zip code"
+                className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+              />
+            </div>
           </div>
           <div className="tw-mb-4">
-            <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Postal Code</label>
-            <input type="text" required className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500" />
+            <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Country</label>
+            <TextInput
+              type="text"
+              id="country"
+              value={shipmentInfo.country}
+              onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, country: e.target.value }))} // Inline update
+              required
+              placeholder="Enter your country"
+              className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+            />
           </div>
-
-          {/* Payment Options */}
-          <h2 className="tw-text-xl tw-font-semibold tw-mb-4 tw-text-blue-600">
-            <i className="fas fa-credit-card tw-mr-2"></i>
-            Payment Method
-          </h2>
-          <div className="tw-flex tw-items-center tw-mb-4">
-            <input type="radio" id="creditCard" name="payment" value="creditCard" className="tw-mr-2" required />
-            <label htmlFor="creditCard">Credit Card</label>
-          </div>
-          <div className="tw-flex tw-items-center tw-mb-4">
-            <input type="radio" id="paypal" name="payment" value="paypal" className="tw-mr-2" required />
-            <label htmlFor="paypal">PayPal</label>
-          </div>
-
-          <button type="submit" className="tw-bg-blue-500 tw-text-white tw-py-2 tw-px-4 tw-rounded hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500">
-            <i className="fas fa-check-circle tw-mr-2"></i>
+          <Button type="submit" className="tw-w-full tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded hover:tw-bg-blue-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500">
             Place Order
-          </button>
+          </Button>
         </form>
       </div>
     </div>

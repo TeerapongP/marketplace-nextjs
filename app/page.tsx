@@ -17,7 +17,7 @@ export default function Home() {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter(); // Get the router instance
-  const { state: { cartItems }, dispatch } = useCart();
+  const { state: { }, dispatch } = useCart();
 
   useEffect(() => {
     fetchCartItems();

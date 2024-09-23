@@ -8,7 +8,8 @@ const TextInput: React.FC<TextInputProps> = ({
     required = false,
     className = '',
     type = 'text',
-    placeholder = ''
+    placeholder = '',
+    maxLength
 }) => {
     return (
         <div className="relative">
@@ -17,6 +18,7 @@ const TextInput: React.FC<TextInputProps> = ({
                 id={id}
                 value={value}
                 onChange={onChange}
+                maxLength={maxLength}
                 required={required}
                 className={`tw-mt-1 tw-block tw-w-full tw-p-2 tw-pl-10 tw-border tw-border-gray-300 tw-rounded-md tw-shadow-sm tw-focus:bg-blue-400 tw-focus:ring-2 tw-focus:ring-blue-400 tw-focus:border-blue-400 ${className}`}
                 placeholder={placeholder}
