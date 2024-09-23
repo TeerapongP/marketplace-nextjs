@@ -31,15 +31,15 @@ export async function DELETE(req: NextRequest) {
 
     // Parse the request body to get cartId
     const requestBody = await req.json();
-    const cartId = requestBody.cartId;
+    const cartsId = requestBody.cartId;
 
-    if (typeof cartId !== "number" || isNaN(cartId)) {
+    if (typeof cartsId !== "number" || isNaN(cartsId)) {
       return NextResponse.json({ message: "Invalid cart ID" }, { status: 400 });
     }
 
     // Delete the cart item
     await prisma.cart.delete({
-      where: { cartId: cartId },
+      where: { cartId: cartsId },
     });
 
     return NextResponse.json({ message: "Item removed from cart" });

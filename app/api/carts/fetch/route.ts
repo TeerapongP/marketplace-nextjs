@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
       include: {
         product: {
           include: {
-            shop: true, // Include related shop data
+            shop: true,
           },
         },
       },
@@ -56,10 +56,12 @@ export async function GET(req: NextRequest) {
     const formattedCartItems = cartItems.map((item) => ({
       shopName: item.product.shop?.shopName, // Access the shop name
       quantity: item.quantity,
+      productId: item.product.productId,
       productName: item.product.productName,
       price: item.product.price,
       stock: item.product.stock,
       images: item.product.images,
+      cartsId: item.cartId,
     }));
 
     return NextResponse.json(formattedCartItems);

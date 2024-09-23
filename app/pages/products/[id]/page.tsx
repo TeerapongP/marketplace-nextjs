@@ -74,7 +74,8 @@ const ProductPage = () => {
           price: product.price,
           quantity,
           stock: product.stock, // Ensure the product object has this property
-          images: product.images, // Ensure the product object has this property
+          images: product.images,
+          shopName: ''
         };
 
         // Dispatch the action to add the item to the cart
