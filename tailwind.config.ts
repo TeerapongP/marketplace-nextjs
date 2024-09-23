@@ -3,7 +3,7 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   prefix: "tw-", // Custom prefix
   content: [
-   "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
@@ -34,7 +34,7 @@ const config: Config = {
         fadeOut: "fadeOut 0.5s ease-in-out",
       },
       screens: {
-        'custom-sm': {'raw': '(max-width: 639px)'},
+        "custom-sm": { raw: "(max-width: 639px)" },
       },
     },
   },
