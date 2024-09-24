@@ -148,7 +148,7 @@ const OrderPage = () => {
                   ))}
                   <div className="tw-flex tw-justify-between tw-font-bold tw-mt-4 tw-text-gray-900">
                     <div>Total:</div>
-                    <div>{totalPrice} Baht</div>
+                    <div>{totalPrice.toFixed(2)} Baht</div>
                   </div>
                 </div>
               );

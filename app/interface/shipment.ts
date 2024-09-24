@@ -10,4 +10,5 @@ export default interface Shipment {
   country: string;
   zipCode: string;
   order: Order;
+  trackingNumber: String;
 }
