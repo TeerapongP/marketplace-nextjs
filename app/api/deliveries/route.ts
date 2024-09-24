@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     const shipments = await prisma.shipment.findMany({
       where: {
         order: {
-          userId: userId,
+          userId: userId, // Find shipments by user's orders
         },
       },
       include: {
@@ -54,7 +54,6 @@ export async function GET(req: NextRequest) {
                     productId: true,
                     productName: true,
                     price: true,
-                    images: true,
                     category: true,
                   },
                 },
@@ -64,6 +63,9 @@ export async function GET(req: NextRequest) {
         },
       },
     });
+
+    // Since `trackingNumber` is in Shipment, it'll be automatically returned with each shipment object.
+    return NextResponse.json(shipments, { status: 200 });
 
     if (!shipments.length) {
       return handleError("No shipments found for this user", 404);
