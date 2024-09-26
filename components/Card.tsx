@@ -3,6 +3,7 @@ import CardProps from './interface/CardProps';
 import Image from 'next/image';
 import ToggleSwitch from './Toggle';
 import Button from './Button';
+
 import Product from '../app/interface/products';
 
 const Card: React.FC<CardProps> = ({
@@ -14,6 +15,7 @@ const Card: React.FC<CardProps> = ({
   disabled,
   bgColor,
   price,
+  roleId,
   bgButtonColor,
   onToggleChange,
   onButtonClick,
@@ -56,8 +58,10 @@ const Card: React.FC<CardProps> = ({
     }
   };
 
+
   return (
-    <div className={`${bgColor ? bgColor : 'tw-bg-gray-100'} tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm`}>
+    <div className={`${bgColor ? bgColor : 'tw-bg-gray-100'} tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm tw-relative`}>
+
       <div className="tw-grid tw-grid-rows-[auto_1fr_auto] tw-gap-4 tw-h-full">
         {/* Image Section */}
         {imageUrl && (
@@ -83,7 +87,7 @@ const Card: React.FC<CardProps> = ({
           <div className="tw-flex tw-items-center tw-ml-4 tw-my-4 tw-justify-between tw-w-full">
             <Button
               type="submit"
-              text={price ? `฿${price.toString()}` : ''}
+              text={price ? `฿${price.toFixed(2)}` : ''} // Format price to 2 decimal places
               width="tw-w-24 custom-sm:tw-w-16"
               height="tw-h-10"
               textColor="tw-text-white"
@@ -95,8 +99,7 @@ const Card: React.FC<CardProps> = ({
               type="submit"
               textColor="tw-text-white"
               color={disabled ? bgButtonColor : 'tw-bg-blue-500'}
-              className="tw-text-white tw-font-bold  tw-mr-8 tw-px-4 tw-py-2 tw-rounded tw-shadow-lg hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 
-              focus:tw-ring-blue-300 tw-flex tw-items-center tw-space-x-2"
+              className="tw-text-white tw-font-bold tw-mr-8 tw-px-4 tw-py-2 tw-rounded tw-shadow-lg hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-300 tw-flex tw-items-center tw-space-x-2"
               onClick={handleButtonClick}
             >
               <i className="fas fa-shopping-cart tw-w-5 tw-h-5"></i>
@@ -124,7 +127,7 @@ const Card: React.FC<CardProps> = ({
                 label={isToggled ? 'open' : 'close'}
                 checked={isToggled}
                 onChange={handleToggleChange}
-                disabled={disabled}
+                disabled={Number(roleId) === 2 || disabled}
               />
             </div>
           </div>

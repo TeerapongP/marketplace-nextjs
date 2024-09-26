@@ -53,7 +53,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} >
         <CartProvider>
           {shouldRenderContent && !hideNavbar && (
             <div className={`tw-mt-${!hideNavbar ? '0' : '16'}`}>

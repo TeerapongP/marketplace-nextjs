@@ -7,6 +7,7 @@ import Shop from './interface/shop';
 import Alert from '../components/Alert';
 import { useRouter } from 'next/navigation'; // Import for client-side navigation
 import { useCart } from './context/CartContext';
+import CloseButton from '../components/CloseButton';
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
@@ -115,7 +116,6 @@ export default function Home() {
     if (2 === roleId || null === roleId) {
       return;
     }
-
     try {
       const response = await fetch('/api/shop/status-shop', {
         method: 'PUT',
@@ -141,13 +141,41 @@ export default function Home() {
       }
       setAlertMessage('Update failed');
       setAlertType('error');
-      console.error('Error updating status:', error);
     }
   };
 
   // Function to handle button click
   const handleButtonClick = (shopId: number) => {
     router.push(`/pages/products/${shopId}`); // Perform client-side navigation
+  };
+
+  const handleDeleteButtonClick = async (shopId: number) => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/shop/shop-delete', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ shopId }),
+      });
+      if (!response.ok) {
+        setLoading(false);
+        throw new Error('Failed to delete shop');
+      }
+      setLoading(false);
+      await fetchShopAll();
+      setAlertMessage('Delete shop successful');
+      setAlertType('success');
+    } catch (error: any) {
+      if (error.message === 'Token expired') {
+        setLoading(false);
+        router.push('/pages/auth/login'); // Redirect to a protected route
+      }
+      setLoading(false);
+      setAlertMessage('Delete failed');
+      setAlertType('error');
+    }
   };
 
   const handleClick = (value: string) => {
@@ -169,23 +197,33 @@ export default function Home() {
         <SearchInput onSearch={handleSearch} onClick={handleClick} />
       </div>
       <div className='tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center'>
+
         {data.length > 0 && data.map((item) => (
-          <Card
-            key={item.shopId}
-            title={item.shopName}
-            content={item.shopDescription}
-            imageUrl={item.shopImages}
-            shopId={Number(item.shopId)}
-            status={item.status}
-            disabled={null == roleId ? true : false}
-            onToggleChange={handleToggleChange}
-            onButtonViewClick={handleButtonClick}
-          />
+          <div key={item.shopId} className="tw-relative ">
+            {(roleId === 3 || roleId === 1) && (
+              <div className='tw-mb-4'> {/* Shift CloseButton 2rem to the right */}
+                <CloseButton onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
+              </div>
+            )}
+            <Card
+              title={item.shopName}
+              content={item.shopDescription}
+              imageUrl={item.shopImages}
+              shopId={Number(item.shopId)}
+              status={item.status}
+              roleId={Number(roleId)}
+              disabled={roleId === null}
+              onToggleChange={handleToggleChange}
+              onButtonViewClick={handleButtonClick}
+            />
+          </div>
         ))}
+
       </div>
       {alertMessage && alertType && (
         <Alert type={alertType} message={alertMessage} />
       )}
     </div>
   );
+
 }
