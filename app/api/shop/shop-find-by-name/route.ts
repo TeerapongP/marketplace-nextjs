@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     // Return the list of shops
     return NextResponse.json(shops, { status: 200 });
   } catch (error) {
-    console.error("Error fetching shops:", error);
+    "Error fetching shops:", error;
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

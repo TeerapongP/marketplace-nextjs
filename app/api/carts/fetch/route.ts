@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(formattedCartItems);
   } catch (error) {
-    console.error("Error fetching cart items:", error);
+    "Error fetching cart items:", error;
     return NextResponse.json(
       { error: "Error fetching cart items" },
       { status: 500 }

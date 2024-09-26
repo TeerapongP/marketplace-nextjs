@@ -19,7 +19,7 @@ const allowedApiPaths = [
   "/api/shop/shop-list",
   "/api/auth/forgotPassword",
   "/api/shop/shop-find-by-name",
-  "/api/products",
+  "/api/products/fetch",
 ];
 
 // Exclude internal Next.js paths and static assets
@@ -76,7 +76,7 @@ export async function middleware(req: NextRequest) {
 
       return NextResponse.next();
     } catch (error) {
-      console.error("Token verification error:", error);
+      "Token verification error:", error;
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
   }

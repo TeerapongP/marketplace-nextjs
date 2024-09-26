@@ -8,7 +8,7 @@ export interface CartItem {
   stock: number;
   images: string;
   shopName: string;
-  cartsId: number;
+  cartsId?: number;
 }
 
 export interface CartState {

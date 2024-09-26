@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
     // Fetch the list of shops with the desired fields
     const shops = await prisma.shop.findMany({
       select: {
-        shopId:true,
+        shopId: true,
         shopName: true,
         shopDescription: true,
         shopImages: true,
@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
     // Return the list of shops
     return NextResponse.json(shops, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    error;
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

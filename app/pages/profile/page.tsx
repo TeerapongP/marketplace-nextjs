@@ -9,7 +9,7 @@ const Profile = () => {
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileUpload = (files: { [key: string]: File }) => {
-    console.log(files[0])
+    (files[0])
     setFile(files[0]);  // Update state with the selected file
   };
 

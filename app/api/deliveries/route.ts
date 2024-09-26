@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(shipments, { status: 200 });
   } catch (error) {
-    console.error("Error fetching shipments:", error);
+    "Error fetching shipments:", error;
     return handleError("Error fetching shipments", 500);
   }
 }

@@ -47,7 +47,7 @@ const OrderPage = () => {
           dispatch({ type: 'SET_CART_ITEMS', payload: data });
         } else {
           const errorMessage = (await res.json())?.message || 'Error fetching cart items';
-          console.error(errorMessage);
+          (errorMessage);
           setAlertMessage(errorMessage);
           setAlertType('error');
         }
@@ -93,7 +93,7 @@ const OrderPage = () => {
       setAlertType('success');
       router.push('/');
     } catch (error) {
-      console.error('Error placing order:', error);
+      ('Error placing order:', error);
       setAlertMessage('Failed to place order.');
       setAlertType('error');
     } finally {
