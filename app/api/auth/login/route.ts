@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         phoneNumber: true,
         address: true,
         userImage: true,
-        roleId: true,   // Include roleId
+        roleId: true, // Include roleId
       },
     });
 
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Internal Server Error:", error);
+    "Internal Server Error:", error;
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

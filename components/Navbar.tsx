@@ -26,10 +26,10 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                     const data: MenuItem[] = await res.json();
                     setMenuItems(data);
                 } else {
-                    console.error('Failed to fetch menu items');
+                    ('Failed to fetch menu items');
                 }
             } catch (error) {
-                console.error('Error fetching menu items:', error);
+                ('Error fetching menu items:', error);
             } finally {
                 setLoading(false);
             }

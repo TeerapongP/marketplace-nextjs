@@ -69,7 +69,7 @@ async function main() {
     ],
   });
 
-  console.log("Bakery seed data inserted");
+  ("Bakery seed data inserted");
 }
 
 main()

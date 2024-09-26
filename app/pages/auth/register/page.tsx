@@ -66,7 +66,7 @@ const RegisterPage = () => {
     }
   };
   const handleSelect = (roleId: number) => {
-    console.log("ROLE ID ", roleId)
+    ("ROLE ID ", roleId)
     setRoleId(roleId)
   };
 

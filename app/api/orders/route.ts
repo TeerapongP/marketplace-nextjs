@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error placing order:", error);
+    "Error placing order:", error;
     return NextResponse.json({ error: "Error placing order" }, { status: 500 });
   }
 }

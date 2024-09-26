@@ -58,10 +58,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const data: CartItem[] = await response.json();
                 dispatch({ type: 'SET_CART_ITEMS', payload: data });
             } else {
-                console.error('Error fetching cart items');
+                ('Error fetching cart items');
             }
         } catch (error) {
-            console.error('Error fetching cart items:', error);
+            ('Error fetching cart items:', error);
         }
     };
 

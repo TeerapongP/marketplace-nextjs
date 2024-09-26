@@ -50,7 +50,6 @@ export default function Home() {
       setData(data);
     } catch (error) {
       setError('Error fetching shop list');
-      console.error('Error fetching shop list:', error);
     } finally {
       setLoading(false);
     }
@@ -183,10 +182,6 @@ export default function Home() {
       fetchShopAll();
     }
   };
-  if (loading) {
-    return <Loading />;
-  }
-
   if (error) {
     return <p>{error}</p>;
   }
