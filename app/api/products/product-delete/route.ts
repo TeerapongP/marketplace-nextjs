@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma"; // Adjust the path as necessary
 
-/**
- * Handles the HTTP DELETE request to remove a product.
- *
- * @param {NextRequest} req - The incoming HTTP request.
- * @return {NextResponse} The HTTP response with the result of the deletion.
- */
 export async function DELETE(req: NextRequest) {
   const JWT_SECRET = process.env.JWT_SECRET;
   if (!JWT_SECRET) {

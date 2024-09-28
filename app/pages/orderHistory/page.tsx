@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { NextPage } from 'next';
 import Shipment from '../../interface/shipment';
-import Loading from '@/components/Loading'; // Adjust path as necessary
+import Alert from '@/components/Alert';
 
 const DeliveriesPage: NextPage = () => {
   const [deliveries, setDeliveries] = useState<Shipment[]>([]);
@@ -42,12 +42,6 @@ const DeliveriesPage: NextPage = () => {
   return (
     <>
       <div className="tw-container tw-mx-auto tw-p-6">
-        {loading && <Loading />}
-        {alertMessage && (
-          <div className={`tw-p-4 tw-mb-4 tw-rounded-lg tw-text-white ${alertType === 'error' ? 'tw-bg-red-500' : 'tw-bg-green-500'}`}>
-            {alertMessage}
-          </div>
-        )}
         <h1 className="tw-text-3xl tw-font-bold tw-text-center tw-mb-6">Deliveries</h1>
         <div className="tw-grid tw-grid-cols-1 tw-gap-6 sm:tw-grid-cols-2 lg:tw-grid-cols-3">
           {deliveries.map((shipment) => (
@@ -80,6 +74,9 @@ const DeliveriesPage: NextPage = () => {
           ))}
         </div>
       </div>
+      {alertMessage && alertType && (
+        <Alert type={alertType} message={alertMessage} />
+      )}
     </>
   );
 };

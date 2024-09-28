@@ -8,6 +8,7 @@ import Alert from '../components/Alert';
 import { useRouter } from 'next/navigation'; // Import for client-side navigation
 import { useCart } from './context/CartContext';
 import CloseButton from '../components/CloseButton';
+import { set } from 'date-fns';
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
@@ -15,16 +16,15 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [roleId, setRoleId] = useState<number | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [imagesPath, setImagesPath] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter(); // Get the router instance
   const { state: { }, dispatch } = useCart();
 
   useEffect(() => {
+    setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL || '');
     fetchCartItems();
-  }, [dispatch]);
-
-  useEffect(() => {
     fetchShopAll();
     const storedRoleId = localStorage.getItem('roleId');
     const storedToken = localStorage.getItem('token');
@@ -38,7 +38,7 @@ export default function Home() {
 
       return () => clearTimeout(timer); // Cleanup timeout on unmount
     }
-  }, [alertMessage]);
+  }, [dispatch, alertMessage]);
 
   const fetchShopAll = async () => {
     try {
@@ -54,7 +54,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-
   const fetchCartItems = async () => {
     const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
@@ -143,7 +142,6 @@ export default function Home() {
     }
   };
 
-  // Function to handle button click
   const handleButtonClick = (shopId: number) => {
     router.push(`/pages/products/${shopId}`); // Perform client-side navigation
   };
@@ -169,7 +167,7 @@ export default function Home() {
     } catch (error: any) {
       if (error.message === 'Token expired') {
         setLoading(false);
-        router.push('/pages/auth/login'); // Redirect to a protected route
+        router.push('/pages/auth/login');
       }
       setLoading(false);
       setAlertMessage('Delete failed');
@@ -182,10 +180,6 @@ export default function Home() {
       fetchShopAll();
     }
   };
-  if (error) {
-    return <p>{error}</p>;
-  }
-
   return (
     <div className='tw-w-full'>
       <div className='tw-grid sm:tw-mt-24 md:tw-mt-24 lg:tw-mt-24 custom-sm:tw-mt-24 custom-sm:tw-justify-items-center tw-justify-items-end tw-mr-20 custom-sm:tw-mr-0'>
@@ -193,32 +187,36 @@ export default function Home() {
       </div>
       <div className='tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center'>
 
-        {data.length > 0 && data.map((item) => (
-          <div key={item.shopId} className="tw-relative ">
-            {(roleId === 3 || roleId === 1) && (
-              <div className='tw-mb-4'> {/* Shift CloseButton 2rem to the right */}
-                <CloseButton onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
-              </div>
-            )}
-            <Card
-              title={item.shopName}
-              content={item.shopDescription}
-              imageUrl={item.shopImages}
-              shopId={Number(item.shopId)}
-              status={item.status}
-              roleId={Number(roleId)}
-              disabled={roleId === null}
-              onToggleChange={handleToggleChange}
-              onButtonViewClick={handleButtonClick}
-            />
-          </div>
-        ))}
-
+        {data.length > 0 && data.map((item) => {
+          const isLocalImage = !item.shopImages.startsWith('http://') && !item.shopImages.startsWith('https://');
+          const imageUrl = isLocalImage ? `${imagesPath}${item.shopImages}` : item.shopImages;
+          return (
+            <div key={item.shopId} className="tw-relative">
+              {(roleId === 3 || roleId === 1) && (
+                <div className='tw-my-4 tw-ms-5'>
+                  <CloseButton right='-0.5' onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
+                </div>
+              )}
+              <Card
+                title={item.shopName}
+                content={item.shopDescription}
+                imageUrl={imageUrl}
+                shopId={Number(item.shopId)}
+                status={item.status}
+                roleId={Number(roleId)}
+                disabled={roleId === null}
+                onToggleChange={handleToggleChange}
+                onButtonViewClick={handleButtonClick}
+              />
+            </div>
+          );
+        })}
       </div>
       {alertMessage && alertType && (
         <Alert type={alertType} message={alertMessage} />
       )}
     </div>
   );
+
 
 }

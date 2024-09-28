@@ -57,11 +57,11 @@ export default function RootLayout({
       <body className={inter.className} >
         <CartProvider>
           {shouldRenderContent && !hideNavbar && (
-            <div className={`tw-mt-${!hideNavbar ? '0' : '16'}`}>
+            <div className={`tw-my-${!hideNavbar ? '0' : '16'} `}>
               <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} />
             </div>
           )}
-          <div className={`tw-mt-${hideNavbar ? '0' : '16'}`}>
+          <div className={`tw-my-${hideNavbar ? '0' : '16'}`}>
             {shouldRenderContent ? children : <Custom404 />}
           </div>
         </CartProvider>
