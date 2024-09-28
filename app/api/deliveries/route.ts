@@ -4,9 +4,8 @@ import { prisma } from "../../../lib/prisma"; // Adjust the path as necessary
 import jwt from "jsonwebtoken";
 import DecodedToken from "../interface/decodedToken";
 
-const handleError = (message: string, status: number) => {
-  return NextResponse.json({ message }, { status });
-};
+const handleError = (message: string, status: number) =>
+  NextResponse.json({ message }, { status });
 
 export async function GET(req: NextRequest) {
   const JWT_SECRET = process.env.JWT_SECRET;
@@ -28,52 +27,24 @@ export async function GET(req: NextRequest) {
     }
 
     // Verify the token
-    let decoded: DecodedToken;
-    try {
-      decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
-    } catch (error) {
-      return handleError("JWT malformed or invalid", 401);
-    }
-
+    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
     const userId = decoded.userId;
 
-    // Fetch shipments associated with the user's orders
+    // Fetch shipments associated with the user's orders in one query
     const shipments = await prisma.shipment.findMany({
-      where: {
-        order: {
-          userId: userId, // Find shipments by user's orders
-        },
-      },
-      include: {
-        order: {
-          include: {
-            orderItems: {
-              include: {
-                product: {
-                  select: {
-                    productId: true,
-                    productName: true,
-                    price: true,
-                    category: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+      where: { order: { userId } },
+      include: { order: { include: { orderItems: { include: { product: true } } } } },
     });
 
-    // Since `trackingNumber` is in Shipment, it'll be automatically returned with each shipment object.
-    return NextResponse.json(shipments, { status: 200 });
 
     if (!shipments.length) {
       return handleError("No shipments found for this user", 404);
     }
+    // Since `trackingNumber` is in Shipment, it'll be automatically returned with each shipment object.
 
     return NextResponse.json(shipments, { status: 200 });
+
   } catch (error) {
-    "Error fetching shipments:", error;
     return handleError("Error fetching shipments", 500);
   }
 }

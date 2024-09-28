@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next dev",
     "lint": "next lint",
+    "prisma": "npx prisma studio",
     "seed": "ts-node prisma/seed/seed.ts"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "@prisma/client": "^5.19.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "date-fns": "^4.1.0",
     "formidable": "^3.5.1",
     "jose": "^5.8.0",
     "jsonwebtoken": "^9.0.2",

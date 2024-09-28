@@ -47,6 +47,7 @@ export default function RootLayout({
     '/pages/order',
     '/pages/delivery',
     '/pages/profile',
+    '/pages/orderHistory'
   ].includes(pathname);
 
   const shouldRenderContent = isValidPath || (requiresToken && token);
