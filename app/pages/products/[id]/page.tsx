@@ -40,7 +40,7 @@ const ProductPage = () => {
   const fetchProducts = async (id: number) => {
     setLoading(true); // Start loading
     try {
-      const response = await fetch(`/api/products/fetch?shopId=${id}`);
+      const response = await fetch(`/api/products/product-list?shopId=${id}`);
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
@@ -109,7 +109,7 @@ const ProductPage = () => {
   const handleDeleteButtonClick = async (productId: number) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/products/delete', {
+      const res = await fetch('/api/products/product-delete', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

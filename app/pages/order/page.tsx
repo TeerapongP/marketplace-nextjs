@@ -93,7 +93,6 @@ const OrderPage = () => {
       setAlertType('success');
       router.push('/');
     } catch (error) {
-      ('Error placing order:', error);
       setAlertMessage('Failed to place order.');
       setAlertType('error');
     } finally {

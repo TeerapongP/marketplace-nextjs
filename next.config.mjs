@@ -30,6 +30,7 @@ const nextConfig = {
       { protocol: "https", hostname: "mkunigroup.com" },
       { protocol: "https", hostname: "www.easycookingmenu.com" },
       { protocol: "https", hostname: "baansomtum.com" },
+      { protocol: "http", hostname: "localhost" }, 
     ],
   },
   webpack(config) {

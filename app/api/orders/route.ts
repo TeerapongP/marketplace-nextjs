@@ -3,12 +3,11 @@ import { prisma } from "../../../lib/prisma"; // Adjust the path as necessary
 import jwt from "jsonwebtoken";
 
 // Function to generate a tracking number
-const generateTrackingNumber = () => {
-  const countryCode = "TH";
-  const randomNumber = Math.floor(100000000 + Math.random() * 900000000); // Generate a random number
-  const randomText = Math.random().toString(36).substring(2, 8).toUpperCase(); // Generate random alphanumeric text
-  return `${countryCode}${randomNumber}${randomText}`;
-};
+const generateTrackingNumber = () => (
+  "TH" +
+  String(Math.floor(Math.random() * 1e9)).padStart(9, "0") +
+  Array.from({ length: 6 }, () => String.fromCharCode(65 + Math.floor(26 * Math.random()))).join("")
+);
 
 export async function POST(req: NextRequest) {
   const JWT_SECRET = process.env.JWT_SECRET || "";
@@ -91,7 +90,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    "Error placing order:", error;
     return NextResponse.json({ error: "Error placing order" }, { status: 500 });
   }
 }
