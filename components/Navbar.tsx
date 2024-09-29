@@ -7,6 +7,7 @@ import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
 import Loading from './Loading';
 import { useCart } from '../app/context/CartContext'; // Import the custom hook
+import Image from 'next/image';
 
 const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -29,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                     ('Failed to fetch menu items');
                 }
             } catch (error) {
-                ('Error fetching menu items:', error);
+                console.log('Error fetching menu items:', error);
             } finally {
                 setLoading(false);
             }
@@ -141,9 +142,11 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                                                         key={`${item.productId}-${index}`} // Ensure key is unique
                                                         className='tw-flex tw-items-center tw-p-2 tw-border-b tw-border-gray-200 hover:bg-gray-100 transition-colors duration-300'
                                                     >
-                                                        <img
+                                                        <Image
                                                             src={item.images}
-                                                            alt={item.productName}
+                                                            alt={item.productName || ''}
+                                                            layout="fill"
+                                                            objectFit="cover"
                                                             className='tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2'
                                                         />
                                                         <div className='tw-flex-1'>
@@ -151,7 +154,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                                                             <div className='tw-text-gray-600'>Quantity: {item.quantity}</div>
                                                         </div>
                                                         <button
-                                                            onClick={() => handleDelete(item.cartsId)}
+                                                            onClick={() => handleDelete(item.cartsId || 0)}
                                                             className='tw-text-red-600 tw-ml-4 hover:tw-text-red-800'
                                                         >
                                                             <i className="fas fa-trash"></i>
@@ -170,7 +173,6 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                                         )}
                                     </div>
                                 )}
-
                             </div>
                         </>
                     )}
