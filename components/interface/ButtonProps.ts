@@ -5,8 +5,9 @@ interface ButtonProps {
   height?: string;
   textColor?: string;
   color?: string;
-  onClick?: () => void;
+  onClick?: () => void; // Ensure onClick doesn't expect parameters
   className?: string;
   disabled?: boolean;
   children?: React.ReactNode;
+  
 }

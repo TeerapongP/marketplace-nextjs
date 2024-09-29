@@ -35,6 +35,7 @@ export async function DELETE(req: NextRequest) {
     await prisma.product.delete({ where: { productId } });
     return NextResponse.json({ message: "Item removed from product" });
   } catch (error: any) {
+    console.log("ERROR : ",error);
     if (error.code === "P2003") {
       return NextResponse.json(
         {

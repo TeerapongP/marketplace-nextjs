@@ -1,4 +1,5 @@
 export default interface FileInputProps {
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    label: string;
-  }
+  onFileChange: (files: File[]) => void; // Ensure the correct function signature
+  value?: string | File[]; // Accept both string URLs and File arrays
+  className?: string; // For custom styles
+}

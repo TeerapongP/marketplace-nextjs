@@ -75,7 +75,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(shipments, { status: 200 });
   } catch (error) {
-    console.error(error); // Log the error for debugging purposes
+    console.log("ERROR : ",error);
+    // Log the error for debugging purposes
     return handleError("Error fetching shipments", 500);
   }
 }

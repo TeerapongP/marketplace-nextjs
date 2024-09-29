@@ -2,13 +2,12 @@
 import { useEffect, useState } from 'react';
 import SearchInput from '../components/SearchInput';
 import Card from '../components/Card';
-import Loading from '../components/Loading';
 import Shop from './interface/shop';
 import Alert from '../components/Alert';
 import { useRouter } from 'next/navigation'; // Import for client-side navigation
 import { useCart } from './context/CartContext';
 import CloseButton from '../components/CloseButton';
-import { set } from 'date-fns';
+import EditButton from '../components/EditButton';
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
@@ -30,6 +29,8 @@ export default function Home() {
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
     setRoleId(storedRoleId ? Number(storedRoleId) : null);
+
+    // Set up the alert message timeout
     if (alertMessage) {
       const timer = setTimeout(() => {
         setAlertMessage(null);
@@ -174,6 +175,9 @@ export default function Home() {
       setAlertType('error');
     }
   };
+  const handleEditButtonClick = async (shopId: number) => {
+    router.push(`/pages/shop/shop-edit/${shopId}`);
+  }
 
   const handleClick = (value: string) => {
     if (value.trim() === '') {
@@ -194,7 +198,8 @@ export default function Home() {
             <div key={item.shopId} className="tw-relative">
               {(roleId === 3 || roleId === 1) && (
                 <div className='tw-my-4 tw-ms-5'>
-                  <CloseButton right='-0.5' onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
+                  <CloseButton onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
+                  <EditButton onClick={() => handleEditButtonClick(Number(item.shopId))} />
                 </div>
               )}
               <Card

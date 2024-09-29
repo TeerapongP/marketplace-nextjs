@@ -47,8 +47,8 @@ export default function RootLayout({
     '/pages/order',
     '/pages/delivery',
     '/pages/profile',
-    '/pages/orderHistory'
-  ].includes(pathname);
+    '/pages/orderHistory',
+  ].includes(pathname) || pathname.startsWith('/pages/shop/shop-edit/');
 
   const shouldRenderContent = isValidPath || (requiresToken && token);
 
