@@ -50,7 +50,7 @@ export default function RootLayout({
     '/pages/profile',
     '/pages/orderHistory',
     '/pages/shop/shop-add',
-  ].some(path => pathname.startsWith(path)) || pathname.startsWith('/pages/shop/shop-edit/') || pathname.startsWith('/pages/shop/product-edit/');
+  ].some(path => pathname.startsWith(path)) || pathname.startsWith('/pages/shop/shop-edit/') || pathname.startsWith('/pages/products/product-edit/') || pathname.startsWith('/pages/products/product-add/');
 
   const shouldRenderContent = isValidPath || (requiresToken && token);
 

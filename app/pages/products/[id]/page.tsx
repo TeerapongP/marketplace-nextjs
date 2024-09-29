@@ -12,8 +12,9 @@ import Card from '@/components/Card'; // Adjust the import path as needed
 import Alert from '@/components/Alert'; // Adjust the import path as needed
 import Product from '../../../interface/products'; // Adjust the import path as needed
 import EditButton from '@/components/EditButton';
-
+import Button from '@/components/Button';
 import Loading from '@/components/Loading';
+
 const ProductPage = () => {
   const pathname = usePathname();
   const [data, setData] = useState<Product[]>([]);
@@ -28,8 +29,6 @@ const ProductPage = () => {
   const [images, setImages] = useState<string | null>(null);
 
   useEffect(() => {
-
-
     const storedRoleId = localStorage.getItem('roleId');
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
@@ -43,8 +42,7 @@ const ProductPage = () => {
       setShopId(numericId); // Set the shopId based on the extracted ID
       fetchProducts(numericId); // Fetch products based on the new shopId
     }
-  }, [` ${pathname}`]);
-
+  }, [pathname]); // Fixed dependency array
 
   const fetchProducts = async (id: number) => {
     const basePath = process.env.NEXT_PUBLIC_LOCAL_BASE_URL || '';
@@ -56,14 +54,12 @@ const ProductPage = () => {
         throw new Error('Failed to fetch products');
       }
       const dataItem = await response.json();
-
       setData(dataItem.map((product: any) => ({
         ...product,
         images: product.images.startsWith('http://') || product.images.startsWith('https://')
           ? product.images
           : `${basePath}${product.images}`,
-      })));// Set fetched data
-
+      }))); // Set fetched data
     } catch (error) {
       setAlertMessage('Failed to load data');
       setAlertType('error');
@@ -71,6 +67,7 @@ const ProductPage = () => {
       setLoading(false); // Stop loading
     }
   };
+
   const handleAddToCart = async (product: Product, quantity: number = 1) => {
     const userId = localStorage.getItem('userId');
 
@@ -155,45 +152,60 @@ const ProductPage = () => {
 
   const handleEditButtonClick = async (productId: number) => {
     router.push(`/pages/products/product-edit/${productId}`);
-  }
+  };
+
+  const handleAddButtonClick = (shopId: number) => {
+    router.push(`/pages/products/product-create/${shopId}`);
+  };
 
   return (
     <div className="tw-mt-20 tw-mx-20">
       {loading ? (
         <div><Loading /></div>
       ) : (
-        <div className="tw-w-full tw-mt-24">
-          {alertMessage && alertType && (
-            <div className="tw-w-full tw-flex tw-justify-center tw-mb-4">
-              <Alert type={alertType} message={alertMessage} />
-            </div>
-          )}
-          <div className="tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center">
-            {data.length > 0 ? (
-              data.map((item) => (
-                <div key={item.productId} className="tw-relative">
-                  {(roleId === 3 || roleId === 1) && (
-                    <div className="tw-mb-4"> {/* Adjust the CloseButton margin */}
-                      <CloseButton onClick={() => handleDeleteButtonClick(Number(item.productId))} />
-                      <EditButton onClick={() => handleEditButtonClick(Number(item.productId))} />
-                    </div>
-                  )}
-                  <Card
-                    title={item.productName}
-                    content={item.description}
-                    imageUrl={item.images || ''} // Fallback image if none exists
-                    bgColor="tw-bg-custom-yellow"
-                    price={item.price}
-                    bgButtonColor="tw-bg-custom-green"
-                    onButtonClick={() => handleAddToCart(item)}
-                  />
-                </div>
-              ))
-            ) : (
-              <p>No products found</p>
-            )}
+        <>
+          <div className="tw-flex tw-justify-end tw-mt-4 tw-mr-20">
+            <Button
+              type="button"
+              text="เพิ่มสินค้า"
+              width="tw-w-full sm:tw-w-auto"  // Adjust width for smaller screens
+              textColor="tw-text-white"
+              color="tw-bg-blue-700"
+              onClick={() => handleAddButtonClick(Number(shopId))}
+            />
           </div>
-        </div>
+
+          <div className='tw-w-full'>
+            <div className="tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center">
+              {data.length > 0 ? (
+                data.map((item) => (
+                  <div key={item.productId} className="tw-relative">
+                    {(roleId === 3 || roleId === 1) && (
+                      <div className="tw-mb-4">
+                        <CloseButton onClick={() => handleDeleteButtonClick(Number(item.productId))} />
+                        <EditButton onClick={() => handleEditButtonClick(Number(item.productId))} />
+                      </div>
+                    )}
+                    <Card
+                      title={item.productName}
+                      content={item.description}
+                      imageUrl={item.images || ''} // Fallback image if none exists
+                      bgColor="tw-bg-custom-yellow"
+                      price={item.price}
+                      bgButtonColor="tw-bg-custom-green"
+                      onButtonClick={() => handleAddToCart(item)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p>No products found</p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+      {alertMessage && alertType && (
+        <Alert type={alertType} message={alertMessage} />
       )}
     </div>
   );

@@ -74,8 +74,8 @@ export const PATCH = async (req: NextRequest) => {
     const buffer = Buffer.from(await images.arrayBuffer());
     const uint8Array = new Uint8Array(buffer); // Convert Buffer to Uint8Array
     await fs.promises.writeFile(filePath, uint8Array);
-    // Update the shop in the database
-    const shop = await prisma.product.update({
+    // Update the products in the database
+    const products = await prisma.product.update({
       where: { productId: parsedProductId }, // Use parsedShopId here
       data: {
         productName,
@@ -90,7 +90,7 @@ export const PATCH = async (req: NextRequest) => {
 
     return NextResponse.json({
       success: true,
-      shop,
+      products,
       fileName: uniqueFileName,
     });
   } catch (err) {
