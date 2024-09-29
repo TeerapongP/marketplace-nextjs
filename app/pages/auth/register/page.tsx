@@ -66,7 +66,6 @@ const RegisterPage = () => {
     }
   };
   const handleSelect = (roleId: number) => {
-    ("ROLE ID ", roleId)
     setRoleId(roleId)
   };
 
@@ -84,6 +83,8 @@ const RegisterPage = () => {
                 <Dropdown
                   url="/api/role" // Your API endpoint to fetch roles
                   onSelect={handleSelect}
+                  valueString="roleId,roleName"
+                  keyString="roleId,roleName"
                   placeholder="Select a role"
                 />
               </div>

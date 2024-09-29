@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Alert from '../../../../components/Alert';
-import Dropdown from '../../../../components/Dropdown';
-import Button from '../../../../components/Button';
-import LoginIcon from '../../../../public/iconsLoginPage.svg';
+import Alert from '@/components/Alert';
+import Dropdown from '@/components/Dropdown';
+import Button from '@/components/Button';
+import LoginIcon from '@/public/iconsLoginPage.svg';
 import TextInput from '@/components/Input';
 import Link from 'next/link';
 import bcrypt from 'bcryptjs';
@@ -28,8 +28,8 @@ const LoginPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        
-        body: JSON.stringify({ username, password:hashedPassword, roleId }),
+
+        body: JSON.stringify({ username, password: hashedPassword, roleId }),
 
       });
       if (res.ok) {
@@ -69,7 +69,7 @@ const LoginPage = () => {
       return () => clearTimeout(timer); // Cleanup timeout on unmount
     }
   }, [alertMessage]);
-  
+
   return (
     <div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-h-screen tw-bg-custom-yellow tw-p-4 tw-gap-4">
       <div className="tw-relative tw-w-full tw-max-w-[60vw] tw-h-64 sm:tw-h-80 md:tw-h-96 lg:tw-h-[500px] tw-flex tw-items-center tw-justify-center">
@@ -84,6 +84,8 @@ const LoginPage = () => {
                 <Dropdown
                   url="/api/role" // Your API endpoint to fetch roles
                   onSelect={handleSelect}
+                  valueString="roleId,roleName"
+                  keyString="roleId,roleName"
                   placeholder="Select a role"
                 />
               </div>

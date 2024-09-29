@@ -26,7 +26,7 @@ export default function RootLayout({
     const storedUserId = localStorage.getItem('userId');
     const storedToken = localStorage.getItem('token');
 
-    setToken(storedToken || null);
+    setToken(storedToken);
     setCurrentUserRoleId(roleId ? Number(roleId) : '');
     setUserId(storedUserId || '');
   }, []);
@@ -34,6 +34,7 @@ export default function RootLayout({
   const apiUrl = '/api/menu';
 
   const hideNavbar = pathname.startsWith('/pages/auth/') || pathname.split('/').length > 10;
+
   const isValidPath = [
     '/',
     '/pages/auth/login',
@@ -48,16 +49,17 @@ export default function RootLayout({
     '/pages/delivery',
     '/pages/profile',
     '/pages/orderHistory',
-  ].includes(pathname) || pathname.startsWith('/pages/shop/shop-edit/');
+    '/pages/shop/shop-add',
+  ].some(path => pathname.startsWith(path)) || pathname.startsWith('/pages/shop/shop-edit/') || pathname.startsWith('/pages/shop/product-edit/');
 
   const shouldRenderContent = isValidPath || (requiresToken && token);
 
   return (
     <html lang="en">
-      <body className={inter.className} >
+      <body className={inter.className}>
         <CartProvider>
-          {shouldRenderContent && !hideNavbar && (
-            <div className={`tw-my-${!hideNavbar ? '0' : '16'} `}>
+          {!hideNavbar && (
+            <div className="tw-my-16">
               <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} />
             </div>
           )}

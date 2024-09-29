@@ -46,6 +46,7 @@ export const PATCH = async (req: NextRequest) => {
       return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
     }
 
+
     // Destructure and parse shopId as integer
     const { shopId, shopName, shopDescription, status, shopImages } = body;
     const parsedShopId = parseInt(shopId, 10); // Parse as integer

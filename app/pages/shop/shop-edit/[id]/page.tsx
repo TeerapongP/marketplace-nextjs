@@ -43,6 +43,8 @@ const ShopEditPage = () => {
   }, [shopId, token]);
 
   const fetchShop = async (id: number) => {
+    console.log(imagesPath);
+
     setLoading(true);
     try {
       const res = await fetch(`/api/shop/shop-find-by-id?shopId=${id}`, {

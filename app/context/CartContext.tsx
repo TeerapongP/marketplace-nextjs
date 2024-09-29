@@ -61,7 +61,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 ('Error fetching cart items');
             }
         } catch (error) {
-            ('Error fetching cart items:', error);
+            console.log('Error fetching cart items:', error);
         }
     };
 
