@@ -1,10 +1,7 @@
 import React, { ChangeEvent, useState, useRef } from 'react';
 import Image from 'next/image';
 import IconsUser from '../public/iconsUser.svg';
-
-interface FileInputCircleProps {
-    onFileChange: (files: { [key: string]: File }) => void;
-}
+import FileInputCircleProps from './interface/FileInputCircleProps';
 
 const FileInputCircle: React.FC<FileInputCircleProps> = ({ onFileChange }) => {
     const [previewImages, setPreviewImages] = useState<string[]>([]);
@@ -34,7 +31,6 @@ const FileInputCircle: React.FC<FileInputCircleProps> = ({ onFileChange }) => {
                 <label
                     htmlFor="file-input"
                     className="tw-cursor-pointer"
-                 
                 >
                     <input
                         type="file"
@@ -57,7 +53,7 @@ const FileInputCircle: React.FC<FileInputCircleProps> = ({ onFileChange }) => {
                                 layout="fill"
                                 objectFit="cover"
                                 className="tw-rounded-full"
-                             
+
                             />
                         </div>
                     ))}

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     // Return the list of shops
     return NextResponse.json(shops, { status: 200 });
   } catch (error) {
-    error;
+    console.error("Error:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

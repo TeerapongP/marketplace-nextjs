@@ -15,11 +15,8 @@ const Button: React.FC<ButtonProps> = ({
     return (
         <button
             type={type}
-            className={`tw-px-4 tw-py-2 tw-rounded-md tw-text-center ${textColor} ${width} ${height} tw-font-medium ${color} tw-shadow-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 ${disabled
-                ? 'tw-bg-gray-300 tw-text-gray-600 tw-cursor-not-allowed'
-                : 'hover:tw-shadow-lg'
-                } ${className}`}
-            onClick={disabled ? undefined : onClick}
+            className={`tw-px-4 tw-py-2 tw-rounded-md tw-text-center ${textColor} ${width} ${height} tw-font-medium ${color} tw-shadow-md focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 ${disabled ? 'tw-bg-gray-300 tw-text-gray-600 tw-cursor-not-allowed' : 'hover:tw-shadow-lg'} ${className}`}
+            onClick={disabled ? undefined : onClick} // Handle disabled state
             disabled={disabled}
         >
             {text && <span>{text}</span>}

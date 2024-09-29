@@ -40,7 +40,7 @@ export const PATCH = async (req: NextRequest) => {
       status: string;
       shopImages: File;
     };
-
+    
     // Early return if any of the required fields are missing
     if (!body.shopId || !body.shopName || !body.shopDescription || !body.status || !body.shopImages) {
       return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
@@ -60,7 +60,7 @@ export const PATCH = async (req: NextRequest) => {
     const parsedStatus = parseBoolean(status);
 
     // Validate uploaded file
-    if (shopImages.size > MAX_FILE_SIZE || REQUIRED_FILE_EXTENSIONS.includes(shopImages.type.split("/")[1]) === false) {
+    if (shopImages.size > MAX_FILE_SIZE || !REQUIRED_FILE_EXTENSIONS.includes(shopImages.type.split("/")[1])) {
       return NextResponse.json({ success: false, message: "File size exceeds the limit" }, { status: 400 });
     }
 
@@ -74,7 +74,8 @@ export const PATCH = async (req: NextRequest) => {
 
     // Convert Blob/File to buffer and write to file
     const buffer = Buffer.from(await shopImages.arrayBuffer());
-    await fs.promises.writeFile(filePath, buffer);
+    const uint8Array = new Uint8Array(buffer); // Convert Buffer to Uint8Array
+    await fs.promises.writeFile(filePath, uint8Array);
 
     // Update the shop in the database
     const shop = await prisma.shop.update({
@@ -95,16 +96,15 @@ export const PATCH = async (req: NextRequest) => {
     });
   } catch (err) {
     console.error("Error uploading file or creating shop:", err);
-   if (err instanceof jwt.JsonWebTokenError) {
-  return NextResponse.json(
-    { success: false, message: "Invalid token" },
-    { status: 401 }
-  );
-}
-
-return NextResponse.json(
-  { success: false, message: "Internal server error" },
-  { status: 500 }
-);
+    if (err instanceof jwt.JsonWebTokenError) {
+      return NextResponse.json(
+        { success: false, message: "Invalid token" },
+        { status: 401 }
+      );
+    }
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
   }
 };

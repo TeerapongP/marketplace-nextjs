@@ -49,6 +49,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(cartItem, { status: 201 });
   } catch (error) {
+    console.log("ERROR : ",error);
+
     return NextResponse.json({ error: error }, { status: 500 });
   }
 }

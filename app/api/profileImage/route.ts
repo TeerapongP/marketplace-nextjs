@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
     // Return user data
     return NextResponse.json({ imageUrl: user.userImage }, { status: 200 });
   } catch (error) {
-    error;
+    console.log("ERROR : ",error)
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

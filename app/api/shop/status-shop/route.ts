@@ -48,7 +48,7 @@ export async function PUT(req: NextRequest) {
     // Return the updated shop
     return NextResponse.json(updatedShop, { status: 200 });
   } catch (error) {
-    "Error updating shop status:", error;
+    console.log("Error updating shop status:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

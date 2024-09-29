@@ -33,7 +33,7 @@ export async function DELETE(req: NextRequest) {
     await prisma.shop.delete({ where: { shopId } });
     return NextResponse.json({ message: "Item removed from shop" });
   } catch (error) {
-    error;
+    console.log("Error removing from shop:", error);
     return NextResponse.json(
       { error: "Error removing from shop" },
       { status: 500 }
