@@ -142,11 +142,9 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                                                         key={`${item.productId}-${index}`} // Ensure key is unique
                                                         className='tw-flex tw-items-center tw-p-2 tw-border-b tw-border-gray-200 hover:bg-gray-100 transition-colors duration-300'
                                                     >
-                                                        <Image
+                                                        <img
                                                             src={item.images}
-                                                            alt={item.productName || ''}
-                                                            layout="fill"
-                                                            objectFit="cover"
+                                                            alt={item.productName}
                                                             className='tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2'
                                                         />
                                                         <div className='tw-flex-1'>
@@ -154,7 +152,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                                                             <div className='tw-text-gray-600'>Quantity: {item.quantity}</div>
                                                         </div>
                                                         <button
-                                                            onClick={() => handleDelete(item.cartsId || 0)}
+                                                            onClick={() => handleDelete(Number(item.cartsId))}
                                                             className='tw-text-red-600 tw-ml-4 hover:tw-text-red-800'
                                                         >
                                                             <i className="fas fa-trash"></i>
@@ -173,6 +171,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                                         )}
                                     </div>
                                 )}
+
                             </div>
                         </>
                     )}
