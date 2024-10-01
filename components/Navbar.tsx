@@ -3,11 +3,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { NavbarProps } from './interface/NavbarProps';
 import { MenuItem } from './interface/MenuItem';
+import Alert from '@/components/Alert';
+
+import { useCart } from '../app/context/CartContext'; // Import the custom hook
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
 import Loading from './Loading';
-import { useCart } from '../app/context/CartContext'; // Import the custom hook
-import Image from 'next/image';
 
 const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -60,10 +61,6 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
             ? menuItems.slice(0, 2)
             : menuItems.filter(item => item.roles.some(role => role.roleId === Number(userRoleId)));
     }, [menuItems, userRoleId]);
-
-    if (loading) {
-        return <Loading />;
-    }
 
     const handleDelete = async (cartsId: number) => {
         const token = localStorage.getItem('token'); // Replace with your actual JWT token
@@ -171,11 +168,13 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                                         )}
                                     </div>
                                 )}
-
                             </div>
                         </>
                     )}
                 </div>
+                {alertMessage && alertType && (
+                    <Alert type={alertType} message={alertMessage} />
+                )}
             </div>
         </nav>
     );
