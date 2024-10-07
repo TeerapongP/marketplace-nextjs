@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { CartItem, CartState } from '../interface/carts';
-
 // Define action types
 type Action =
     | { type: 'SET_CART_ITEMS'; payload: CartItem[] }
@@ -58,7 +57,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const data: CartItem[] = await response.json();
                 dispatch({ type: 'SET_CART_ITEMS', payload: data });
             } else {
-                ('Error fetching cart items');
+                console.error('Error fetching cart items');
+
             }
         } catch (error) {
             console.log('Error fetching cart items:', error);

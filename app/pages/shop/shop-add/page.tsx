@@ -85,7 +85,6 @@ const ShopEditPage = () => {
   }
   return (
     <div className='tw-mt-20 tw-mx-20'>
-      (
       <>
         <form onSubmit={handleSubmit}>
 
@@ -155,7 +154,6 @@ const ShopEditPage = () => {
           <Alert type={alertType} message={alertMessage} />
         )}
       </>
-      )
     </div>
   );
 };
