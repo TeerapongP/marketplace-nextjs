@@ -5,4 +5,5 @@ export type NavbarProps = {
   userRoleId: number;
   userId: string;
   className?: string;
+  menuItems: MenuItem[];
 };

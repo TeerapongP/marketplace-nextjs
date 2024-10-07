@@ -10,7 +10,7 @@ const generateTrackingNumber = () => (
 );
 
 export async function POST(req: NextRequest) {
-  const JWT_SECRET = process.env.JWT_SECRET || "";
+  const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
   try {
     // Extract the Authorization header
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.log("ERROR : ",error);
+    console.log("ERROR : ", error);
     return NextResponse.json({ error: "Error placing order" }, { status: 500 });
   }
 }

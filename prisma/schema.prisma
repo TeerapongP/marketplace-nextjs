@@ -155,10 +155,10 @@ model Shop {
 }
 
 model Space {
-  spaceId       Int    @id @default(autoincrement())
+  spaceId       Int            @id @default(autoincrement())
   spaceLocation String
   pricePerDay   Float
-
+  images        String
   // Relationships
   reserveSpaces ReserveSpace[]
 

@@ -3,8 +3,15 @@ import { prisma } from "../../../../lib/prisma"; // Adjust the path as necessary
 
 export async function GET(req: NextRequest) {
   try {
-    // Fetch products; if categoryId is null, fetch all products
+    // Extract categoryId from the query parameters
+    const url = new URL(req.url);
+    const categoryId = url.searchParams.get("categoryId");
+
+    // Fetch products by categoryId
     const products = await prisma.product.findMany({
+      where: {
+        categoryId: Number(categoryId),
+      },
       select: {
         productId: true,
         productName: true,
