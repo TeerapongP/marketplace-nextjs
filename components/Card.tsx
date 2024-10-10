@@ -18,6 +18,7 @@ const Card: React.FC<CardProps> = ({
   roleId,
   bgButtonColor,
   hideButton = false,
+  reserveStall = false,
   onToggleChange,
   onButtonClick,
   onButtonViewClick,
@@ -61,7 +62,7 @@ const Card: React.FC<CardProps> = ({
 
 
   return (
-    <div className={`${bgColor ?? 'tw-bg-gray-100'} tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm tw-relative`}>
+    <div className={`${bgColor ?? 'tw-bg-gray-100'} custom-sm:tw-w-[40vw]  custom-sm:tw-mt-20 tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm tw-relative`}>
       <div className="tw-grid tw-grid-rows-[auto_1fr_auto] tw-gap-4 tw-h-full">
         {imageUrl && (
           <div className="tw-relative tw-w-[20vw] tw-h-[20vh] tw-row-span-1">
@@ -69,23 +70,19 @@ const Card: React.FC<CardProps> = ({
               src={imageUrl}
               alt={title ?? ''}
               layout="fill"
-              objectFit="cover"
-              className="tw-object-cover "
+              className="tw-object-cover"
             />
           </div>
-
         )}
-
         {/* Content Section */}
         <div className="tw-p-4 tw-row-span-1 tw-overflow-auto">
           <h2 className="tw-text-xl tw-font-bold tw-text-gray-900">{title}</h2>
           <p className="tw-text-gray-600 tw-mt-2">{content}</p>
         </div>
-
         {/* Footer Section */}
         {price !== undefined ? (
           <div className="tw-flex tw-items-center tw-ml-4 tw-my-4 tw-justify-between tw-w-full" >
-            {!hideButton ? (
+            {!hideButton && !reserveStall ? (
               <div className="tw-flex tw-items-center tw-ml-4 tw-my-4 tw-justify-between tw-w-full">
                 <Button
                   type="submit"
@@ -108,26 +105,37 @@ const Card: React.FC<CardProps> = ({
                   <span>Cart</span>
                 </Button>
               </div>
-            ) : null}
+            ) :
+              <div className="tw-flex tw-items-center tw-justify-center ">
+                <Button
+                  type="submit"
+                  text="Reserve Stall"
+                  width="tw-w-80 custom-sm:tw-w-16"
+                  height="tw-h-10"
+                  textColor="tw-text-black"
+                  color="tw-bg-white"
+                  disabled={false}
+                  onClick={handleButtonClick}
+                  className='tw-mx-4'
+                />
+              </div>
+            }
           </div>
-
         ) : (
           <div className="tw-p-4 tw-flex tw-items-center tw-justify-between tw-row-span-1">
             {!hideButton ? (
               <>
-                <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
-                  <Button
-                    type="submit"
-                    text="View"
-                    width="tw-w-48 custom-sm:tw-w-16"
-                    height="tw-h-10"
-                    textColor="tw-text-black"
-                    color="tw-bg-white"
-                    disabled={false}
-                    className="tw-mr-4"
-                    onClick={handleButtonViewClick}
-                  />
-                </div>
+                <Button
+                  type="submit"
+                  text="View"
+                  width="tw-w-full"
+                  height="tw-h-10"
+                  textColor="tw-text-black"
+                  color="tw-bg-white"
+                  disabled={false}
+                  onClick={handleButtonViewClick}
+                  className='tw-mx-4 tw-mr-10'
+                />
 
                 <div className="tw-flex tw-items-center tw-ml-4 tw-mt-4">
                   <ToggleSwitch
