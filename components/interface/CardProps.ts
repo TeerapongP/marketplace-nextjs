@@ -1,5 +1,3 @@
-import Product from "../../app/interface/products";
-
 export default interface CardProps {
   title?: string;
   content?: string;
@@ -11,8 +9,9 @@ export default interface CardProps {
   disabled?: boolean;
   price?: number;
   hideButton?: boolean;
+  reserveStall?: boolean;
   bgButtonColor?: string;
   onToggleChange?: (shopId: number, checked: boolean) => void;
-  onButtonClick?: (product: Product) => void;
+  onButtonClick?: (product: any) => void;
   onButtonViewClick?: (shopId: number) => void; // Add this line
 }

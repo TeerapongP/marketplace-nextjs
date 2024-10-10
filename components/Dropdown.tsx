@@ -11,6 +11,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     keyString = "",
     value,
     disable,
+    className = ""
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState<null | Record<string, any>>(null); // Define specific type for selected
@@ -55,7 +56,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         };
     }, []);
 
-    const toggleDropdown = () => setIsOpen(prev => !prev);
+    const toggleDropdown = () => setIsOpen((prev) => !prev);
 
     const handleSelect = useCallback((selectedOption: any) => {
         const [idKey] = valueString.split(',');
@@ -66,19 +67,24 @@ const Dropdown: React.FC<DropdownProps> = ({
     }, [onSelect, valueString]);
 
     return (
-        <div className="tw-relative tw-mt-2" ref={dropdownRef}>
+        <div className={`tw-relative tw-mt-2 `} ref={dropdownRef}>
             <button
                 type="button"
                 onClick={toggleDropdown}
-                className="tw-w-full tw-px-4 tw-py-2 tw-bg-white tw-border tw-border-gray-300 tw-rounded-md tw-shadow-sm tw-text-gray-700 tw-text-left tw-focus:outline-none tw-focus:ring-2 tw-focus:ring-indigo-500"
+                className={
+                    className === ""
+                        ? "tw-w-full tw-px-4 tw-py-2 tw-bg-white tw-border tw-border-gray-300 tw-rounded-md tw-shadow-sm tw-text-gray-700 tw-text-left tw-focus:outline-none tw-focus:ring-2 tw-focus:ring-indigo-500"
+                        : className
+                }
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 disabled={disable}
             >
                 {selected ? selected[keyString.split(',')[1]] : placeholder}
             </button>
+
             {isOpen && (
-                <div className="tw-absolute tw-right-0 tw-mt-2 tw-w-full tw-bg-white tw-border tw-border-gray-300 tw-rounded-md tw-shadow-lg tw-z-10">
+                <div className={`tw-absolute tw-right-0 tw-mt-2 tw-w-full tw-bg-white tw-border tw-border-gray-300 tw-rounded-md tw-shadow-lg tw-z-10`}>
                     {options.map((data) => (
                         <button
                             key={data[valueString.split(',')[0]]}
@@ -90,6 +96,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                     ))}
                 </div>
             )}
+            {error && <p className="tw-text-red-500 tw-text-sm tw-mt-2">{error}</p>} {/* Display error message */}
         </div>
     );
 };

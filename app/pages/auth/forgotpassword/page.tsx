@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '../../../../components/Alert';
 import Button from '../../../../components/Button';
-import ForgotPassword from '../../../../public/iconsLock.svg';
 import TextInput from '@/components/Input';
 import bcrypt from 'bcryptjs';
+import Link from 'next/link';
 
 
 const ForgotPasswordPage = () => {
@@ -16,10 +16,10 @@ const ForgotPasswordPage = () => {
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter();
 
- 
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     try {
       const res = await fetch('/api/auth/forgotPassword', {
@@ -58,48 +58,66 @@ const ForgotPasswordPage = () => {
       return () => clearTimeout(timer);
     }
   }, [alertMessage]);
-
   return (
-    <div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-h-screen tw-bg-custom-yellow tw-p-4 tw-gap-4">
-      <div className="tw-flex tw-w-full tw-max-w-[60vw] tw-h-64 sm:tw-h-80 md:tw-h-96 lg:tw-h-[500px]">
-        <div className="tw-flex-1 tw-bg-custom-green tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-6 tw-text-center tw-flex tw-flex-col tw-justify-center tw-items-center">
-          <h1 className="tw-text-lg sm:tw-text-2xl md:tw-text-3xl tw-font-bold tw-mb-4 sm:tw-mb-6 lg:tw-mb-8">Forgot your password?</h1>
-          <form onSubmit={handleSubmit} className="tw-w-full tw-space-y-4">
-            <div className="tw-w-full tw-text-start">
-              <label className="tw-block tw-font-medium">Username</label>
-              <TextInput
-                type="text"
-                id="username"
-                value={userName}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                placeholder="Enter your username"
-                className="tw-w-full"
-              />
-            </div>
-            <div className="tw-w-full tw-text-start">
-              <label className="tw-block tw-font-medium">Password</label>
-              <TextInput
-                type="password"
-                id="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                placeholder="Enter your password"
-                className="tw-w-full"
-              />
-            </div>
-            <Button type="submit" text="Confirm" width="tw-w-80" textColor="tw-text-white" color="tw-bg-black" />
-          </form>
-        </div>
-        <div className="tw-flex-1 tw-bg-custom-gray tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-10 tw-flex tw-justify-center tw-items-center">
-          <ForgotPassword />
+    <div className="tw-min-h-screen tw-flex tw-items-center tw-justify-center tw-bg-gradient-to-r tw-bg-blue-600">
+      <div className="tw-w-full tw-max-w-lg tw-bg-white tw-p-10 tw-rounded-3xl tw-shadow-2xl tw-relative tw-overflow-hidden">
+        <div className="tw-absolute tw-inset-0 tw-bg-gradient-to-br  tw-bg-blue-500 tw-opacity-10 tw-pointer-events-none"></div>
+        <h2 className="tw-text-3xl tw-font-bold tw-text-center tw-text-gray-800 tw-mb-6">
+          Forgot Password
+        </h2>
+
+        <form onSubmit={handleSubmit} className="tw-mt-8">
+          <div className="tw-mb-6">
+            <label htmlFor="username" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
+              Username
+            </label>
+            <TextInput
+              type="text"
+              id="username"
+              value={userName}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              placeholder="Enter your username"
+              className="tw-w-full"
+            />
+          </div>
+
+          <div className="tw-mb-6">
+            <label htmlFor="password" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
+              Password
+            </label>
+            <TextInput
+              type="password"
+              id="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              placeholder="Enter your password"
+              className="tw-w-full"
+            />
+          </div>
+          <Button
+            type="submit"
+            text="Forgot Password"
+            className='tw-w-full tw-py-3 tw-bg-gradient-to-r tw-from-purple-500 tw-to-blue-600 tw-text-white tw-rounded-lg tw-shadow-lg tw-transform tw-hover:scale-105 tw-transition-all tw-duration-300'
+          />
+        </form>
+        <div className="tw-mt-6 tw-flex tw-items-center tw-justify-between">
+          <Link href="/pages/auth/login" className="tw-text-sm tw-text-purple-600 hover:tw-underline">
+            Login
+          </Link>
+          <Link href="/pages/auth/register" className='tw-text-sm tw-text-purple-600 hover:tw-underline'>
+            Register
+          </Link>
         </div>
       </div>
-      {alertMessage && alertType && (
-        <Alert type={alertType} message={alertMessage} />
-      )}
-    </div>
+
+      {
+        alertMessage && alertType && (
+          <Alert type={alertType} message={alertMessage} />
+        )
+      }
+    </div >
   );
 };
 

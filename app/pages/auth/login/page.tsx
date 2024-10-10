@@ -3,9 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '@/components/Alert';
-import Dropdown from '@/components/Dropdown';
 import Button from '@/components/Button';
-import LoginIcon from '@/public/iconsLoginPage.svg';
 import TextInput from '@/components/Input';
 import Link from 'next/link';
 import bcrypt from 'bcryptjs';
@@ -14,7 +12,6 @@ import bcrypt from 'bcryptjs';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [roleId, setRoleId] = useState(0);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter();
@@ -22,16 +19,14 @@ const LoginPage = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-
-        body: JSON.stringify({ username, password: hashedPassword, roleId }),
-
+        body: JSON.stringify({ username, password }),
       });
+
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem('token', data.token);
@@ -40,7 +35,6 @@ const LoginPage = () => {
 
         setUsername(''); // Clear username
         setPassword(''); // Clear password
-        setRoleId(0)
 
         router.push('/'); // Redirect to a protected route
         setAlertMessage('Login successful');
@@ -55,9 +49,7 @@ const LoginPage = () => {
       setAlertType('error');
     }
   };
-  const handleSelect = (roleId: number) => {
-    setRoleId(roleId)
-  };
+
 
   useEffect(() => {
     if (alertMessage) {
@@ -71,72 +63,71 @@ const LoginPage = () => {
   }, [alertMessage]);
 
   return (
-    <div className="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-h-screen tw-bg-custom-yellow tw-p-4 tw-gap-4">
-      <div className="tw-relative tw-w-full tw-max-w-[60vw] tw-h-64 sm:tw-h-80 md:tw-h-96 lg:tw-h-[500px] tw-flex tw-items-center tw-justify-center">
-        <div className="tw-flex-1 tw-bg-custom-green tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-6 tw-text-center tw-z-10 tw-grid tw-grid-rows-auto tw-gap-4">
-          <div className='tw-w-full'>
-            <h1 className="tw-text-lg sm:tw-text-2xl md:tw-text-3xl tw-font-bold tw-mb-4 sm:tw-mb-6 lg:tw-mb-8">Login</h1>
-          </div>
-          <div className="tw-max-w-full tw-w-full">
-            <form onSubmit={handleSubmit} className="tw-space-y-4">
-              <div className="tw-w-full tw-text-start">
-                <label className="tw-block tw-font-medium">User type</label>
-                <Dropdown
-                  url="/api/role" // Your API endpoint to fetch roles
-                  onSelect={handleSelect}
-                  valueString="roleId,roleName"
-                  keyString="roleId,roleName"
-                  placeholder="Select a role"
-                />
-              </div>
-              <div className="tw-w-full tw-text-start">
-                <label className="tw-block tw-font-medium">Username</label>
-                <TextInput
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  placeholder="Enter your username"
-                  className="tw-w-full"
-                />
-              </div>
-              <div className="tw-w-full tw-text-start">
-                <label className="tw-block tw-font-medium">Password</label>
-                <TextInput
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Enter your password"
-                  className="tw-w-full"
-                />
-                <div className='tw-text-center tw-mt-2'>
-                  <Link href="/pages/auth/forgotpassword">
-                    Forgot your password?
-                  </Link>
-                  <Link href="/pages/auth/register">
-                    / Register
-                  </Link>
-                </div>
-              </div>
-              <Button type="submit" text="Login" width="tw-w-80" textColor='tw-text-black' color="tw-bg-white" />
-            </form>
+    <div className="tw-min-h-screen tw-flex tw-items-center tw-justify-center tw-bg-gradient-to-r tw-bg-blue-600">
+      <div className="tw-w-full tw-max-w-lg tw-bg-white tw-p-10 tw-rounded-3xl tw-shadow-2xl tw-relative tw-overflow-hidden">
+        <div className="tw-absolute tw-inset-0 tw-bg-gradient-to-br  tw-bg-blue-500 tw-opacity-10 tw-pointer-events-none"></div>
+        <h2 className="tw-text-3xl tw-font-bold tw-text-center tw-text-gray-800 tw-mb-6">
+          Login
+        </h2>
+
+        <form onSubmit={handleSubmit} className="tw-mt-8">
+          <div className="tw-mb-6">
+            <label htmlFor="username" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
+              Username
+            </label>
+            <TextInput
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              placeholder="Enter your username"
+              className="tw-w-full tw-mt-2 tw-px-4 tw-py-3 tw-border tw-border-gray-300 tw-rounded-lg tw-shadow-sm tw-focus:outline-none tw-focus:ring tw-focus:ring-purple-400"
+            />
           </div>
 
-        </div>
-        <div className="tw-flex-1 tw-bg-custom-gray tw-shadow-lg tw-rounded-lg tw-p-4 sm:tw-p-6 md:tw-p-8 lg:tw-p-10 tw-text-center tw-z-0">
-          <div className='tw-flex tw-justify-center tw-items-center'>
-            <LoginIcon />
+          <div className="tw-mb-6">
+            <label htmlFor="password" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
+              Password
+            </label>
+            <TextInput
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Enter your password"
+              className="tw-w-full tw-mt-2 tw-px-4 tw-py-3 tw-border tw-border-gray-300 tw-rounded-lg tw-shadow-sm tw-focus:outline-none tw-focus:ring tw-focus:ring-purple-400"
+            />
           </div>
+
+          <Button
+            type="submit"
+            text="Login"
+            className='tw-w-full tw-py-3 tw-bg-gradient-to-r tw-from-purple-500 tw-to-blue-600 tw-text-white tw-rounded-lg tw-shadow-lg tw-transform tw-hover:scale-105 tw-transition-all tw-duration-300'
+          />
+        </form>
+
+        <div className="tw-mt-6 tw-flex tw-items-center tw-justify-between">
+          <Link href="/pages/auth/forgotpassword" className="tw-text-sm tw-text-purple-600 hover:tw-underline">
+            Forgot your password?
+          </Link>
+          <Link href="/pages/auth/register" className='tw-text-sm tw-text-purple-600 hover:tw-underline'>
+            Register
+          </Link>
         </div>
       </div>
-      {alertMessage && alertType && (
-        <Alert type={alertType} message={alertMessage} />
-      )}
+
+      {
+        alertMessage && alertType && (
+          <Alert type={alertType} message={alertMessage} />
+        )
+      }
     </div >
   );
 };
 
 export default LoginPage;
+
+
+

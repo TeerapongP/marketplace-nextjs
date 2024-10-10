@@ -81,7 +81,7 @@ const Category = () => {
               valueString="categoryId,name"
               keyString="categoryId,name"
               disable={false}
-              placeholder="Select a Category Products"
+              placeholder="เลือกหมวดหมู่สินค้า"
               value={categoryId}
             />
           </div>
