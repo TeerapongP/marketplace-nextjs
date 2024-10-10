@@ -24,7 +24,6 @@ const RegisterPage = () => {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter();
-
   useEffect(() => {
     if (alertMessage) {
       const timer = setTimeout(() => {
