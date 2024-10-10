@@ -10,6 +10,7 @@ export default interface CardProps {
   bgColor?: string;
   disabled?: boolean;
   price?: number;
+  hideButton?: boolean;
   bgButtonColor?: string;
   onToggleChange?: (shopId: number, checked: boolean) => void;
   onButtonClick?: (product: Product) => void;

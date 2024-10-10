@@ -1,13 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
-import SearchInput from '../components/SearchInput';
-import Card from '../components/Card';
+import SearchInput from '@/components/SearchInput';
+import Card from '@/components/Card';
 import Shop from './interface/shop';
-import Alert from '../components/Alert';
+import Alert from '@/components/Alert';
 import { useRouter } from 'next/navigation'; // Import for client-side navigation
 import { useCart } from './context/CartContext';
-import CloseButton from '../components/CloseButton';
-import EditButton from '../components/EditButton';
+import CloseButton from '@/components/CloseButton';
+import EditButton from '@/components/EditButton';
+import Loading from '@/components/Loading';
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
@@ -22,7 +23,7 @@ export default function Home() {
   const { state: { }, dispatch } = useCart();
 
   useEffect(() => {
-    setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL || '');
+    setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL ?? '');
     fetchCartItems();
     fetchShopAll();
     const storedRoleId = localStorage.getItem('roleId');
@@ -185,43 +186,43 @@ export default function Home() {
     }
   };
   return (
-    <div className='tw-w-full'>
-      <div className='tw-grid sm:tw-mt-24 md:tw-mt-24 lg:tw-mt-24 custom-sm:tw-mt-24 custom-sm:tw-justify-items-center tw-justify-items-end tw-mr-20 custom-sm:tw-mr-0'>
-        <SearchInput onSearch={handleSearch} onClick={handleClick} />
-      </div>
-      <div className='tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center'>
+    loading ? <Loading /> : error ? <Alert message={error} type={'success'} /> : (
+      <div className='tw-w-full'>
+        <div className='tw-grid sm:tw-mt-24 md:tw-mt-24 lg:tw-mt-24 custom-sm:tw-mt-24 custom-sm:tw-justify-items-center tw-justify-items-end tw-mr-20 custom-sm:tw-mr-0'>
+          <SearchInput onSearch={handleSearch} onClick={handleClick} />
+        </div>
+        <div className='tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center'>
 
-        {data.length > 0 && data.map((item) => {
-          const isLocalImage = !item.shopImages.startsWith('http://') && !item.shopImages.startsWith('https://');
-          const imageUrl = isLocalImage ? `${imagesPath}${item.shopImages}` : item.shopImages;
-          return (
-            <div key={item.shopId} className="tw-relative">
-              {(roleId === 3 || roleId === 1) && (
-                <div className='tw-my-4 tw-ms-5'>
-                  <CloseButton onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
-                  <EditButton onClick={() => handleEditButtonClick(Number(item.shopId))} />
-                </div>
-              )}
-              <Card
-                title={item.shopName}
-                content={item.shopDescription}
-                imageUrl={imageUrl}
-                shopId={Number(item.shopId)}
-                status={item.status}
-                roleId={Number(roleId)}
-                disabled={roleId === null}
-                onToggleChange={handleToggleChange}
-                onButtonViewClick={handleButtonClick}
-              />
-            </div>
-          );
-        })}
+          {data.length > 0 && data.map((item) => {
+            const isLocalImage = !item.shopImages.startsWith('http://') && !item.shopImages.startsWith('https://');
+            const imageUrl = isLocalImage ? `${imagesPath}${item.shopImages}` : item.shopImages;
+            return (
+              <div key={item.shopId} className="tw-relative">
+                {(roleId === 3 || roleId === 1) && (
+                  <div className='tw-my-4 tw-ms-5'>
+                    <CloseButton onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
+                    <EditButton onClick={() => handleEditButtonClick(Number(item.shopId))} />
+                  </div>
+                )}
+                <Card
+                  title={item.shopName}
+                  content={item.shopDescription}
+                  imageUrl={imageUrl}
+                  shopId={Number(item.shopId)}
+                  status={item.status}
+                  roleId={Number(roleId)}
+                  disabled={roleId === null}
+                  onToggleChange={handleToggleChange}
+                  onButtonViewClick={handleButtonClick}
+                />
+              </div>
+            );
+          })}
+        </div>
+        {alertMessage && alertType && (
+          <Alert type={alertType} message={alertMessage} />
+        )}
       </div>
-      {alertMessage && alertType && (
-        <Alert type={alertType} message={alertMessage} />
-      )}
-    </div>
+    )
   );
-
-
 }

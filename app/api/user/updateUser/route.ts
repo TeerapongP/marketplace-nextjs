@@ -1,77 +1,109 @@
-// import { NextRequest, NextResponse } from 'next/server';
-// import jwt from 'jsonwebtoken';
-// import { prisma } from '../../../../lib/prisma'; // Adjust the path as necessary
-// import { IncomingMessage } from 'http';
-// import parseForm from '../../lib/formidableMiddleware';
-// import formidable from 'formidable';
+import { NextRequest, NextResponse } from "next/server";
+import path from "path";
+import fs from "fs";
+import { prisma } from "@/lib/prisma"; // Adjust the path as necessary
+import jwt from "jsonwebtoken"; // Ensure this package is installed
+import DecodedToken from "../../interface/decodedToken";
 
-// const JWT_SECRET = process.env.JWT_SECRET || '';
+const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? "", "public/uploads");
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB limit
+const REQUIRED_FILE_EXTENSIONS = ["jpg", "jpeg", "png"];
 
-// export async function PUT(req: NextRequest) {
-//   try {
-//     // Convert NextRequest to http.IncomingMessage
-//     const incomingReq = req as unknown as IncomingMessage;
+export const PATCH = async (req: NextRequest) => {
+  const JWT_SECRET = process.env.JWT_SECRET;
+  if (!JWT_SECRET) {
+    return NextResponse.json(
+      { message: "JWT_SECRET environment variable is not defined" },
+      { status: 500 }
+    );
+  }
 
-//     // Use the parseForm utility function
-//     const { fields, files } = await parseForm(incomingReq);
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return NextResponse.json(
+      { message: "Authorization header is missing" },
+      { status: 401 }
+    );
+  }
 
-//     const authHeader = req.headers.get('authorization') || '';
-//     if (!authHeader) {
-//       return NextResponse.json({ message: 'Authorization header is missing' }, { status: 401 });
-//     }
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return NextResponse.json({ message: "Token is missing" }, { status: 401 });
+  }
 
-//     const token = authHeader.split(' ')[1];
-//     if (!token) {
-//       return NextResponse.json({ message: 'Token is missing' }, { status: 401 });
-//     }
+  try {
+    const formData = await req.formData();
+    const body = Object.fromEntries(formData) as unknown as {
+      productId: string;
+      productName: string;
+      description: string;
+      price: number;
+      stock: number;
+      images: File;
+      shopId: number;
+      categoryId:number
+    };
+    
+    // Early return if any of the required fields are missing
+    if (!body.productId || !body.productName || !body.description || !body.price || !body.images) {
+      return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
+    }
 
-//     let decoded;
-//     try {
-//       decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-//     } catch (err) {
-//       return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
-//     }
 
-//     const { userId } = decoded;
-//     const userName = Array.isArray(fields.userName) ? fields.userName[0] : fields.userName;
-//     const firstName = Array.isArray(fields.firstName) ? fields.firstName[0] : fields.firstName;
-//     const lastName = Array.isArray(fields.lastName) ? fields.lastName[0] : fields.lastName;
-//     const email = Array.isArray(fields.email) ? fields.email[0] : fields.email;
-//     const phoneNumber = Array.isArray(fields.phoneNumber) ? fields.phoneNumber[0] : fields.phoneNumber;
-//     const address = Array.isArray(fields.address) ? fields.address[0] : fields.address;
-//     const userImage = files.file ? (files.file[0] as formidable.File).newFilename : undefined;
+    // Destructure and parse shopId as integer
+    const { shopId, productId, productName, description, price, stock, categoryId, images } = body;
+    const parsedProductId = parseInt(productId, 10); // Parse as integer
 
-//     if (!userId) {
-//       return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
-//     }
+    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
+    const userId = decoded.userId;
 
-//     try {
-//       const updatedUser = await prisma.user.update({
-//         where: { userId: Number(userId) },
-//         data: {
-//           userName,
-//           firstName,
-//           lastName,
-//           email,
-//           phoneNumber,
-//           address,
-//           userImage,
-//         },
-//       });
+    // Validate uploaded file
+    if (images.size > MAX_FILE_SIZE || !REQUIRED_FILE_EXTENSIONS.includes(images.type.split("/")[1])) {
+      return NextResponse.json({ success: false, message: "File size exceeds the limit" }, { status: 400 });
+    }
 
-//       return NextResponse.json(updatedUser, { status: 200 });
-//     } catch (error) {
-//       (error);
-//       return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
-//     }
-//   } catch (error) {
-//     (error);
-//     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
-//   }
-// }
-import { NextResponse } from "next/server";
+    // Ensure upload directory exists
+    if (!fs.existsSync(UPLOAD_DIR)) {
+      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    }
 
-export async function POST(request: Request) {
-  // Your logic to handle the request
-  return NextResponse.json({ message: "User updated successfully" });
-}
+    const uniqueFileName = `${Date.now()}-${images.name}`;
+    const filePath = path.resolve(UPLOAD_DIR, uniqueFileName);
+
+    // Convert Blob/File to buffer and write to file
+    const buffer = Buffer.from(await images.arrayBuffer());
+    const uint8Array = new Uint8Array(buffer); // Convert Buffer to Uint8Array
+    await fs.promises.writeFile(filePath, uint8Array);
+    // Update the products in the database
+    const products = await prisma.product.update({
+      where: { productId: parsedProductId }, // Use parsedShopId here
+      data: {
+        productName,
+        description,
+        images: uniqueFileName,
+        price: Number(price),
+        shopId: Number(shopId),
+        categoryId: Number(categoryId),
+        stock: Number(stock),
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      products,
+      fileName: uniqueFileName,
+    });
+  } catch (err) {
+    console.error("Error uploading file or creating product:", err);
+    if (err instanceof jwt.JsonWebTokenError) {
+      return NextResponse.json(
+        { success: false, message: "Invalid token" },
+        { status: 401 }
+      );
+    }
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+};

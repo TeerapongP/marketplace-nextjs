@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Shop } from '@prisma/client';
-import { useRouter } from 'next/navigation';
 
 import Alert from '../../../../../components/Alert';
 import FileInput from "@/components/FileInput";
@@ -10,7 +9,6 @@ import TextInput from '@/components/Input';
 import Button from '@/components/Button';
 import Loading from "@/components/Loading";
 import Dropdown from '@/components/Dropdown';
-import { set } from 'date-fns';
 
 const ProductEditPage = () => {
   const pathname = usePathname();

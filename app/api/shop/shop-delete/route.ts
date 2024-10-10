@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma"; // Adjust the path as necessary
-import jwt from "jsonwebtoken";
 
 export async function DELETE(req: NextRequest) {
   const JWT_SECRET = process.env.JWT_SECRET;
@@ -30,12 +29,17 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ message: "Invalid shop ID" }, { status: 400 });
     }
 
-    await prisma.shop.delete({ where: { shopId } });
-    return NextResponse.json({ message: "Item removed from shop" });
+    // Delete the shop and related products in a single transaction
+    await prisma.$transaction([
+      prisma.product.deleteMany({ where: { shopId } }),
+      prisma.shop.delete({ where: { shopId } }),
+    ]);
+
+    return NextResponse.json({ message: "Shop and related products deleted successfully" });
   } catch (error) {
     console.log("Error removing from shop:", error);
     return NextResponse.json(
-      { error: "Error removing from shop" },
+      { error: "Error removing shop or products" },
       { status: 500 }
     );
   }

@@ -2,42 +2,20 @@ import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { NavbarProps } from './interface/NavbarProps';
-import { MenuItem } from './interface/MenuItem';
+import Alert from '@/components/Alert';
+
+import { useCart } from '../app/context/CartContext'; // Import the custom hook
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
-import Loading from './Loading';
-import { useCart } from '../app/context/CartContext'; // Import the custom hook
-import Image from 'next/image';
 
-const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className, menuItems }) => {
+
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-    const [loading, setLoading] = useState(true);
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
     const router = useRouter();
     const { state: { cartItems }, dispatch } = useCart();
-
-    useEffect(() => {
-        const fetchMenuItems = async () => {
-            try {
-                const res = await fetch(url);
-                if (res.ok) {
-                    const data: MenuItem[] = await res.json();
-                    setMenuItems(data);
-                } else {
-                    ('Failed to fetch menu items');
-                }
-            } catch (error) {
-                console.log('Error fetching menu items:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchMenuItems();
-    }, [url]);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -46,7 +24,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
 
     const handleLoginClick = () => router.push('/pages/auth/login');
     const handleProfile = () => router.push('/pages/profile');
-    const handleSignoutClick = () => {
+    const handleSignOutClick = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('roleId');
@@ -60,10 +38,6 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
             ? menuItems.slice(0, 2)
             : menuItems.filter(item => item.roles.some(role => role.roleId === Number(userRoleId)));
     }, [menuItems, userRoleId]);
-
-    if (loading) {
-        return <Loading />;
-    }
 
     const handleDelete = async (cartsId: number) => {
         const token = localStorage.getItem('token'); // Replace with your actual JWT token
@@ -111,7 +85,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                 </div>
                 <div className='tw-flex tw-space-x-4 tw-items-center tw-justify-end'>
                     {isLoggedIn === null ? (
-                        <Loading />
+                        <></>
                     ) : !isLoggedIn ? (
                         <div className='tw-flex'>
                             <UserAvatarIcon className='tw-mr-4' />
@@ -121,7 +95,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                         <>
                             <div className='tw-flex'>
                                 <UserAvatarIcon className='tw-mr-4 tw-cursor-pointer' onClick={handleProfile} />
-                                <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignoutClick} />
+                                <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignOutClick} />
                             </div>
                             <div className='tw-relative'>
                                 <div className='tw-flex tw-items-center tw-cursor-pointer' onClick={handleCartClick}>
@@ -171,11 +145,13 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className }) => {
                                         )}
                                     </div>
                                 )}
-
                             </div>
                         </>
                     )}
                 </div>
+                {alertMessage && alertType && (
+                    <Alert type={alertType} message={alertMessage} />
+                )}
             </div>
         </nav>
     );

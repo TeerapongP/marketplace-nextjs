@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { NextPage } from 'next';
+import React from 'react';
 import Loading from '@/components/Loading'; // Adjust path as necessary
 import TextInput from '@/components/Input';
 import Button from '@/components/Button';
@@ -18,7 +19,7 @@ const DeliveriesPage: NextPage = () => {
     const fetchTrackingNumber = async (trackingNumber: string) => {
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
-
+        setLoading(true);
         if (!trackingNumber || trackingNumber.length < 17) {
             setData([]);
             return;
@@ -33,11 +34,13 @@ const DeliveriesPage: NextPage = () => {
             if (!response.ok) {
                 throw new Error('Failed to fetch deliveries');
             }
+            setLoading(false);
             const data = await response.json();
             setData(data);
             setAlertMessage('Deliveries fetched successfully!');
             setAlertType('success');
         } catch (error) {
+            setLoading(false);
             setAlertMessage(`ERROR: ${error instanceof Error ? error.message : 'Unknown error'}`);
             setAlertType('error');
         }
