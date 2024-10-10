@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt"; // Import bcrypt for password comparison
 import { prisma } from "../../../../lib/prisma";
 
 // Ensure JWT_SECRET is always a string
@@ -11,28 +12,23 @@ if (!JWT_SECRET) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body: { username: string; roleId: number } = await req.json();
-    const { username, roleId } = body;
+    const body: { username: string; password: string } = await req.json();
+    const { username, password } = body;
 
-    if (!username || roleId === undefined) {
+    if (!username || !password) {
       return NextResponse.json(
-        { message: "Username and roleId are required" },
+        { message: "Username and password are required" }, // Updated message
         { status: 400 }
       );
     }
 
-    // Find user by username and roleId
+    // Find user by username only
     const user = await prisma.user.findFirst({
-      where: { userName: username, roleId: roleId },
+      where: { userName: username },
       select: {
         userId: true,
         userName: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        phoneNumber: true,
-        address: true,
-        userImage: true,
+        password: true, // Get the stored hashed password
         roleId: true, // Include roleId
       },
     });
@@ -41,10 +37,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // Generate JWT token
+    // Compare the plain-text password with the stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return NextResponse.json({ message: "Invalid password" }, { status: 401 });
+    }
+
     const token = jwt.sign(
       { userId: user.userId, username: user.userName, roleId: user.roleId },
-      JWT_SECRET, // JWT_SECRET is guaranteed to be a string here
+      JWT_SECRET,
       { expiresIn: "5h" }
     );
 
@@ -62,7 +64,6 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    "Internal Server Error:", error;
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }
