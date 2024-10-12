@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-// Define public paths
-const allowedPaths = [
+// Use constants for public paths and API paths
+const ALLOWED_PATHS = [
   "/",
   "/pages/auth/login",
   "/pages/auth/register",
   "/pages/profile",
   "/pages/auth/forgotpassword",
-].concat(["/pages/products/"]);
+  "/pages/products/",
+];
 
-// Define API paths that should be allowed without authentication
-const allowedApiPaths = [
+const ALLOWED_API_PATHS = [
   "/api/menu",
   "/api/role",
   "/api/auth/login",
@@ -22,8 +22,8 @@ const allowedApiPaths = [
   "/api/products/fetch",
 ];
 
-// Exclude internal Next.js paths and static assets
-const excludedPaths = [
+// Regex for excluded paths (internal Next.js paths, static assets, etc.)
+const EXCLUDED_PATHS_REGEX = [
   /^\/_next\/static\/.*/,
   /^\/_next\/data\/.*/,
   /^\/_next\/image\/.*/,
@@ -32,32 +32,28 @@ const excludedPaths = [
   /^\/manifest.json$/,
 ];
 
+// Helper function to check if a path matches any excluded regex
+const isExcludedPath = (pathname: string) =>
+  EXCLUDED_PATHS_REGEX.some((regex) => regex.test(pathname));
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Allow internal Next.js paths and static assets
-  if (excludedPaths.some((pattern) => pattern.test(pathname))) {
+  // Bypass middleware for excluded paths
+  if (isExcludedPath(pathname)) {
     return NextResponse.next();
   }
 
-  // Allow specified public paths
-  if (allowedPaths.some((path) => pathname.startsWith(path))) {
+  // Allow access to public paths without authentication
+  if (ALLOWED_PATHS.includes(pathname) || ALLOWED_API_PATHS.includes(pathname)) {
     return NextResponse.next();
   }
 
-  // Allow specific API paths without authentication
-  if (allowedApiPaths.some((path) => pathname.startsWith(path))) {
-    return NextResponse.next();
-  }
-
-  // Check if the request path requires authentication
+  // Authentication required for API requests
   if (pathname.startsWith("/api/")) {
     const authHeader = req.headers.get("authorization");
-    const token = authHeader?.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : null;
 
-    if (!token) {
+    if (!authHeader) {
       return NextResponse.json(
         { message: "No token provided" },
         { status: 401 }
@@ -65,27 +61,25 @@ export async function middleware(req: NextRequest) {
     }
 
     try {
-      // Verify the JWT token using `jose`
+      const token = authHeader.split(" ")[1];
       const { payload } = await jwtVerify(
         token,
         new TextEncoder().encode(process.env.JWT_SECRET!)
       );
 
-      // Optionally, attach user information to the request headers
+      // Attach user info to request headers if needed
       req.headers.set("user", JSON.stringify(payload));
-
       return NextResponse.next();
     } catch (error) {
-      "Token verification error:", error;
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
   }
 
-  // Redirect to a custom 404 page for other paths
+  // Redirect to a 404 page for other non-matching paths
   return NextResponse.rewrite(new URL("/404", req.url));
 }
 
-// Define the routes where the middleware should be applied
+// Apply middleware to specific routes
 export const config = {
   matcher: ["/", "/api/:path*", "/(.*)"],
 };
