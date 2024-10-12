@@ -146,7 +146,6 @@ export default function Home() {
               {(() => {
                 const isLocalImage = !selectedProduct.images.startsWith('http:') && !selectedProduct.images.startsWith('https:');
                 const imageUrl = isLocalImage ? `${imagesPath}${selectedProduct.images}` : selectedProduct.images;
-                console.log('Image URL:', imageUrl); // Check the URL
                 return (
                   <>
                     <p>ยืนยันการจองแผงตลาดสำหรับ {selectedProduct.spaceLocation}</p>
