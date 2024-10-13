@@ -24,7 +24,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, footer, children 
                 <div className="tw-p-4 tw-border-b">
                     <h2 className="tw-text-lg tw-font-semibold">{title}</h2>
                 </div>
-                <div className="tw-p-4">
+                <div className="tw-p-4 tw-h-full">
                     {children}
                 </div>
                 {footer && (

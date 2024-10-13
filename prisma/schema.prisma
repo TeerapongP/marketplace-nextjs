@@ -24,9 +24,10 @@ model User {
   role   Role @relation(fields: [roleId], references: [roleId])
 
   // Relationships
-  orders Order[]
-  carts  Cart[]
-  shops  Shop[] // Add this line to indicate a user can have multiple shops
+  orders       Order[]
+  carts        Cart[]
+  shops        Shop[] // Add this line to indicate a user can have multiple shops
+  ReserveSpace ReserveSpace[]
 
   @@map("User") // Maps the model name "User" to the table name "User" in the database
 }
@@ -146,10 +147,10 @@ model Shop {
   shopImages      String
   status          Boolean
 
-  ownerId      Int // Foreign key for the user who owns the shop
-  owner        User          @relation(fields: [ownerId], references: [userId])
-  products     Product[] // A shop can have multiple products
-  reserveSpace ReserveSpace? // Optional one-to-one relationship with ReserveSpace
+  ownerId       Int // Foreign key for the user who owns the shop
+  owner         User           @relation(fields: [ownerId], references: [userId])
+  products      Product[] // A shop can have multiple products
+  reserveSpaces ReserveSpace[]
 
   @@map("Shop")
 }
@@ -158,9 +159,10 @@ model Space {
   spaceId       Int            @id @default(autoincrement())
   spaceLocation String
   pricePerDay   Float
-  images        String
+  images        String // or String[]
+  status        Boolean?
   // Relationships
-  reserveSpaces ReserveSpace[]
+  reserveSpaces ReserveSpace[] // Relation to ReserveSpace
 
   @@map("Space") // Maps the model name "Space" to the table name "Space" in the database
 }
@@ -168,14 +170,16 @@ model Space {
 model ReserveSpace {
   reserveSpaceId Int      @id @default(autoincrement())
   reserveDate    DateTime @default(now())
-  status         String
+  status         Boolean
   roleId         Int
   spaceId        Int
-  shopId         Int      @unique // Foreign key for the shop associated with the reservation @unique
+  userId         Int // Ensure this field exists
+  shopId         Int
 
   role  Role  @relation(fields: [roleId], references: [roleId], onUpdate: NoAction, onDelete: NoAction)
   space Space @relation(fields: [spaceId], references: [spaceId], onUpdate: NoAction, onDelete: NoAction)
-  shop  Shop  @relation(fields: [shopId], references: [shopId], onUpdate: NoAction, onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [userId], onUpdate: NoAction, onDelete: NoAction) // Change Cascade to NoAction
+  shop  Shop? @relation(fields: [shopId], references: [shopId])
 
   @@map("ReserveSpace")
 }

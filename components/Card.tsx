@@ -62,24 +62,29 @@ const Card: React.FC<CardProps> = ({
 
 
   return (
-    <div className={`${bgColor ?? 'tw-bg-gray-100'} custom-sm:tw-w-[40vw]  custom-sm:tw-mt-20 tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm tw-relative`}>
+    <div className={`${bgColor ?? 'tw-bg-gray-100'} tw-shadow-md tw-rounded-lg tw-overflow-hidden tw-border tw-border-gray-200 tw-max-w-sm tw-relative`}>
+
+
       <div className="tw-grid tw-grid-rows-[auto_1fr_auto] tw-gap-4 tw-h-full">
+
         {imageUrl && (
-          <div className="tw-relative tw-w-[20vw] tw-h-[20vh] tw-row-span-1">
+          <div className="tw-relative tw-w-96 tw-h-56 tw-row-span-1">
             <Image
               src={imageUrl}
               alt={title ?? ''}
               layout="fill"
+              objectFit="cover"
               className="tw-object-cover"
             />
           </div>
         )}
+
         {/* Content Section */}
         <div className="tw-p-4 tw-row-span-1 tw-overflow-auto">
           <h2 className="tw-text-xl tw-font-bold tw-text-gray-900">{title}</h2>
           <p className="tw-text-gray-600 tw-mt-2">{content}</p>
         </div>
-        {/* Footer Section */}
+
         {price !== undefined ? (
           <div className="tw-flex tw-items-center tw-ml-4 tw-my-4 tw-justify-between tw-w-full" >
             {!hideButton && !reserveStall ? (
@@ -91,7 +96,7 @@ const Card: React.FC<CardProps> = ({
                   height="tw-h-10"
                   textColor="tw-text-white"
                   color={disabled ? bgButtonColor : 'tw-bg-green-600'}
-                  disabled={token === null}
+                  disabled={null === token}
                   className="tw-mr-4"
                 />
                 <Button

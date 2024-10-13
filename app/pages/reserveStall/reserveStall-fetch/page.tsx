@@ -40,7 +40,6 @@ export default function Home() {
       setLoading(false);
       const data = await response.json();
       setData(data);
-      setAlertMessage('Fetch data successfully');
     } catch (error) {
       setAlertMessage('Failed to fetch data');
       setLoading(false);
@@ -56,9 +55,40 @@ export default function Home() {
     setSelectedProduct(null);
   };
 
-  const handleConfirm = async (productId: number) => {
+  const handleConfirm = async (item: any) => {
+    const token = localStorage.getItem('token');
+    const roleId = localStorage.getItem('roleId');
+    const userId = localStorage.getItem('userId');
+    try {
+      const response = await fetch(`/api/reserveStall/reserveStall-add`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json', // Specify the content type
+        },
+        body: JSON.stringify({ roleId: roleId, status: true, spaceId: item.spaceId, userId: userId }),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json(); // Attempt to parse the error response
+        throw new Error(errorData.message || 'Failed to reserve stall');
+      }
+
+      const data = await response.json(); // Parse the successful response
+      const { message } = data;
+      // Fetch updated space market data
+      fetchSpaceMarket();
+      // Set success alert
+      setAlertType('success');
+      setAlertMessage('จองแผงสำเร็จแล้ว');
+      setIsModalOpen(false);
+
+    } catch (error: any) {
+      setAlertType('error');
+      setAlertMessage(error); // Display a generic error message if none is provided
+    }
   };
+
 
   const getButtonColor = (alphabeticPart: string): string => {
     if (alphabeticPart === "A") {
@@ -82,24 +112,25 @@ export default function Home() {
             width="tw-w-[10vw]"
             textColor="tw-text-white"
             color="tw-bg-blue-700"
-            onClick={() => router.push('/reserveStall/reserveStall-edit')}
+            onClick={() => router.push('/pages/reserveStall/reserveStall-edit')}
           />
         </div>
 
         <div className='tw-relative tw-flex-1'>
           <div className='tw-flex tw-justify-between tw-py-10'>
-            <div className="tw-grid tw-grid-roles-1 sm:tw-grid-cols-2 md:tw-grid-cols-3 lg:tw-grid-cols-4 xl:tw-grid-cols-8 tw-h-auto tw-max-h-[90vh]">
+            <div className="tw-grid tw-grid-roles-1 sm:tw-grid-cols-2 md:tw-grid-cols-3 lg:tw-grid-cols-4 xl:tw-grid-cols-8 tw-h-[3vh]">
               {data.length > 0 && data.map((item) => {
                 const alphabeticPart = item.spaceLocation.match(/^[A-Z]+/);
                 const buttonColor = alphabeticPart ? getButtonColor(alphabeticPart[0]) : "tw-bg-gray-500";
                 return (
-                  <div key={item.spaceId} className="tw-ml-10 tw-my-4 tw-h-[7vh]">
+                  <div key={item.spaceId} className="tw-ml-10 tw-my-4 tw-h-[7vh] ">
                     <Button
                       type="button"
-                      text={`${item.spaceLocation}`}
+                      text={` ${item.status ? 'แผงถูกจองแล้ว' : item.spaceLocation}`}
                       width="tw-w-[10vw] tw-h-full"
-                      textColor="tw-text-white"
-                      color={buttonColor}
+                      textColor={`${item.status ? 'tw-text-red-500' : 'tw-text-white'}`}
+                      color={item.status ? 'tw-bg-bg-current' : buttonColor}
+                      disabled={item.status}
                       onClick={() => openModal(item)}
                     />
                   </div>
@@ -142,16 +173,15 @@ export default function Home() {
           }
         >
           {selectedProduct && (
-            <div className="tw-w-full tw-flex tw-flex-col tw-items-center tw-p-4">
+            <div className="tw-w-full tw-flex tw-flex-col  tw-p-4 tw-text-start">
               {(() => {
                 const isLocalImage = !selectedProduct.images.startsWith('http:') && !selectedProduct.images.startsWith('https:');
                 const imageUrl = isLocalImage ? `${imagesPath}${selectedProduct.images}` : selectedProduct.images;
-                console.log('Image URL:', imageUrl); // Check the URL
                 return (
                   <>
-                    <p>ยืนยันการจองแผงตลาดสำหรับ {selectedProduct.spaceLocation}</p>
-                    <p>ราคาต่อวัน: {selectedProduct.pricePerDay} Baht</p>
-                    <div className="tw-relative tw-w-full tw-h-64"> {/* Set a height for the parent */}
+                    <h2>ยืนยันการจองแผงตลาดสำหรับ {selectedProduct.spaceLocation}</h2>
+                    <h3>ราคาต่อวัน: {selectedProduct.pricePerDay} Baht</h3>
+                    <div className="tw-relative tw-w-full tw-h-64 tw-my-10"> {/* Set a height for the parent */}
                       <Image
                         src={imageUrl}
                         alt={selectedProduct.spaceLocation ?? ''}

@@ -40,24 +40,55 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Query to fetch all spaces
-    const spaces = await prisma.space.findMany({
+    // Fetch reserve spaces
+    const spaces = await prisma.reserveSpace.findMany({
       select: {
-        spaceId: true,
-        spaceLocation: true,
-        pricePerDay: true,
-        images: true, // Ensure 'images' exists in the schema and the Prisma Client is regenerated
+        reserveSpaceId: true,
+        reserveDate: true,
         status: true,
+        roleId: true,
+        spaceId: true,
+        userId: true,
+        space: { // Include space data
+          select: {
+            spaceId: true,
+            spaceLocation: true, // Include necessary fields
+          },
+        },
       },
     });
 
+    // Fetch user data for each space entry
+    const userIds = spaces.map(space => space.userId);
+    const users = await prisma.user.findMany({
+      where: {
+        userId: {
+          in: userIds,
+        },
+      },
+      select: {
+        userId: true,  // Keep userId if needed for internal logic
+        userName: true, // Include userName
+      },
+    });
+
+    // Combine the spaces with their corresponding users and shops
+    const spacesWithUsers = spaces.map(space => {
+      const user = users.find(user => user.userId === space.userId);
+
+      return {
+        ...space,
+        user: user ? { userName: user.userName } : null, // Include userName only
+      };
+    });
+
     // Return the fetched data
-    return NextResponse.json(spaces, { status: 200 });
+    return NextResponse.json(spacesWithUsers, { status: 200 });
 
   } catch (error) {
-    console.error("Error fetching spaces:", error);
+    console.error("Error fetching reserveSpace:", error);
     return NextResponse.json(
-      { message: "Error fetching spaces" },
+      { message: "Error fetching reserveSpace" },
       { status: 500 }
     );
   }

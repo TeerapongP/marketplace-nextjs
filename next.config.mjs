@@ -1,4 +1,11 @@
-/** @type {import('next').NextConfig} */
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+// Setup bundle analyzer
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+// Define Next.js configuration
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -30,17 +37,21 @@ const nextConfig = {
       { protocol: "https", hostname: "mkunigroup.com" },
       { protocol: "https", hostname: "www.easycookingmenu.com" },
       { protocol: "https", hostname: "baansomtum.com" },
-      { protocol: "http", hostname: "localhost" },
+      { protocol: "http", hostname: "localhost" }, // For local development
       { protocol: "https", hostname: "www.veniceresorthotel.com" },
+      { protocol: "https", hostname: "www.taokaecafe.com" },
     ],
   },
+
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
       use: ["@svgr/webpack"],
     });
+
     return config;
   },
 };
 
-export default nextConfig;
+// Export with bundle analyzer wrapper
+export default withBundleAnalyzer(nextConfig);
