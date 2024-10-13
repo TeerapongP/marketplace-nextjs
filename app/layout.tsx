@@ -45,7 +45,8 @@ export default function RootLayout({
     '/pages/profile',
     '/pages/orderHistory',
     '/pages/shop/shop-add',
-    '/pages/reserveStall/reserveStall-fetch'
+    '/pages/reserveStall/reserveStall-fetch',
+    '/pages/reserveStall/reserveStall-edit',
   ].some(path => pathname.startsWith(path)) || pathname.startsWith('/pages/shop/shop-edit/') || pathname.startsWith('/pages/products/product-edit/') || pathname.startsWith('/pages/products/product-add/');
 
   // Check if content should be rendered based on path and token status

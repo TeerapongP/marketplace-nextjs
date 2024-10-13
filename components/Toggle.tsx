@@ -1,7 +1,7 @@
 import React from 'react';
 import ToggleSwitchProps from './interface/ToggleProps';
 
-const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange,disabled }) => {
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange, disabled }) => {
   // Handle the checkbox change event and pass the correct type
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (onChange) {
