@@ -1,29 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-// Use constants for public paths and API paths
-const ALLOWED_PATHS = [
-  "/",
-  "/pages/auth/login",
-  "/pages/auth/register",
-  "/pages/profile",
-  "/pages/auth/forgotpassword",
-  "/pages/products/",
-];
+// Define public paths
+enum ALLOW_PATHS {
+  Home = "/",
+  Login = "/pages/auth/login",
+  Register = "/pages/auth/register",
+  Profile = "/pages/profile",
+  ForgotPassword = "/pages/auth/forgotpassword",
+  Products = "/pages/products/",
+}
 
-const ALLOWED_API_PATHS = [
-  "/api/menu",
-  "/api/role",
-  "/api/auth/login",
-  "/api/auth/register",
-  "/api/shop/shop-list",
-  "/api/auth/forgotPassword",
-  "/api/shop/shop-find-by-name",
-  "/api/products/fetch",
-];
+// Define API paths that should be allowed without authentication
+enum ALLOW_API_PATHS {
+  Menu = "/api/menu",
+  Role = "/api/role",
+  Login = "/api/auth/login",
+  Register = "/api/auth/register",
+  ShopList = "/api/shop/shop-list",
+  ForgotPassword = "/api/auth/forgotPassword",
+  ShopFindByName = "/api/shop/shop-find-by-name",
+  ProductsFetch = "/api/products/fetch",
+}
 
-// Regex for excluded paths (internal Next.js paths, static assets, etc.)
-const EXCLUDED_PATHS_REGEX = [
+// Exclude internal Next.js paths and static assets
+const excludedPaths = [
   /^\/_next\/static\/.*/,
   /^\/_next\/data\/.*/,
   /^\/_next\/image\/.*/,
@@ -32,54 +33,46 @@ const EXCLUDED_PATHS_REGEX = [
   /^\/manifest.json$/,
 ];
 
-// Helper function to check if a path matches any excluded regex
-const isExcludedPath = (pathname: string) =>
-  EXCLUDED_PATHS_REGEX.some((regex) => regex.test(pathname));
-
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Bypass middleware for excluded paths
-  if (isExcludedPath(pathname)) {
+  // Quick checks to avoid unnecessary processing
+  if (
+    excludedPaths.some((pattern) => pattern.test(pathname)) ||
+    Object.values(ALLOW_PATHS).some((path) => pathname.startsWith(path)) ||
+    Object.values(ALLOW_API_PATHS).some((path) => pathname.startsWith(path))
+  ) {
     return NextResponse.next();
   }
 
-  // Allow access to public paths without authentication
-  if (ALLOWED_PATHS.includes(pathname) || ALLOWED_API_PATHS.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  // Authentication required for API requests
+  // Check if the request path requires authentication
   if (pathname.startsWith("/api/")) {
     const authHeader = req.headers.get("authorization");
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
 
-    if (!authHeader) {
-      return NextResponse.json(
-        { message: "No token provided" },
-        { status: 401 }
-      );
+    if (!token) {
+      return NextResponse.json({ message: "No token provided" }, { status: 401 });
     }
 
     try {
-      const token = authHeader.split(" ")[1];
       const { payload } = await jwtVerify(
         token,
-        new TextEncoder().encode(process.env.JWT_SECRET!)
+        new TextEncoder().encode(process.env.JWT_SECRET)
       );
 
-      // Attach user info to request headers if needed
       req.headers.set("user", JSON.stringify(payload));
+
       return NextResponse.next();
-    } catch (error) {
+    } catch {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
   }
 
-  // Redirect to a 404 page for other non-matching paths
+  // Redirect to a custom 404 page for other paths
   return NextResponse.rewrite(new URL("/404", req.url));
 }
 
-// Apply middleware to specific routes
+// Define the routes where the middleware should be applied
 export const config = {
   matcher: ["/", "/api/:path*", "/(.*)"],
-};
+}

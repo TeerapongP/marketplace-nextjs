@@ -106,7 +106,7 @@ const ShopEditPage = () => {
     formData.append('shopName', shopName);
     formData.append('shopDescription', shopDescription);
     formData.append('status', String(isToggled));
-    formData.append('userId', userId || '');
+    formData.append('userId', userId ?? '');
 
     if (shopImages.length > 0) {
       for (let i = 0; i < shopImages.length; i++) {

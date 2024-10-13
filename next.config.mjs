@@ -39,6 +39,7 @@ const nextConfig = {
       { protocol: "https", hostname: "baansomtum.com" },
       { protocol: "http", hostname: "localhost" }, // For local development
       { protocol: "https", hostname: "www.veniceresorthotel.com" },
+      { protocol: "https", hostname: "www.taokaecafe.com" },
     ],
   },
 
