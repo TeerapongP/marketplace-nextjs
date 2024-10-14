@@ -40,20 +40,16 @@ export const PATCH = async (req: NextRequest) => {
       stock: number;
       images: File;
       shopId: number;
-      categoryId:number
+      categoryId: number;
     };
-    
+
     // Early return if any of the required fields are missing
     if (!body.productName || !body.description || !body.price || !body.images) {
       return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
     }
 
-
-    // Destructure and parse shopId as integer
-    const { shopId,  productName, description, price, stock, categoryId, images } = body;
-
-    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
-    const userId = decoded.userId;
+    // Destructure and parse fields
+    const { shopId, productName, description, price, stock, categoryId, images } = body;
 
     // Validate uploaded file
     if (images.size > MAX_FILE_SIZE || !REQUIRED_FILE_EXTENSIONS.includes(images.type.split("/")[1])) {
@@ -72,20 +68,48 @@ export const PATCH = async (req: NextRequest) => {
     const buffer = Buffer.from(await images.arrayBuffer());
     const uint8Array = new Uint8Array(buffer); // Convert Buffer to Uint8Array
     await fs.promises.writeFile(filePath, uint8Array);
-    // Update the product in the database
 
+    // Validate and parse numeric fields
+    const numericPrice = Number(price);
+    const numericStock = Number(stock);
+    const numericShopId = Number(shopId);
+    const numericCategoryId = Number(categoryId);
+
+    // Check for valid input values
+    if (!productName || !description || isNaN(numericPrice) || isNaN(numericStock) || !images) {
+      return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
+    }
+
+    if (numericPrice <= 0 || numericStock < 0 || numericShopId <= 0 || numericCategoryId <= 0) {
+      return NextResponse.json(
+        { success: false, message: "Invalid input values" },
+        { status: 400 }
+      );
+    }
+
+    // Log product data before creating
+    console.log("Product data:", {
+      productName,
+      description,
+      price: numericPrice,
+      stock: numericStock,
+      shopId: numericShopId,
+      categoryId: numericCategoryId,
+      fileName: uniqueFileName,
+    });
+
+    // Update the product in the database
     const product = await prisma.product.create({
       data: {
         productName,
         description,
         images: uniqueFileName,
-        price: Number(price),
-        shopId: Number(shopId),
-        categoryId: Number(categoryId),
-        stock: Number(stock),
+        price: numericPrice,
+        shopId: numericShopId,
+        categoryId: numericCategoryId,
+        stock: numericStock,
       },
     });
-    
 
     return NextResponse.json({
       success: true,

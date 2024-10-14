@@ -5,3 +5,5 @@
 3.npm run seed
 
 4.npx prisma studio
+
+5.cd marketplace-nextjs
