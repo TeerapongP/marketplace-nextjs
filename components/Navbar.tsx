@@ -15,14 +15,13 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
     const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
     const router = useRouter();
     const [imagesPath, setImagesPath] = useState<string | null>(null);
-
     const { state: { cartItems }, dispatch } = useCart();
 
     useEffect(() => {
         setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL ?? '');
         const token = localStorage.getItem('token');
         setIsLoggedIn(!!token);
-    }, []);
+    }, [dispatch]);
 
     const handleLoginClick = () => router.push('/pages/auth/login');
     const handleProfile = () => router.push('/pages/profile');

@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     // Create a new reserve space
     const reserveSpace = await prisma.reserveSpace.create({
-      data: {
+         data: {
         reserveDate: new Date(),
         status,
         roleId: Number(roleId),

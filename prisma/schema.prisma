@@ -174,7 +174,7 @@ model ReserveSpace {
   roleId         Int
   spaceId        Int
   userId         Int // Ensure this field exists
-  shopId         Int
+  shopId         Int?
 
   role  Role  @relation(fields: [roleId], references: [roleId], onUpdate: NoAction, onDelete: NoAction)
   space Space @relation(fields: [spaceId], references: [spaceId], onUpdate: NoAction, onDelete: NoAction)
