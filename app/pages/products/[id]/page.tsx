@@ -26,7 +26,7 @@ const ProductPage = () => {
   const [roleId, setRoleId] = useState<number | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const router = useRouter(); // Get the router instance
-  const [images, setImages] = useState<string | null>(null);
+  const [cartData, setCartData] = useState<CartItem[]>([]); // New state for cart data
 
   useEffect(() => {
     const storedRoleId = localStorage.getItem('roleId');
@@ -108,6 +108,7 @@ const ProductPage = () => {
         dispatch({ type: 'ADD_TO_CART', payload: cartItem });
         setAlertMessage('Product added to cart');
         setAlertType('success');
+        fetchCartData();
       } else {
         const errorMessage = (await res.json())?.message || 'Something went wrong. Please try again.';
         setAlertMessage(errorMessage);
@@ -156,6 +157,40 @@ const ProductPage = () => {
 
   const handleAddButtonClick = (shopId: number) => {
     router.push(`/pages/products/product-create/${shopId}`);
+  };
+
+  // Function to fetch cart data
+  const fetchCartData = async () => {
+    const userId = localStorage.getItem('userId'); // Assuming userId is stored in localStorage
+
+    if (!userId || !token) {
+      setAlertMessage('You need to be logged in to view your cart.');
+      setAlertType('error');
+      return;
+    }
+
+    setLoading(true); // Set loading to true while fetching
+
+    try {
+      const response = await fetch(`/api/carts/fetch?userId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include token in the headers
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch cart data');
+      }
+
+      const cartItems = await response.json();
+      setCartData(cartItems); // Set the cart data in the state
+      dispatch({ type: 'SET_CART_ITEMS', payload: cartItems }); // Dispatch cart data to the global cart context
+    } catch (error) {
+      setAlertMessage('Failed to load cart data');
+      setAlertType('error');
+    } finally {
+      setLoading(false); // Stop loading
+    }
   };
 
   return (
