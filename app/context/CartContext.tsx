@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { CartItem, CartState } from '../interface/carts';
+
 // Define action types
 type Action =
     | { type: 'SET_CART_ITEMS'; payload: CartItem[] }
@@ -47,7 +48,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userId = localStorage.getItem('userId'); // Replace with your auth handling
 
         try {
-            const response = await fetch(`/api/carts/fetch?userId=${userId}`, { // Use template literal here
+            const response = await fetch(`/api/carts/fetch?userId=${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -58,17 +59,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 dispatch({ type: 'SET_CART_ITEMS', payload: data });
             } else {
                 console.error('Error fetching cart items');
-
             }
         } catch (error) {
             console.log('Error fetching cart items:', error);
         }
     };
 
+    // Fetch cart items on component mount
     useEffect(() => {
-        fetchCartItems(); // Fetch items on component mount
+        fetchCartItems();
     }, []);
-
 
     return (
         <CartContext.Provider value={{ state, dispatch }}>
