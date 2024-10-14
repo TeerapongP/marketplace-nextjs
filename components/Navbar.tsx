@@ -3,21 +3,23 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { NavbarProps } from './interface/NavbarProps';
 import Alert from '@/components/Alert';
-
 import { useCart } from '../app/context/CartContext'; // Import the custom hook
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
 
-const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className, menuItems }) => {
+const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => {
 
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
     const router = useRouter();
+    const [imagesPath, setImagesPath] = useState<string | null>(null);
+
     const { state: { cartItems }, dispatch } = useCart();
 
     useEffect(() => {
+        setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL ?? '');
         const token = localStorage.getItem('token');
         setIsLoggedIn(!!token);
     }, []);
@@ -103,6 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className, menuItems }
                                     <span className="tw-bg-white tw-text-black tw-rounded-full tw-px-2 tw-py-1 tw-text-sm">{cartItems.length}</span>
                                 </div>
                                 {dropdownOpen && (
+
                                     <div
                                         className={`tw-absolute tw-right-0 tw-top-full tw-mt-2 tw-bg-white tw-text-black tw-shadow-lg tw-rounded-md tw-w-64 tw-p-4 tw-border tw-border-gray-200 ${dropdownOpen ? 'tw-animate-fadeIn' : 'tw-animate-fadeOut'}`}
                                     >
@@ -111,30 +114,35 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className, menuItems }
                                             {cartItems.length === 0 ? (
                                                 <li className='tw-text-gray-500'>No items in the cart</li>
                                             ) : (
-                                                cartItems.map((item, index) => (
-                                                    <li
-                                                        key={`${item.productId}-${index}`} // Ensure key is unique
-                                                        className='tw-flex tw-items-center tw-p-2 tw-border-b tw-border-gray-200 hover:bg-gray-100 transition-colors duration-300'
-                                                    >
-                                                        <img
-                                                            src={item.images}
-                                                            alt={item.productName}
-                                                            className='tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2'
-                                                        />
-                                                        <div className='tw-flex-1'>
-                                                            <span className='tw-font-semibold'>{item.productName}</span>
-                                                            <div className='tw-text-gray-600'>Quantity: {item.quantity}</div>
-                                                        </div>
-                                                        <button
-                                                            onClick={() => handleDelete(Number(item.cartsId))}
-                                                            className='tw-text-red-600 tw-ml-4 hover:tw-text-red-800'
+                                                cartItems.map((item, index) => {
+                                                    const isLocalImage = !item.images.startsWith('http://') && !item.images.startsWith('https://');
+                                                    const imageUrl = isLocalImage ? `${imagesPath}${item.images}` : item.images;
+                                                    return ( // Use return here to return the JSX
+                                                        <li
+                                                            key={item.cartsId ? item.cartsId : `item-${index}`} // Fallback to index if cartsId is undefined
+                                                            className='tw-flex tw-items-center tw-p-2 tw-border-b tw-border-gray-200 hover:bg-gray-100 transition-colors duration-300'
                                                         >
-                                                            <i className="fas fa-trash"></i>
-                                                        </button>
-                                                    </li>
-                                                ))
+                                                            <img
+                                                                src={imageUrl} // Use imageUrl instead of item.images
+                                                                alt={item.productName}
+                                                                className='tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2'
+                                                            />
+                                                            <div className='tw-flex-1'>
+                                                                <span className='tw-font-semibold'>{item.productName}</span>
+                                                                <div className='tw-text-gray-600'>Quantity: {item.quantity}</div>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => handleDelete(Number(item.cartsId))}
+                                                                className='tw-text-red-600 tw-ml-4 hover:tw-text-red-800'
+                                                            >
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
+                                                        </li>
+                                                    );
+                                                })
                                             )}
                                         </ul>
+
                                         {cartItems.length > 0 && (
                                             <Link
                                                 href='/pages/order'
@@ -158,5 +166,3 @@ const Navbar: React.FC<NavbarProps> = ({ url, userRoleId, className, menuItems }
 };
 
 export default Navbar;
-
-

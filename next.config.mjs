@@ -40,6 +40,7 @@ const nextConfig = {
       { protocol: "http", hostname: "localhost" }, // For local development
       { protocol: "https", hostname: "www.veniceresorthotel.com" },
       { protocol: "https", hostname: "www.taokaecafe.com" },
+      { protocol: "https", hostname: "www.bakery.com" },
     ],
   },
 
