@@ -47,7 +47,6 @@ const OrderPage = () => {
           dispatch({ type: 'SET_CART_ITEMS', payload: data });
         } else {
           const errorMessage = (await res.json())?.message || 'Error fetching cart items';
-          (errorMessage);
           setAlertMessage(errorMessage);
           setAlertType('error');
         }
@@ -69,7 +68,7 @@ const OrderPage = () => {
       orderItems: cartItems.map(item => ({
         productId: item.productId,
         quantity: item.quantity,
-        totalPrice: item.price, // Make sure to get the correct price
+        totalPrice: item.price,
       })),
       totalPrice: cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
       shipment: {
@@ -106,6 +105,7 @@ const OrderPage = () => {
       acc[item.shopName] = [];
     }
     acc[item.shopName].push(item);
+
     return acc;
   }, {} as Record<string, typeof cartItems>);
 
@@ -140,7 +140,7 @@ const OrderPage = () => {
                 <div key={shopName} className={`tw-mb-6 ${backgroundColor} tw-p-4 tw-rounded-lg`}>
                   <h3 className="tw-font-semibold tw-text-lg tw-text-gray-800">{shopName}</h3>
                   {items.map(item => (
-                    <div key={item.productId} className="tw-flex tw-justify-between tw-border-b tw-pb-2 tw-mb-2 tw-text-gray-700">
+                    <div key={item.cartsId ? item.cartsId : `item-${index}`} className="tw-flex tw-justify-between tw-border-b tw-pb-2 tw-mb-2 tw-text-gray-700">
                       <div>{item.productName}</div>
                       <div>Price: {item.price} Baht</div>
                     </div>
@@ -211,32 +211,17 @@ const OrderPage = () => {
               className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
             />
           </div>
-          <div className="tw-grid tw-gap-4 tw-mb-4 md:tw-grid-cols-2">
-            <div>
-              <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">State</label>
-              <TextInput
-                type="text"
-                id="state"
-                value={shipmentInfo.state}
-                onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, state: e.target.value }))} // Inline update
-                required
-                placeholder="Enter your state"
-                className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Zip Code</label>
-              <TextInput
-                type="text"
-                id="zipCode"
-                value={shipmentInfo.zipCode}
-                onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, zipCode: e.target.value }))} // Inline update
-                required
-                maxLength={5}
-                placeholder="Enter your zip code"
-                className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
-              />
-            </div>
+          <div className="tw-mb-4">
+            <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">State</label>
+            <TextInput
+              type="text"
+              id="state"
+              value={shipmentInfo.state}
+              onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, state: e.target.value }))} // Inline update
+              required
+              placeholder="Enter your state"
+              className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+            />
           </div>
           <div className="tw-mb-4">
             <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Country</label>
@@ -250,7 +235,23 @@ const OrderPage = () => {
               className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
             />
           </div>
-          <Button type="submit" className="tw-w-full tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded hover:tw-bg-blue-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500">
+          <div className="tw-mb-4">
+            <label className="tw-block tw-text-sm tw-font-medium tw-mb-1">Zip Code</label>
+            <TextInput
+              type="text"
+              id="zipCode"
+              value={shipmentInfo.zipCode}
+              onChange={(e) => setShipmentInfo(prevState => ({ ...prevState, zipCode: e.target.value }))} // Inline update
+              required
+              placeholder="Enter your zip code"
+              className="tw-border tw-border-gray-300 tw-p-2 tw-w-full tw-rounded hover:tw-border-blue-500 focus:tw-border-blue-500"
+            />
+          </div>
+          <Button
+            type="submit"
+            className="tw-w-full tw-bg-blue-600 tw-text-white tw-p-2 tw-rounded hover:tw-bg-blue-700"
+            disabled={loading}
+          >
             Place Order
           </Button>
         </form>
