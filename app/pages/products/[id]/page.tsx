@@ -45,7 +45,7 @@ const ProductPage = () => {
   }, [pathname]); // Fixed dependency array
 
   const fetchProducts = async (id: number) => {
-    const basePath = process.env.NEXT_PUBLIC_LOCAL_BASE_URL || '';
+    const basePath = process.env.NEXT_PUBLIC_LOCAL_BASE_URL ?? '';
     if (!id) return;
     setLoading(true);
     try {

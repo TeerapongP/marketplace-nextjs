@@ -26,7 +26,7 @@ const ShopEditPage = () => {
   const router = useRouter(); // Get the router instance
 
   useEffect(() => {
-    setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL || '');
+    setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL ?? '');
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
     const id = pathname.split('/').pop();
@@ -43,8 +43,6 @@ const ShopEditPage = () => {
   }, [shopId, token]);
 
   const fetchShop = async (id: number) => {
-    console.log(imagesPath);
-
     setLoading(true);
     try {
       const res = await fetch(`/api/shop/shop-find-by-id?shopId=${id}`, {

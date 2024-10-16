@@ -105,8 +105,8 @@ export default function RootLayout({
 
 
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className={inter.className}>
+      <body>
         <CartProvider>
           {/* Render Navbar only if shouldRenderContent is true */}
           {shouldRenderContent && !hideNavbar && (
@@ -114,7 +114,6 @@ export default function RootLayout({
               <Navbar url={apiUrl} userRoleId={Number(currentUserRoleId)} userId={userId} menuItems={menuItems} />
             </div>
           )}
-
           {/* Adjust margin-top based on whether navbar is hidden and whether content is rendered */}
           <div className={`tw-my-${shouldRenderContent && !hideNavbar ? '16' : '0'}`}>
             {shouldRenderContent ? children : <Custom404 />}
