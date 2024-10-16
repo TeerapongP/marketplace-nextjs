@@ -38,14 +38,13 @@ export const PATCH = async (req: NextRequest) => {
       shopName: string;
       shopDescription: string;
       status: string;
-      shopImages: File;
+      shopImages?: File; // Make shopImages optional
     };
-    
+
     // Early return if any of the required fields are missing
-    if (!body.shopId || !body.shopName || !body.shopDescription || !body.status || !body.shopImages) {
+    if (!body.shopId || !body.shopName || !body.shopDescription || !body.status) {
       return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
     }
-
 
     // Destructure and parse shopId as integer
     const { shopId, shopName, shopDescription, status, shopImages } = body;
@@ -60,34 +59,46 @@ export const PATCH = async (req: NextRequest) => {
 
     const parsedStatus = parseBoolean(status);
 
-    // Validate uploaded file
-    if (shopImages.size > MAX_FILE_SIZE || !REQUIRED_FILE_EXTENSIONS.includes(shopImages.type.split("/")[1])) {
-      return NextResponse.json({ success: false, message: "File size exceeds the limit" }, { status: 400 });
+    let uniqueFileName: string | undefined;
+
+    // Check if a new image was uploaded
+    if (shopImages && undefined !== shopImages.type) {
+      // Validate uploaded file
+      if (shopImages.size > MAX_FILE_SIZE || !REQUIRED_FILE_EXTENSIONS.includes(shopImages.type.split("/")[1])) {
+        return NextResponse.json({ success: false, message: "File size exceeds the limit or invalid file type" }, { status: 400 });
+      }
+
+      // Ensure upload directory exists
+      if (!fs.existsSync(UPLOAD_DIR)) {
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+      }
+
+      uniqueFileName = `${Date.now()}-${shopImages.name}`;
+      const filePath = path.resolve(UPLOAD_DIR, uniqueFileName);
+
+      // Convert Blob/File to buffer and write to file
+      const buffer = Buffer.from(await shopImages.arrayBuffer());
+      const uint8Array = new Uint8Array(buffer); // Convert Buffer to Uint8Array
+      await fs.promises.writeFile(filePath, uint8Array);
     }
 
-    // Ensure upload directory exists
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    // Prepare the data object for updating the shop
+    const updateData: any = {
+      shopName,
+      shopDescription,
+      status: parsedStatus,
+      ownerId: userId,
+    };
+
+    // If a new image was uploaded, include it in the update
+    if (uniqueFileName) {
+      updateData.shopImages = uniqueFileName;
     }
-
-    const uniqueFileName = `${Date.now()}-${shopImages.name}`;
-    const filePath = path.resolve(UPLOAD_DIR, uniqueFileName);
-
-    // Convert Blob/File to buffer and write to file
-    const buffer = Buffer.from(await shopImages.arrayBuffer());
-    const uint8Array = new Uint8Array(buffer); // Convert Buffer to Uint8Array
-    await fs.promises.writeFile(filePath, uint8Array);
 
     // Update the shop in the database
     const shop = await prisma.shop.update({
       where: { shopId: parsedShopId }, // Use parsedShopId here
-      data: {
-        shopName,
-        shopDescription,
-        shopImages: uniqueFileName,
-        status: parsedStatus,
-        ownerId: userId,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({

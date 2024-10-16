@@ -39,48 +39,49 @@ export const PATCH = async (req: NextRequest) => {
       description: string;
       price: number;
       stock: number;
-      images: File;
+      images?: File; // Make images optional
       shopId: number;
-      categoryId:number
+      categoryId: number;
     };
-    
+
     // Early return if any of the required fields are missing
-    if (!body.productId || !body.productName || !body.description || !body.price || !body.images) {
+    if (!body.productId || !body.productName || !body.description || !body.price) {
       return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
     }
 
-
-    // Destructure and parse shopId as integer
+    // Destructure and parse productId as integer
     const { shopId, productId, productName, description, price, stock, categoryId, images } = body;
     const parsedProductId = parseInt(productId, 10); // Parse as integer
 
-    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
-    const userId = decoded.userId;
+    // Initialize a variable for the filename
+    let uniqueFileName: string | undefined;
 
-    // Validate uploaded file
-    if (images.size > MAX_FILE_SIZE || !REQUIRED_FILE_EXTENSIONS.includes(images.type.split("/")[1])) {
-      return NextResponse.json({ success: false, message: "File size exceeds the limit" }, { status: 400 });
+    // Validate uploaded file if images exist
+    if (images && undefined !== images.type) {
+      if (images.size > MAX_FILE_SIZE || !REQUIRED_FILE_EXTENSIONS.includes(images.type.split("/")[1])) {
+        return NextResponse.json({ success: false, message: "File size exceeds the limit or invalid file type" }, { status: 400 });
+      }
+
+      // Ensure upload directory exists
+      if (!fs.existsSync(UPLOAD_DIR)) {
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+      }
+      uniqueFileName = `${Date.now()}-${images.name}`;
+      const filePath = path.resolve(UPLOAD_DIR, uniqueFileName);
+
+      // Convert Blob/File to buffer and write to file
+      const buffer = Buffer.from(await images.arrayBuffer());
+      const uint8Array = new Uint8Array(buffer); // Convert Buffer to Uint8Array
+      await fs.promises.writeFile(filePath, uint8Array);
     }
 
-    // Ensure upload directory exists
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-    }
-
-    const uniqueFileName = `${Date.now()}-${images.name}`;
-    const filePath = path.resolve(UPLOAD_DIR, uniqueFileName);
-
-    // Convert Blob/File to buffer and write to file
-    const buffer = Buffer.from(await images.arrayBuffer());
-    const uint8Array = new Uint8Array(buffer); // Convert Buffer to Uint8Array
-    await fs.promises.writeFile(filePath, uint8Array);
     // Update the products in the database
     const products = await prisma.product.update({
-      where: { productId: parsedProductId }, // Use parsedShopId here
+      where: { productId: parsedProductId }, // Use parsedProductId here
       data: {
         productName,
         description,
-        images: uniqueFileName,
+        ...(uniqueFileName ? { images: uniqueFileName } : {}), // Update images only if uniqueFileName is defined
         price: Number(price),
         shopId: Number(shopId),
         categoryId: Number(categoryId),
@@ -94,7 +95,7 @@ export const PATCH = async (req: NextRequest) => {
       fileName: uniqueFileName,
     });
   } catch (err) {
-    console.error("Error uploading file or creating product:", err);
+    console.error("Error uploading file or updating product:", err);
     if (err instanceof jwt.JsonWebTokenError) {
       return NextResponse.json(
         { success: false, message: "Invalid token" },
