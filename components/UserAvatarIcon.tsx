@@ -32,7 +32,7 @@ const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className, onClick }) =
                 const data = await response.json();
                 setImageUrl(data.imageUrl);
             } catch (error) {
-                ('Error fetching image:', error);
+                console.error('Error fetching image:', error);
             }
         };
 
