@@ -1,0 +1,185 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+
+model User {
+  userId      Int     @id @default(autoincrement())
+  userName    String  @unique // Ensure userName is unique
+  password    String
+  firstName   String?
+  lastName    String?
+  email       String?
+  phoneNumber String?
+  address     String?
+  userImage   String?
+
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [roleId])
+
+  // Relationships
+  orders       Order[]
+  carts        Cart[]
+  shops        Shop[] // Add this line to indicate a user can have multiple shops
+  ReserveSpace ReserveSpace[]
+
+  @@map("User") // Maps the model name "User" to the table name "User" in the database
+}
+
+model Role {
+  roleId   Int    @id @default(autoincrement())
+  roleName String
+
+  // Relationships
+  users         User[]
+  reserveSpaces ReserveSpace[]
+  menus         Menu[]         @relation("MenuRoles")
+
+  @@map("Role") // Maps the model name "Role" to the table name "Role" in the database
+}
+
+model Menu {
+  menuId   Int    @id @default(autoincrement())
+  menuName String
+  menuUrl  String
+
+  roles Role[] @relation("MenuRoles")
+
+  @@map("Menu") // Maps the model name "Menu" to the table name "Menu" in the database
+}
+
+model Order {
+  orderId    Int      @id @default(autoincrement())
+  orderDate  DateTime @default(now())
+  totalPrice Float
+
+  userId Int
+  user   User @relation(fields: [userId], references: [userId])
+
+  // Relationships
+  orderItems OrderItem[]
+  shipments  Shipment[]
+
+  @@map("Order") // Maps the model name "Order" to the table name "Order" in the database
+}
+
+model OrderItem {
+  orderItemId Int      @id @default(autoincrement())
+  orderDate   DateTime @default(now())
+  totalPrice  Float
+
+  orderId   Int
+  quantity  Int // Add this line if it's missing
+  productId Int
+  order     Order   @relation(fields: [orderId], references: [orderId], onUpdate: NoAction, onDelete: NoAction)
+  product   Product @relation(fields: [productId], references: [productId], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("OrderItem")
+}
+
+model Shipment {
+  shipmentId     Int      @id @default(autoincrement())
+  shipmentDate   DateTime @default(now())
+  name           String
+  lastName       String
+  address        String
+  city           String
+  state          String
+  country        String
+  zipCode        String
+  trackingNumber String // Make sure this line exists
+  orderId        Int
+  order          Order    @relation(fields: [orderId], references: [orderId])
+
+  @@map("Shipment")
+}
+
+model Product {
+  productId   Int    @id @default(autoincrement())
+  productName String // New field
+  description String
+  price       Float
+  stock       Int
+  images      String
+
+  // Relationships
+  categoryId Int
+  category   Category    @relation(fields: [categoryId], references: [categoryId])
+  shopId     Int
+  shop       Shop        @relation(fields: [shopId], references: [shopId])
+  carts      Cart[]
+  OrderItem  OrderItem[]
+
+  @@map("Product")
+}
+
+model Category {
+  categoryId Int    @id @default(autoincrement())
+  name       String
+
+  // Relationships
+  products Product[]
+
+  @@map("Category") // Maps the model name "Category" to the table name "Category" in the database
+}
+
+model Cart {
+  cartId    Int     @id @default(autoincrement())
+  quantity  Int
+  userId    Int
+  user      User    @relation(fields: [userId], references: [userId], onUpdate: NoAction, onDelete: NoAction)
+  productId Int
+  product   Product @relation(fields: [productId], references: [productId], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("Cart")
+}
+
+model Shop {
+  shopId          Int     @id @default(autoincrement())
+  shopName        String
+  shopDescription String
+  shopImages      String
+  status          Boolean
+
+  ownerId       Int // Foreign key for the user who owns the shop
+  owner         User           @relation(fields: [ownerId], references: [userId])
+  products      Product[] // A shop can have multiple products
+  reserveSpaces ReserveSpace[]
+
+  @@map("Shop")
+}
+
+model Space {
+  spaceId       Int            @id @default(autoincrement())
+  spaceLocation String
+  pricePerDay   Float
+  images        String // or String[]
+  status        Boolean?
+  // Relationships
+  reserveSpaces ReserveSpace[] // Relation to ReserveSpace
+
+  @@map("Space") // Maps the model name "Space" to the table name "Space" in the database
+}
+
+model ReserveSpace {
+  reserveSpaceId Int      @id @default(autoincrement())
+  reserveDate    DateTime @default(now())
+  status         Boolean
+  roleId         Int
+  spaceId        Int
+  userId         Int // Ensure this field exists
+  shopId         Int?
+
+  role  Role  @relation(fields: [roleId], references: [roleId], onUpdate: NoAction, onDelete: NoAction)
+  space Space @relation(fields: [spaceId], references: [spaceId], onUpdate: NoAction, onDelete: NoAction)
+  user  User  @relation(fields: [userId], references: [userId], onUpdate: NoAction, onDelete: NoAction) // Change Cascade to NoAction
+  shop  Shop? @relation(fields: [shopId], references: [shopId])
+
+  @@map("ReserveSpace")
+}
