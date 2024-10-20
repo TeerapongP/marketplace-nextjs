@@ -63,7 +63,7 @@ const LoginPage = () => {
   }, [alertMessage]);
 
   return (
-    <div className="tw-min-h-screen tw-flex tw-items-center tw-justify-center tw-bg-gradient-to-r tw-bg-blue-600">
+    <div className="tw-min-h-screen tw-flex tw-items-center tw-justify-center tw-min-h-screen tw-bg-gradient-to-r tw-from-blue-600 tw-to-purple-500">
       <div className="tw-w-full tw-max-w-lg tw-bg-white tw-p-10 tw-rounded-3xl tw-shadow-2xl tw-relative tw-overflow-hidden">
         <div className="tw-absolute tw-inset-0 tw-bg-gradient-to-br  tw-bg-blue-500 tw-opacity-10 tw-pointer-events-none"></div>
         <h2 className="tw-text-3xl tw-font-bold tw-text-center tw-text-gray-800 tw-mb-6">
