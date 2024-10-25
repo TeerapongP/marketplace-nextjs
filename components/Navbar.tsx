@@ -6,6 +6,8 @@ import Alert from '@/components/Alert';
 import { useCart } from '../app/context/CartContext'; // Import the custom hook
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
+import Product from '@/app/interface/product';
+import { CartItem } from '@/app/interface/carts';
 
 const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => {
 
@@ -114,13 +116,13 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                 <li className='tw-text-gray-500'>No items in the cart</li>
                                             ) : (
                                                 Object.values(
-                                                    cartItems.reduce((acc, item) => {
+                                                    cartItems.reduce((acc: { [key: string]: any }, item: any) => {
                                                         // เช็คว่ามีสินค้านี้อยู่ใน acc หรือยัง
                                                         if (acc[item.productName]) {
                                                             // ถ้ามีอยู่แล้ว ให้เพิ่ม quantity
                                                             acc[item.productName].quantity += item.quantity;
                                                         } else {
-                                                            // ถ้ายังไม่มี ให้นำสินค้าเข้า acc`
+                                                            // ถ้ายังไม่มี ให้นำสินค้าเข้า acc
                                                             acc[item.productName] = { ...item };
                                                         }
                                                         return acc;
@@ -128,6 +130,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                 ).map((item, index) => {
                                                     const isLocalImage = !item.images.startsWith('http://') && !item.images.startsWith('https://');
                                                     const imageUrl = isLocalImage ? `${imagesPath}${item.images}` : item.images;
+
                                                     return (
                                                         <li
                                                             key={item.cartsId ? item.cartsId : `item-${index}`}
