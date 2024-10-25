@@ -113,16 +113,28 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                             {cartItems.length === 0 ? (
                                                 <li className='tw-text-gray-500'>No items in the cart</li>
                                             ) : (
-                                                cartItems.map((item, index) => {
+                                                Object.values(
+                                                    cartItems.reduce((acc, item) => {
+                                                        // เช็คว่ามีสินค้านี้อยู่ใน acc หรือยัง
+                                                        if (acc[item.productName]) {
+                                                            // ถ้ามีอยู่แล้ว ให้เพิ่ม quantity
+                                                            acc[item.productName].quantity += item.quantity;
+                                                        } else {
+                                                            // ถ้ายังไม่มี ให้นำสินค้าเข้า acc`
+                                                            acc[item.productName] = { ...item };
+                                                        }
+                                                        return acc;
+                                                    }, {})
+                                                ).map((item, index) => {
                                                     const isLocalImage = !item.images.startsWith('http://') && !item.images.startsWith('https://');
                                                     const imageUrl = isLocalImage ? `${imagesPath}${item.images}` : item.images;
-                                                    return ( // Use return here to return the JSX
+                                                    return (
                                                         <li
-                                                            key={item.cartsId ? item.cartsId : `item-${index}`} // Fallback to index if cartsId is undefined
+                                                            key={item.cartsId ? item.cartsId : `item-${index}`}
                                                             className='tw-flex tw-items-center tw-p-2 tw-border-b tw-border-gray-200 hover:bg-gray-100 transition-colors duration-300'
                                                         >
                                                             <img
-                                                                src={imageUrl} // Use imageUrl instead of item.images
+                                                                src={imageUrl}
                                                                 alt={item.productName}
                                                                 className='tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2'
                                                             />
@@ -141,7 +153,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                 })
                                             )}
                                         </ul>
-
                                         {cartItems.length > 0 && (
                                             <Link
                                                 href='/pages/order'
