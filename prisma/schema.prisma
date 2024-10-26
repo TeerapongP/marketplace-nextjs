@@ -15,7 +15,7 @@ model User {
   password    String
   firstName   String?
   lastName    String?
-  email       String?
+  email       String  @unique
   phoneNumber String?
   address     String?
   userImage   String?
@@ -24,22 +24,49 @@ model User {
   role   Role @relation(fields: [roleId], references: [roleId])
 
   // Relationships
-  orders       Order[]
-  carts        Cart[]
-  shops        Shop[] // Add this line to indicate a user can have multiple shops
-  ReserveSpace ReserveSpace[]
+  orders        Order[] // A user can have multiple orders
+  carts         Cart[] // A user can have multiple carts
+  shops         Shop[] // A user can have multiple shops
+  reserveSpaces ReserveSpace[] // A user can have multiple reserved spaces
+  accounts      Account[] // A user can have multiple accounts
+
+  createdAt DateTime @default(now()) // Optional timestamp for creation
+  updatedAt DateTime @updatedAt // Optional timestamp for last update
 
   @@map("User") // Maps the model name "User" to the table name "User" in the database
 }
 
+model Account {
+  accountId         String  @id @default(cuid()) // Unique account identifier
+  userId            Int
+  roleId            Int? // Ensure this line exists
+  type              String // Type of the account (e.g., social, local, etc.)
+  provider          String // Provider name (e.g., Google, Facebook)
+  providerAccountId String // Unique account ID from the provider
+  refresh_token     String? @db.Text // Token for refreshing session
+  access_token      String? @db.Text // Token for accessing account
+  expires_at        Int? // Expiration time of the access token
+  token_type        String? // Type of the token
+  scope             String? // Scope of the access
+  id_token          String? @db.Text // ID token for authentication
+  session_state     String? // State of the session
+
+  user User  @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship to User
+  role Role? @relation(fields: [roleId], references: [roleId], onDelete: NoAction, onUpdate: NoAction) // Optional relationship to Role with NoAction
+
+  @@unique([provider, providerAccountId]) // Ensure each provider/account combination is unique
+}
+
 model Role {
   roleId   Int    @id @default(autoincrement())
-  roleName String
+  roleName String @unique // Ensure roleName is unique
 
   // Relationships
-  users         User[]
-  reserveSpaces ReserveSpace[]
-  menus         Menu[]         @relation("MenuRoles")
+  users         User[] // A role can have multiple users
+  reserveSpaces ReserveSpace[] // A role can have multiple reserved spaces
+  menus         Menu[]         @relation("MenuRoles") // Relationship to menus
+
+  accounts Account[] // A role can have multiple accounts
 
   @@map("Role") // Maps the model name "Role" to the table name "Role" in the database
 }

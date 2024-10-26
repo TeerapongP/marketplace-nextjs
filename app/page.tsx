@@ -9,6 +9,7 @@ import { useCart } from './context/CartContext';
 import CloseButton from '@/components/CloseButton';
 import EditButton from '@/components/EditButton';
 import Loading from '@/components/Loading';
+import { useSession } from 'next-auth/react';
 
 export default function Home() {
   const [data, setData] = useState<Shop[]>([]);
@@ -21,7 +22,6 @@ export default function Home() {
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter(); // Get the router instance
   const { state: { }, dispatch } = useCart();
-
   useEffect(() => {
     setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL ?? '');
     fetchCartItems();
@@ -186,42 +186,50 @@ export default function Home() {
     }
   };
   return (
-    loading ? <Loading /> : error ? <Alert message={error} type={'success'} /> : (
-      <div className='tw-w-full'>
-        <div className='tw-grid sm:tw-mt-24 md:tw-mt-24 lg:tw-mt-24 custom-sm:tw-mt-24 custom-sm:tw-justify-items-center tw-justify-items-end tw-mr-20 custom-sm:tw-mr-0'>
+    loading ? (
+      <Loading />
+    ) : error ? (
+      <Alert message={error} type={'error'} />
+    ) : (
+      <div className="tw-w-full">
+        <div className="tw-grid sm:tw-mt-24 md:tw-mt-24 lg:tw-mt-24 custom-sm:tw-mt-24 custom-sm:tw-justify-items-center tw-justify-items-end tw-mr-20 custom-sm:tw-mr-0">
           <SearchInput onSearch={handleSearch} onClick={handleClick} />
         </div>
-        <div className='tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center'>
 
-          {data.length > 0 && data.map((item) => {
-            const isLocalImage = !item.shopImages.startsWith('http://') && !item.shopImages.startsWith('https://');
-            const imageUrl = isLocalImage ? `${imagesPath}${item.shopImages}` : item.shopImages;
-            return (
-              <div key={item.shopId} className="tw-relative">
-                {(roleId === 3 || roleId === 1) && (
-                  <div className='tw-my-4 tw-ms-5'>
-                    <CloseButton onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
-                    <EditButton onClick={() => handleEditButtonClick(Number(item.shopId))} />
-                  </div>
-                )}
-                <Card
-                  title={item.shopName}
-                  content={item.shopDescription}
-                  imageUrl={imageUrl}
-                  shopId={Number(item.shopId)}
-                  status={item.status}
-                  roleId={Number(roleId)}
-                  disabled={roleId === null}
-                  onToggleChange={handleToggleChange}
-                  onButtonViewClick={handleButtonClick}
-                />
-              </div>
-            );
-          })}
+        <div className="tw-grid tw-gap-4 tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-pl-4 custom-sm:tw-pr-4 tw-mt-5 tw-items-center tw-place-items-center">
+          {data?.length > 0 ? (
+            data.map((item) => {
+              const isLocalImage = !item.shopImages.startsWith('http://') && !item.shopImages.startsWith('https://');
+              const imageUrl = isLocalImage ? `${imagesPath}${item.shopImages}` : item.shopImages;
+
+              return (
+                <div key={item.shopId} className="tw-relative">
+                  {(roleId === 3 || roleId === 1) && (
+                    <div className="tw-my-4 tw-ms-5">
+                      <CloseButton onClick={() => handleDeleteButtonClick(Number(item.shopId))} />
+                      <EditButton onClick={() => handleEditButtonClick(Number(item.shopId))} />
+                    </div>
+                  )}
+                  <Card
+                    title={item.shopName}
+                    content={item.shopDescription}
+                    imageUrl={imageUrl}
+                    shopId={Number(item.shopId)}
+                    status={item.status}
+                    roleId={Number(roleId)}
+                    disabled={roleId === null}
+                    onToggleChange={handleToggleChange}
+                    onButtonViewClick={handleButtonClick}
+                  />
+                </div>
+              );
+            })
+          ) : (
+            <p>No shops available to display.</p>
+          )}
         </div>
-        {alertMessage && alertType && (
-          <Alert type={alertType} message={alertMessage} />
-        )}
+
+        {alertMessage && alertType && <Alert type={alertType} message={alertMessage} />}
       </div>
     )
   );

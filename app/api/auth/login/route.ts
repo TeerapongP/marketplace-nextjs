@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"; // Import bcrypt for password comparison
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "../../../../lib/prisma"; // Ensure the correct import path
 
 // Ensure JWT_SECRET is always a string
 const JWT_SECRET = process.env.JWT_SECRET as string;
@@ -12,27 +12,30 @@ if (!JWT_SECRET) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body: { username: string; password: string } = await req.json();
-    const { username, password } = body;
+    // Parse the incoming request body
+    const body: { email: string; password: string } = await req.json();
+    const { email, password } = body;
 
-    if (!username || !password) {
+    // Validate input
+    if (!email || !password) {
       return NextResponse.json(
-        { message: "Username and password are required" }, // Updated message
+        { message: "Email and password are required" },
         { status: 400 }
       );
     }
 
-    // Find user by username only
+    // Find user by email only
     const user = await prisma.user.findFirst({
-      where: { userName: username },
+      where: { email }, // Find user by email directly
       select: {
         userId: true,
-        userName: true,
+        email: true,
         password: true, // Get the stored hashed password
         roleId: true, // Include roleId
       },
     });
 
+    // If user not found, return 404
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
@@ -40,14 +43,16 @@ export async function POST(req: NextRequest) {
     // Compare the plain-text password with the stored hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
+    // If password is invalid, return 401
     if (!isPasswordValid) {
       return NextResponse.json({ message: "Invalid password" }, { status: 401 });
     }
 
+    // Create JWT token with user details
     const token = jwt.sign(
-      { userId: user.userId, username: user.userName, roleId: user.roleId },
+      { userId: user.userId, email: user.email, roleId: user.roleId },
       JWT_SECRET,
-      { expiresIn: "5h" }
+      { expiresIn: "5h" } // Token expiration time
     );
 
     // Return user data along with the token
@@ -56,7 +61,7 @@ export async function POST(req: NextRequest) {
         message: "User found",
         user: {
           userId: user.userId,
-          userName: user.userName,
+          email: user.email,
           roleId: user.roleId,
         },
         token,
@@ -64,6 +69,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    console.error("Error during authentication:", error); // Log the error for debugging
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

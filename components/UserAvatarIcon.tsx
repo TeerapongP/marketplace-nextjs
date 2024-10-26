@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image'; // Make sure you import Image from Next.js
+import { useSession } from 'next-auth/react';
 
+interface UserAvatarIconProps {
+    className?: string;
+    onClick?: () => void; // Optional onClick prop for click handling
+}
 
 const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className, onClick }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
     const [token, setToken] = useState<string | null>(null);
+    const { data: session } = useSession();
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
@@ -44,9 +50,9 @@ const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({ className, onClick }) =
             className={`tw-relative tw-w-10 tw-h-10 tw-overflow-hidden tw-bg-gray-100 tw-rounded-full tw-dark:bg-gray-600 ${className}`}
             onClick={onClick}
         >
-            {imageUrl ? (
+            {imageUrl || session?.user?.image ? (
                 <Image
-                    src={`${imageUrl}`} // Correct relative path with leading slash
+                    src={session?.user?.image || imageUrl || ''} // Provide a default image
                     alt="User Avatar"
                     fill // Ensure the image covers the container
                     style={{ objectFit: 'cover' }} // Ensures the image covers the container
