@@ -34,8 +34,8 @@ const ForgotPasswordPage = () => {
         setEmail(''); // Clear email field
         setNewPassword(''); // Clear password field
         router.push('/pages/auth/login');
-        setAlertMessage('Password reset successful');
-        setAlertType('success');
+        setAlertMessage('Change password successful');
+        setAlertType('success');//200
       } else {
         const errorMessage = 'Something went wrong. Please try again.';
         setAlertMessage(errorMessage);
@@ -43,7 +43,7 @@ const ForgotPasswordPage = () => {
       }
     } catch (error) {
       setAlertMessage('An unexpected error occurred. Please try again later.');
-      setAlertType('error');
+      setAlertType('error');//500
     }
   };
 
