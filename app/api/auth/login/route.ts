@@ -24,11 +24,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-<<<<<<< HEAD
-    // Find user by email only
-=======
     // Find user by username only ค้นหาชื่อผู้ใช้ด้วยชื่อผู้ใช้เท่านั้น
->>>>>>> 91c846b (commit to pull)
     const user = await prisma.user.findFirst({
       where: { email }, // Find user by email directly
       select: {
