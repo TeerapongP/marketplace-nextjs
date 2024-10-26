@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
         email: true,
         password: true, // Get the stored hashed password
         roleId: true, // Include roleId
+        userName: true,
       },
     });
 
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
           userId: user.userId,
           email: user.email,
           roleId: user.roleId,
+          userName: user.userName,
         },
         token,
       },
