@@ -121,7 +121,7 @@ export default function Home() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Include 'Bearer' in the header
+          'Authorization': `Bearer ${token}`, // Include 'Bearer' in the header ปุ่มเปิดปิด
         },
         body: JSON.stringify({
           shopId: shopId,
@@ -145,7 +145,7 @@ export default function Home() {
   };
 
   const handleButtonClick = (shopId: number) => {
-    router.push(`/pages/products/${shopId}`); // Perform client-side navigation
+    router.push(`/pages/products/${shopId}`); // Perform client-side navigation กดปุ่มวิว
   };
 
   const handleDeleteButtonClick = async (shopId: number) => {
@@ -165,24 +165,24 @@ export default function Home() {
       setLoading(false);
       await fetchShopAll();
       setAlertMessage('Delete shop successful');
-      setAlertType('success');
+      setAlertType('success');//200
     } catch (error: any) {
       if (error.message === 'Token expired') {
         setLoading(false);
-        router.push('/pages/auth/login');
+        router.push('/pages/auth/login');//ถ้า token หมดอายุ ดีดไปหน้าล็อดอิน
       }
       setLoading(false);
       setAlertMessage('Delete failed');
-      setAlertType('error');
+      setAlertType('error');//500
     }
   };
   const handleEditButtonClick = async (shopId: number) => {
-    router.push(`/pages/shop/shop-edit/${shopId}`);
+    router.push(`/pages/shop/shop-edit/${shopId}`);//ปุมแก้ไข
   }
 
   const handleClick = (value: string) => {
     if (value.trim() === '') {
-      fetchShopAll();
+      fetchShopAll(); //ถ้าไม่พิพม์อะไนขึ้นทุกร้าน
     }
   };
   return (
