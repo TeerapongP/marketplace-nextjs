@@ -3,14 +3,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { NavbarProps } from './interface/NavbarProps';
 import Alert from '@/components/Alert';
-import { useCart } from '../app/context/CartContext'; // Import the custom hook
+import { useCart } from '../app/context/CartContext';
 import Button from './Button';
 import UserAvatarIcon from './UserAvatarIcon';
-import Product from '@/app/interface/product';
-import { CartItem } from '@/app/interface/carts';
+import { signOut, useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => {
-
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -18,15 +17,23 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
     const router = useRouter();
     const [imagesPath, setImagesPath] = useState<string | null>(null);
     const { state: { cartItems }, dispatch } = useCart();
+    const { data: session } = useSession();
 
+    useEffect(() => {
+        if (session) {
+            localStorage.setItem('roleId', session?.user?.role);
+            localStorage.setItem('userId', session?.user?.id);
+            localStorage.setItem('token', session?.user?.customToken);
+        }
+    }, [session]);
     useEffect(() => {
         setImagesPath(process.env.NEXT_PUBLIC_LOCAL_BASE_URL ?? '');
         const token = localStorage.getItem('token');
         setIsLoggedIn(!!token);
-    }, [dispatch]);
+    }, [dispatch, session]);
+
 
     const handleLoginClick = () => router.push('/pages/auth/login');
-    const handleProfile = () => router.push('/pages/profile');
     const handleSignOutClick = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
@@ -43,7 +50,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
     }, [menuItems, userRoleId]);
 
     const handleDelete = async (cartsId: number) => {
-        const token = localStorage.getItem('token'); // Replace with your actual JWT token
+        const token = localStorage.getItem('token');
         try {
             const response = await fetch('/api/carts/delete', {
                 method: 'DELETE',
@@ -86,94 +93,109 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                         ))}
                     </ul>
                 </div>
-                <div className='tw-flex tw-space-x-4 tw-items-center tw-justify-end'>
+                <div className="tw-flex tw-space-x-4 tw-items-center tw-justify-end">
+
                     {isLoggedIn === null ? (
                         <></>
-                    ) : !isLoggedIn ? (
-                        <div className='tw-flex'>
-                            <UserAvatarIcon className='tw-mr-4' />
-                            <Button type="submit" text="Login" width="tw-w-20 custom-sm:tw-w-16" height='tw-h-10' textColor='tw-text-black' color="tw-bg-white" onClick={handleLoginClick} />
+                    ) : !isLoggedIn && !session?.user ? (
+                        <div className="tw-flex">
+                            <UserAvatarIcon className="tw-mr-4" />
+                            <Button
+                                type="submit"
+                                text="Login"
+                                width="tw-w-20 custom-sm:tw-w-16"
+                                height="tw-h-10"
+                                textColor="tw-text-black"
+                                color="tw-bg-white"
+                                onClick={handleLoginClick}
+                            />
                         </div>
                     ) : (
                         <>
-                            <div className='tw-flex'>
-                                <UserAvatarIcon className='tw-mr-4 tw-cursor-pointer' onClick={handleProfile} />
-                                <Button type="button" text="Logout" width="tw-w-20 custom-sm:tw-w-15" textColor='tw-text-black' color="tw-bg-white" onClick={handleSignOutClick} />
-                            </div>
-                            <div className='tw-relative'>
-                                <div className='tw-flex tw-items-center tw-cursor-pointer' onClick={handleCartClick}>
+                            <span> {session?.user?.name}</span>
+                            <UserAvatarIcon className="tw-mr-4" />
+                            <Button
+                                type="button"
+                                text="Logout"
+                                width="tw-w-20 custom-sm:tw-w-15"
+                                textColor="tw-text-black"
+                                color="tw-bg-white"
+                                onClick={handleSignOutClick}
+                            />
+                            <div className="tw-relative">
+                                <div
+                                    className="tw-flex tw-items-center tw-cursor-pointer"
+                                    onClick={handleCartClick}
+                                >
                                     <i className="fas fa-shopping-cart tw-w-5 tw-h-5 tw-text-white tw-mr-2"></i>
-                                    <span className="tw-bg-white tw-text-black tw-rounded-full tw-px-2 tw-py-1 tw-text-sm">{cartItems.length}</span>
+                                    <span className="tw-bg-white tw-text-black tw-rounded-full tw-px-2 tw-py-1 tw-text-sm">
+                                        {cartItems.length}
+                                    </span>
                                 </div>
                                 {dropdownOpen && (
-
-                                    <div
-                                        className={`tw-absolute tw-right-0 tw-top-full tw-mt-2 tw-bg-white tw-text-black tw-shadow-lg tw-rounded-md tw-w-64 tw-p-4 tw-border tw-border-gray-200 ${dropdownOpen ? 'tw-animate-fadeIn' : 'tw-animate-fadeOut'}`}
-                                    >
-                                        <h4 className='tw-font-bold tw-text-lg tw-border-b tw-pb-2'>Cart Items</h4>
-                                        <ul className='tw-space-y-2'>
+                                    <div className={`tw-absolute tw-right-0 tw-top-full tw-mt-2 tw-bg-white tw-text-black tw-shadow-lg tw-rounded-md tw-w-64 tw-p-4 tw-border tw-border-gray-200`}>
+                                        <h4 className="tw-font-bold tw-text-lg tw-border-b tw-pb-2">Cart Items</h4>
+                                        <ul className="tw-space-y-2">
                                             {cartItems.length === 0 ? (
-                                                <li className='tw-text-gray-500'>No items in the cart</li>
+                                                <li className="tw-text-gray-500">No items in the cart</li>
                                             ) : (
                                                 Object.values(
-                                                    cartItems.reduce((acc: { [key: string]: any }, item: any) => {
-                                                        // เช็คว่ามีสินค้านี้อยู่ใน acc หรือยัง
-                                                        if (acc[item.productName]) {
-                                                            // ถ้ามีอยู่แล้ว ให้เพิ่ม quantity
-                                                            acc[item.productName].quantity += item.quantity;
-                                                        } else {
-                                                            // ถ้ายังไม่มี ให้นำสินค้าเข้า acc
-                                                            acc[item.productName] = { ...item };
-                                                        }
-                                                        return acc;
-                                                    }, {})
+                                                    cartItems.reduce(
+                                                        (acc: { [key: string]: any }, item: any) => {
+                                                            if (acc[item.productName]) {
+                                                                acc[item.productName].quantity += item.quantity;
+                                                            } else {
+                                                                acc[item.productName] = { ...item };
+                                                            }
+                                                            return acc;
+                                                        },
+                                                        {}
+                                                    )
                                                 ).map((item, index) => {
-                                                    const isLocalImage = !item.images.startsWith('http://') && !item.images.startsWith('https://');
-                                                    const imageUrl = isLocalImage ? `${imagesPath}${item.images}` : item.images;
+                                                    const isLocalImage =
+                                                        !item.images.startsWith('http://') &&
+                                                        !item.images.startsWith('https://');
+                                                    const imageUrl = isLocalImage
+                                                        ? `${imagesPath}${item.images}`
+                                                        : item.images;
 
                                                     return (
                                                         <li
-                                                            key={item.cartsId ? item.cartsId : `item-${index}`}
-                                                            className='tw-flex tw-items-center tw-p-2 tw-border-b tw-border-gray-200 hover:bg-gray-100 transition-colors duration-300'
+                                                            key={index}
+                                                            className="tw-flex tw-items-center tw-justify-between"
                                                         >
-                                                            <img
-                                                                src={imageUrl}
-                                                                alt={item.productName}
-                                                                className='tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2'
-                                                            />
-                                                            <div className='tw-flex-1'>
-                                                                <span className='tw-font-semibold'>{item.productName}</span>
-                                                                <div className='tw-text-gray-600'>Quantity: {item.quantity}</div>
+                                                            <div className="tw-flex tw-items-center">
+                                                                <Image
+                                                                    src={imageUrl}
+                                                                    alt={item.productName}
+                                                                    className="tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2"
+                                                                    onError={(e) => {
+                                                                        e.currentTarget.src = '/path/to/fallback/image.png';
+                                                                    }}
+                                                                />
+                                                                <span>{item.productName}</span>
                                                             </div>
                                                             <button
-                                                                onClick={() => handleDelete(Number(item.cartsId))}
-                                                                className='tw-text-red-600 tw-ml-4 hover:tw-text-red-800'
+                                                                onClick={() => handleDelete(item.id)}
+                                                                className="tw-text-red-500 tw-p-1 tw-rounded hover:tw-bg-red-100"
                                                             >
-                                                                <i className="fas fa-trash"></i>
+                                                                Remove
                                                             </button>
                                                         </li>
                                                     );
                                                 })
                                             )}
                                         </ul>
-                                        {cartItems.length > 0 && (
-                                            <Link
-                                                href='/pages/order'
-                                                className='tw-block tw-bg-blue-600 tw-text-white tw-text-center tw-mt-4 tw-py-2 tw-rounded-md tw-transition tw-duration-300 tw-hover:bg-blue-700'
-                                            >
-                                                View Cart
-                                            </Link>
-                                        )}
                                     </div>
                                 )}
                             </div>
                         </>
                     )}
                 </div>
-                {alertMessage && alertType && (
-                    <Alert type={alertType} message={alertMessage} />
-                )}
             </div>
+            {alertMessage && alertType && (
+                <Alert type={alertType} message={alertMessage} />
+            )}
         </nav>
     );
 };

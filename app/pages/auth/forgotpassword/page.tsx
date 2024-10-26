@@ -10,12 +10,11 @@ import Link from 'next/link';
 
 
 const ForgotPasswordPage = () => {
-  const [userName, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // Changed from username to email
   const [newPassword, setNewPassword] = useState('');
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter();
-
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -27,15 +26,15 @@ const ForgotPasswordPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userName, newPassword: hashedPassword }),
+        body: JSON.stringify({ email, newPassword: hashedPassword }), // Updated payload to use email
       });
 
       if (res.ok) {
         const data = await res.json();
-        setUsername('');
-        setNewPassword('');
+        setEmail(''); // Clear email field
+        setNewPassword(''); // Clear password field
         router.push('/pages/auth/login');
-        setAlertMessage('Change password successful');
+        setAlertMessage('Password reset successful');
         setAlertType('success');
       } else {
         const errorMessage = 'Something went wrong. Please try again.';
@@ -58,8 +57,9 @@ const ForgotPasswordPage = () => {
       return () => clearTimeout(timer);
     }
   }, [alertMessage]);
+
   return (
-    <div className="tw-min-h-screen tw-flex tw-items-center tw-justify-center tw-min-h-screen tw-bg-gradient-to-r tw-from-blue-600 tw-to-purple-500">
+    <div className="tw-flex tw-items-center tw-justify-center tw-min-h-screen tw-bg-gradient-to-r tw-from-blue-600 tw-to-purple-500">
       <div className="tw-w-full tw-max-w-lg tw-bg-white tw-p-10 tw-rounded-3xl tw-shadow-2xl tw-relative tw-overflow-hidden">
         <div className="tw-absolute tw-inset-0 tw-bg-gradient-to-br  tw-bg-blue-500 tw-opacity-10 tw-pointer-events-none"></div>
         <h2 className="tw-text-3xl tw-font-bold tw-text-center tw-text-gray-800 tw-mb-6">
@@ -68,23 +68,23 @@ const ForgotPasswordPage = () => {
 
         <form onSubmit={handleSubmit} className="tw-mt-8">
           <div className="tw-mb-6">
-            <label htmlFor="username" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
-              Username
+            <label htmlFor="email" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
+              Email
             </label>
             <TextInput
-              type="text"
-              id="username"
-              value={userName}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)} // Updated to set email
               required
-              placeholder="Enter your username"
+              placeholder="Enter your email"
               className="tw-w-full"
             />
           </div>
 
           <div className="tw-mb-6">
             <label htmlFor="password" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
-              Password
+              New Password
             </label>
             <TextInput
               type="password"
@@ -92,13 +92,13 @@ const ForgotPasswordPage = () => {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
-              placeholder="Enter your password"
+              placeholder="Enter your new password"
               className="tw-w-full"
             />
           </div>
           <Button
             type="submit"
-            text="Forgot Password"
+            text="Reset Password"
             className='tw-w-full tw-py-3 tw-bg-gradient-to-r tw-from-purple-500 tw-to-blue-600 tw-text-white tw-rounded-lg tw-shadow-lg tw-transform tw-hover:scale-105 tw-transition-all tw-duration-300'
           />
         </form>

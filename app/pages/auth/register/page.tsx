@@ -7,23 +7,17 @@ import Link from 'next/link';
 import Alert from '../../../../components/Alert';
 import Dropdown from '../../../../components/Dropdown';
 import Button from '../../../../components/Button';
-import SignupIcon from '../../../../public/iconsSignUp.svg';
 import TextInput from '@/components/Input';
-
 
 const RegisterPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName] = useState('');
-  const [lastName] = useState('');
-  const [email] = useState('');
-  const [phoneNumber] = useState('');
-  const [address] = useState('');
-  const [userImage] = useState('');
+  const [email, setEmail] = useState('');  // <-- Added email state
   const [roleId, setRoleId] = useState(0);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
   const router = useRouter();
+
   useEffect(() => {
     if (alertMessage) {
       const timer = setTimeout(() => {
@@ -35,7 +29,6 @@ const RegisterPage = () => {
     }
   }, [alertMessage]);
 
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -44,14 +37,15 @@ const RegisterPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password, roleId, firstName, lastName, email, phoneNumber, address, userImage }),
-
+        body: JSON.stringify({ username, password, roleId, email }),  // <-- Send email along with form data
       });
+
       if (res.ok) {
         setUsername('');
         setPassword('');
-        setRoleId(0)
-        router.push('/pages/auth/login'); // Redirect to a protected route
+        setEmail('');  // <-- Clear email after success
+        setRoleId(0);
+        router.push('/pages/auth/login'); // Redirect to login
         setAlertMessage('Register successful');
         setAlertType('success');
       } else {
@@ -64,8 +58,9 @@ const RegisterPage = () => {
       setAlertType('error');
     }
   };
+
   const handleSelect = (roleId: number) => {
-    setRoleId(roleId)
+    setRoleId(roleId);
   };
 
   return (
@@ -77,6 +72,7 @@ const RegisterPage = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="tw-mt-8">
+          {/* Role Dropdown */}
           <div className="tw-mb-6">
             <label htmlFor="role" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700 ">
               Role
@@ -90,6 +86,22 @@ const RegisterPage = () => {
               className="tw-w-full tw-mt-2 tw-px-8 tw-py-3 tw-border tw-border-gray-300 tw-rounded-lg tw-shadow-sm tw-focus:outline-none tw-focus:ring tw-text-start"
             />
           </div>
+          <div className="tw-mb-6">
+            <label htmlFor="email" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
+              Email
+            </label>
+            <TextInput
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="Enter your email"
+              className="tw-w-full tw-mt-2 tw-px-4 tw-py-3 tw-border tw-border-gray-300 tw-rounded-lg tw-shadow-sm tw-focus:outline-none tw-focus:ring"
+            />
+          </div>
+
+          {/* Username Input */}
           <div className="tw-mb-6">
             <label htmlFor="username" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
               Username
@@ -105,6 +117,10 @@ const RegisterPage = () => {
             />
           </div>
 
+          {/* Email Input (newly added) */}
+
+
+          {/* Password Input */}
           <div className="tw-mb-6">
             <label htmlFor="password" className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
               Password
@@ -116,32 +132,29 @@ const RegisterPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="Enter your password"
-              className="tw-w-full tw-mt-2 tw-px-4 tw-py-3 tw-border tw-border-gray-300 tw-rounded-lg tw-shadow-sm tw-focus:outline-none tw-focus:ring "
+              className="tw-w-full tw-mt-2 tw-px-4 tw-py-3 tw-border tw-border-gray-300 tw-rounded-lg tw-shadow-sm tw-focus:outline-none tw-focus:ring"
             />
           </div>
 
           <Button
             type="submit"
             text="Register"
-            className='tw-w-full tw-py-3 tw-bg-gradient-to-r tw-from-purple-500 tw-to-blue-600 tw-text-white tw-rounded-lg tw-shadow-lg tw-transform tw-hover:scale-105 tw-transition-all tw-duration-300'
+            className="tw-w-full tw-py-3 tw-bg-gradient-to-r tw-from-purple-500 tw-to-blue-600 tw-text-white tw-rounded-lg tw-shadow-lg tw-transform tw-hover:scale-105 tw-transition-all tw-duration-300"
           />
         </form>
+
         <div className="tw-mt-6 tw-flex tw-items-center tw-justify-between">
           <Link href="/pages/auth/forgotpassword" className="tw-text-sm tw-text-purple-600 hover:tw-underline">
             Forgot your password?
           </Link>
-          <Link href="/pages/auth/login" className='tw-text-sm tw-text-purple-600 hover:tw-underline'>
+          <Link href="/pages/auth/login" className="tw-text-sm tw-text-purple-600 hover:tw-underline">
             Login
           </Link>
         </div>
       </div>
 
-      {
-        alertMessage && alertType && (
-          <Alert type={alertType} message={alertMessage} />
-        )
-      }
-    </div >
+      {alertMessage && alertType && <Alert type={alertType} message={alertMessage} />}
+    </div>
   );
 };
 

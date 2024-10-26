@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         roleId: roleId,
         firstName: firstName || null,
         lastName: lastName || null,
-        email: email || null,
+        email: email,
         phoneNumber: phoneNumber || null,
         address: address || null,
         userImage: userImage || null,

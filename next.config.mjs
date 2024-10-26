@@ -41,10 +41,9 @@ const nextConfig = {
       { protocol: "https", hostname: "www.veniceresorthotel.com" },
       { protocol: "https", hostname: "www.taokaecafe.com" },
       { protocol: "https", hostname: "www.bakery.com" },
-      
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
-  
 
   webpack(config) {
     config.module.rules.push({
