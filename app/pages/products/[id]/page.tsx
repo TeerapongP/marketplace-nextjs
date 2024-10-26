@@ -200,14 +200,16 @@ const ProductPage = () => {
       ) : (
         <>
           <div className="tw-flex tw-justify-end tw-mt-4 tw-mr-20">
-            <Button
-              type="button"
-              text="เพิ่มสินค้า"
-              width="tw-w-full sm:tw-w-auto"  // Adjust width for smaller screens
-              textColor="tw-text-white"
-              color="tw-bg-blue-700"
-              onClick={() => handleAddButtonClick(Number(shopId))}
-            />
+            {(roleId === 3 || roleId === 1) && (
+              <Button
+                type="button"
+                text="เพิ่มสินค้า"
+                width="tw-w-full sm:tw-w-auto"  // Adjust width for smaller screens
+                textColor="tw-text-white"
+                color="tw-bg-blue-700"
+                onClick={() => handleAddButtonClick(Number(shopId))}
+              />
+            )}
           </div>
 
           <div className='tw-w-full'>

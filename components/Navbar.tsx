@@ -35,11 +35,20 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
 
     const handleLoginClick = () => router.push('/pages/auth/login');
     const handleSignOutClick = () => {
+        // Remove items from local storage
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('roleId');
-        router.push('/pages/auth/login');
-        setIsLoggedIn(false);
+        localStorage.removeItem('userName');
+        signOut({
+            redirect: false, // Prevent automatic redirect (if needed)
+        }).then(() => {
+            // Redirect to login page after sign-out
+            router.push('/pages/auth/login');
+            setIsLoggedIn(false);
+        }).catch((err) => {
+            console.error('Error signing out:', err);
+        });
     };
     const handleCartClick = () => setDropdownOpen(prev => !prev);
 
@@ -112,7 +121,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                         </div>
                     ) : (
                         <>
-                            <span> {session?.user?.name}</span>
+                            <span>{session?.user?.name ?? localStorage.getItem('userName')}</span>
                             <UserAvatarIcon className="tw-mr-4" />
                             <Button
                                 type="button"
@@ -158,7 +167,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                     const imageUrl = isLocalImage
                                                         ? `${imagesPath}${item.images}`
                                                         : item.images;
-
                                                     return (
                                                         <li
                                                             key={index}
@@ -169,6 +177,8 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                                     src={imageUrl}
                                                                     alt={item.productName}
                                                                     className="tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2"
+                                                                    width={64}
+                                                                    height={64}
                                                                     onError={(e) => {
                                                                         e.currentTarget.src = '/path/to/fallback/image.png';
                                                                     }}
@@ -176,7 +186,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                                 <span>{item.productName}</span>
                                                             </div>
                                                             <button
-                                                                onClick={() => handleDelete(item.id)}
+                                                                onClick={() => handleDelete(item.cartsId)}
                                                                 className="tw-text-red-500 tw-p-1 tw-rounded hover:tw-bg-red-100"
                                                             >
                                                                 Remove
