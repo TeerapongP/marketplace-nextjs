@@ -9,7 +9,7 @@ const DeliveriesPage: NextPage = () => {
   const [deliveries, setDeliveries] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertType, setAlertType] = useState<'success' | 'error' | null>(null);
+  const [alertType, setAlertType] = useState<'success' | 'error' | 'warning' | 'info' | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -30,8 +30,8 @@ const DeliveriesPage: NextPage = () => {
         const data = await response.json();
         setDeliveries(data);
       } catch (error) {
-        setAlertMessage(`ERROR: ${error}`);
-        setAlertType('error');
+        setAlertMessage(`No shipments found for this user`);
+        setAlertType('warning');
       } finally {
         setLoading(false);
       }
