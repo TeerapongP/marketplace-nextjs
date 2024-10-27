@@ -35,7 +35,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
 
     const handleLoginClick = () => router.push('/pages/auth/login');
     const handleSignOutClick = () => {
-        // Remove items from local storage
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('roleId');
@@ -53,9 +52,16 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
     const handleCartClick = () => setDropdownOpen(prev => !prev);
 
     const filteredMenuItems = useMemo(() => {
-        return userRoleId === 0
-            ? menuItems.slice(0, 2)
-            : menuItems.filter(item => item.roles.some(role => role.roleId === Number(userRoleId)));
+        // If userRoleId is 0, show first 2 items
+        if (userRoleId === 0) {
+            return menuItems.slice(0, 2);
+        }
+
+        // If roleId exists in roles or roles array is empty, show the item
+        return menuItems.filter(item =>
+            item.roles.length === 0 || // Show if roles array is empty
+            item.roles.some(role => role.roleId === Number(userRoleId)) // Show if role matches userRoleId
+        );
     }, [menuItems, userRoleId]);
 
     const handleDelete = async (cartsId: number) => {
@@ -86,6 +92,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
     };
 
     return (
+
         <nav className={`tw-bg-custom-green tw-px-4 tw-py-2 tw-fixed tw-w-full tw-top-0 tw-left-0 tw-z-50 ${className}`}>
             <div className='tw-grid tw-grid-cols-2 tw-w-full'>
                 <div className='tw-w-full tw-flex tw-space-x-4'>
@@ -93,13 +100,18 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                         Market delivery
                     </Link>
                     <ul className="tw-flex tw-space-x-4 tw-text-white lg:tw-text-xl md:tw-text-base sm:tw-text-base custom-sm:text-base custom-sm:tw-text-center tw-tw-ml-5">
-                        {filteredMenuItems.map(item => (
-                            <li key={item.menuName}>
-                                <Link href={item.menuUrl} className="tw-hover:tw-text-gray-400">
-                                    {item.menuName}
-                                </Link>
-                            </li>
-                        ))}
+                        {filteredMenuItems.length > 0 ? (
+                            filteredMenuItems.map(item => (
+                                <li key={item.menuName}>
+                                    <Link href={item.menuUrl} className="tw-hover:tw-text-gray-400">
+                                        {item.menuName}
+                                    </Link>
+                                </li>
+                            ))
+                        ) : (
+                            <li>No menu items available</li>
+                        )}
+
                     </ul>
                 </div>
                 <div className="tw-flex tw-space-x-4 tw-items-center tw-justify-end">

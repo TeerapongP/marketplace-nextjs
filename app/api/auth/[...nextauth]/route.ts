@@ -30,10 +30,8 @@ export const authOptions: NextAuthOptions = {
         jwt: async ({ token, user }) => {
             if (user) {
                 // If user object is available (on sign-in)
-                console.log('User signed in:', user); // Debugging log
-
                 const existingUser = await prisma.user.findUnique({
-                    where: { email: user.email || '' },
+                    where: { email: user.email ?? '' },
                 });
 
                 if (!existingUser) {
@@ -41,18 +39,15 @@ export const authOptions: NextAuthOptions = {
                     const hashedPassword = await bcrypt.hash('', 10); // Hash an empty password
                     const newUser = await prisma.user.create({
                         data: {
-                            userName: user.name || '',
-                            email: user.email || '',
+                            userName: user.name ?? '',
+                            email: user.email ?? '',
                             userImage: user.image,
                             roleId: 2,
-                            firstName: user.name?.split(' ')[0] || '',
-                            lastName: user.name?.split(' ')[1] || '',
+                            firstName: user.name?.split(' ')[0] ?? '',
+                            lastName: user.name?.split(' ')[1] ?? '',
                             password: hashedPassword,
                         },
                     });
-
-                    console.log('New user created:', newUser); // Debugging log
-
                     // Create an account record for OAuth provider
                     await prisma.account.create({
                         data: {
@@ -79,13 +74,19 @@ export const authOptions: NextAuthOptions = {
                 } else {
                     // Update the user's information if needed
                     await prisma.user.update({
-                        where: { email: user.email || '' },
+                        where: { email: user.email ?? '' },
                         data: {
                             userImage: user.image,
                         },
                     });
 
+                    // Sign a custom JWT token
+                    const tokenPayload = { userId: existingUser.userId, email: existingUser.email, roleId: 2 };
+                    const secret = process.env.JWT_SECRET as string; // Ensure your secret is set in the environment variables
+                    const customToken = jwt.sign(tokenPayload, secret, { expiresIn: '5h' });
+
                     // Assign existing user details to the token
+                    token.customToken = customToken;
                     token.id = existingUser.userId;
                     token.name = existingUser.userName;
                     token.email = existingUser.email;
