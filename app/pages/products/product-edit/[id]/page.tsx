@@ -62,7 +62,6 @@ const ProductEditPage = () => {
 
       const isLocalImage = !data.images.startsWith('http://') && !data.images.startsWith('https://');
       const imageUrl = isLocalImage ? `${imagesPath}${data.images}` : data.images;
-      console.log(imageUrl);
 
       setData(data);
       setProductId(data.productId);
