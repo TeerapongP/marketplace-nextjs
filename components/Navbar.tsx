@@ -161,17 +161,14 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                 <li className="tw-text-gray-500">No items in the cart</li>
                                             ) : (
                                                 Object.values(
-                                                    cartItems.reduce(
-                                                        (acc: { [key: string]: any }, item: any) => {
-                                                            if (acc[item.productName]) {
-                                                                acc[item.productName].quantity += item.quantity;
-                                                            } else {
-                                                                acc[item.productName] = { ...item };
-                                                            }
-                                                            return acc;
-                                                        },
-                                                        {}
-                                                    )
+                                                    cartItems.reduce((acc: { [key: string]: any }, item: any) => {
+                                                        if (acc[item.productName]) {
+                                                            acc[item.productName].quantity += item.quantity;
+                                                        } else {
+                                                            acc[item.productName] = { ...item };
+                                                        }
+                                                        return acc;
+                                                    }, {})
                                                 ).map((item, index) => {
                                                     const isLocalImage =
                                                         !item.images.startsWith('http://') &&
@@ -181,33 +178,35 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                         : item.images;
                                                     return (
                                                         <li
-                                                            key={index}
-                                                            className="tw-flex tw-items-center tw-justify-between"
+                                                            key={`${item.productId}-${index}`} // Ensure key is unique
+                                                            className='tw-flex tw-items-center tw-p-2 tw-border-b tw-border-gray-200 hover:bg-gray-100 transition-colors duration-300'
                                                         >
-                                                            <div className="tw-flex tw-items-center">
-                                                                <Image
-                                                                    src={imageUrl}
-                                                                    alt={item.productName}
-                                                                    className="tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2"
-                                                                    width={64}
-                                                                    height={64}
-                                                                    onError={(e) => {
-                                                                        e.currentTarget.src = '/path/to/fallback/image.png';
-                                                                    }}
-                                                                />
-                                                                <span>{item.productName}</span>
+                                                            <Image
+                                                                src={imageUrl}
+                                                                alt={item.productName}
+                                                                className="tw-h-16 tw-w-16 tw-object-cover tw-rounded-md tw-mr-2"
+                                                                width={64}
+                                                                height={64}
+                                                                onError={(e) => {
+                                                                    e.currentTarget.src = '/path/to/fallback/image.png';
+                                                                }}
+                                                            />
+                                                            <div className='tw-flex-1'>
+                                                                <span className='tw-font-semibold'>{item.productName}</span>
+                                                                <div className='tw-text-gray-600'>Quantity: {item.quantity}</div>
                                                             </div>
                                                             <button
                                                                 onClick={() => handleDelete(item.cartsId)}
-                                                                className="tw-text-red-500 tw-p-1 tw-rounded hover:tw-bg-red-100"
+                                                                className='tw-text-red-600 tw-ml-4 hover:tw-text-red-800'
                                                             >
-                                                                Remove
+                                                                <i className="fas fa-trash"></i>
                                                             </button>
                                                         </li>
                                                     );
                                                 })
                                             )}
                                         </ul>
+
                                     </div>
                                 )}
                             </div>

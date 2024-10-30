@@ -200,7 +200,7 @@ const ProductPage = () => {
       ) : (
         <>
           <div className="tw-flex tw-justify-end tw-mt-4 tw-mr-20">
-            {(roleId === 3 || roleId === 1) && (
+            {(roleId === 4 || roleId === 1) && (
               <Button
                 type="button"
                 text="เพิ่มสินค้า"
