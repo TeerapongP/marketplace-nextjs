@@ -206,7 +206,14 @@ const Navbar: React.FC<NavbarProps> = ({ userRoleId, className, menuItems }) => 
                                                 })
                                             )}
                                         </ul>
-
+                                        {cartItems.length > 0 && (
+                                            <Link
+                                                href='/pages/order'
+                                                className='tw-block tw-bg-blue-600 tw-text-white tw-text-center tw-mt-4 tw-py-2 tw-rounded-md tw-transition tw-duration-300 tw-hover:bg-blue-700'
+                                            >
+                                                View Cart
+                                            </Link>
+                                        )}
                                     </div>
                                 )}
                             </div>
